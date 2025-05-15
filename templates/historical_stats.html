@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Análise Histórica{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Análise Histórica e Previsões</h4>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('historical_stats') }}" class="row g-3">
+                <div class="col-md-6">
+                    <label for="period" class="form-label">Período de Análise</label>
+                    <select name="period" id="period" class="form-select" required>
+                        <option value="">Selecione um período...</option>
+                        <option value="week" {% if period == 'week' %}selected{% endif %}>Última Semana</option>
+                        <option value="month" {% if period == 'month' %}selected{% endif %}>Último Mês</option>
+                        <option value="year" {% if period == 'year' %}selected{% endif %}>Último Ano</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="prediction_type" class="form-label">Método de Previsão</label>
+                    <select name="prediction_type" id="prediction_type" class="form-select" required>
+                        <option value="frequency" {% if prediction_type == 'frequency' %}selected{% endif %}>
+                            Análise de Frequência
+                        </option>
+                        <option value="bayes" {% if prediction_type == 'bayes' %}selected{% endif %}>
+                            Análise Bayesiana
+                        </option>
+                        <option value="pattern" {% if prediction_type == 'pattern' %}selected{% endif %}>
+                            Análise de Padrões
+                        </option>
+                        <option value="combined" {% if prediction_type == 'combined' %}selected{% endif %}>
+                            Análise Combinada
+                        </option>
+                    </select>
+                </div>
+                
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Analisar</button>
+                </div>
+            </form>
+
+            {% if error %}
+                <div class="alert alert-danger mt-3">{{ error }}</div>
+            {% endif %}
+
+            {% if stats %}
+                <div class="mt-4">
+                    <h5>{{ stats.method_name }}</h5>
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>Números mais prováveis:</h6>
+                            <div class="number-predictions mb-3">
+                                {% for item in stats.frequent_numbers %}
+                                    <div class="number-badge">
+                                        <span class="badge bg-primary">{{ item.number }}</span>
+                                        <small class="text-muted">{{ "%.1f"|format(item.percentage) }}%</small>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <h6>Estatísticas do Período</h6>
+                                    <ul class="list-unstyled">
+                                        <li>Total de Jogos: {{ stats.total_games }}</li>
+                                        <li>Média de Pares: {{ "%.1f"|format(stats.avg_even) }}</li>
+                                        <li>Média de Ímpares: {{ "%.1f"|format(stats.avg_odd) }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.number-predictions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.number-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.number-badge small {
+    font-size: 0.7rem;
+    margin-top: 2px;
+}
+</style>
+{% endblock %}

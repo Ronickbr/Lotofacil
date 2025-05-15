@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="mt-4">Dashboard de Estatísticas</h1>
+
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    <i class="fas fa-exclamation-triangle"></i> {{ error }}
+</div>
+{% else %}
+    {% if top_numbers and frequencies %}
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar"></i> 5 Números Mais Frequentes
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for number, frequency in zip(top_numbers, frequencies) %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Número {{ number }}
+                                <span class="badge bg-primary rounded-pill">{{ frequency }} vezes</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-balance-scale"></i> Frequência de Pares e Ímpares
+                </div>
+                <div class="card-body">
+                    {% if even_count is defined and odd_count is defined %}
+                        <p><i class="fa-solid fa-circle-check text-success"></i> Pares: {{ even_count }}</p>
+                        <p><i class="fa-solid fa-circle-xmark text-danger"></i> Ímpares: {{ odd_count }}</p>
+                        
+                        <div class="progress mt-3">
+                            {% set total = even_count + odd_count %}
+                            {% set even_percentage = (even_count / total * 100) if total > 0 else 0 %}
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ even_percentage }}%"
+                                 aria-valuenow="{{ even_percentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ "%.1f"|format(even_percentage) }}%
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Dados não disponíveis</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-table"></i> Frequência por Posição
+                </div>
+                <div class="card-body">
+                    {% if position_freq %}
+                        <div class="table-responsive">
+                            {{ position_freq | safe }}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Dados não disponíveis</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle"></i> Nenhum dado disponível para exibição. Por favor, faça o upload de resultados primeiro.
+    </div>
+    {% endif %}
+{% endif %}
+{% endblock %}

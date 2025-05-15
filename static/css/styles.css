@@ -1,0 +1,23 @@
+/* Corrige altura do sidebar */
+.sidebar {
+    min-height: 100vh;
+}
+
+/* Estiliza cards de estatísticas */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Ajusta gráficos */
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+/* Estiliza números gerados */
+#numbers span {
+    font-size: 1.2em;
+    font-weight: bold;
+}
