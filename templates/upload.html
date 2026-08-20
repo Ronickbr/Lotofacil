@@ -59,12 +59,25 @@
                     <h4>Upload de Arquivo Excel</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST" enctype="multipart/form-data">
+                    <form id="excelUploadForm"
+                          method="POST"
+                          action="{{ request.path }}"
+                          enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="file" class="form-label">Selecione o arquivo (.xlsx)</label>
-                            <input class="form-control" type="file" id="file" name="file" accept=".xlsx">
+                            <input class="form-control"
+                                   type="file"
+                                   id="file"
+                                   name="file"
+                                   accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                   required>
+                            <div class="form-text">A primeira linha deve conter: Concurso, Data e Bola1 até Bola15.</div>
+                            <div id="fileInfo" class="small mt-2 text-muted" aria-live="polite"></div>
                         </div>
-                        <button type="submit" class="btn btn-secondary w-100">Processar Arquivo</button>
+                        <button id="uploadButton" type="submit" class="btn btn-secondary w-100">
+                            Processar Arquivo
+                        </button>
+                        <div id="uploadError" class="alert alert-danger mt-3 mb-0 d-none" role="alert"></div>
                     </form>
                 </div>
             </div>
@@ -72,8 +85,11 @@
     </div>
 
     <div class="card mt-4">
-        <div class="card-header">
-            <h4>Histórico de Concursos</h4>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Histórico de Concursos</h4>
+            <a href="{{ url_for('export_excel') }}" class="btn btn-success btn-sm">
+                <i class="fas fa-file-excel"></i> Exportar para Excel
+            </a>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -99,7 +115,7 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-danger" 
-                                            onclick="deleteConcurso({{ concurso.concurso }})">
+                                            onclick="deleteConcurso('{{ concurso.concurso }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -137,5 +153,67 @@ function deleteConcurso(concurso) {
         .catch(error => alert('Erro ao excluir concurso: ' + error));
     }
 }
+
+// Validação no navegador. O envio continua sendo feito pelo POST tradicional,
+// portanto funciona mesmo sem JavaScript no backend para receber o arquivo.
+(function configureExcelUpload() {
+    const form = document.getElementById('excelUploadForm');
+    const input = document.getElementById('file');
+    const info = document.getElementById('fileInfo');
+    const error = document.getElementById('uploadError');
+    const button = document.getElementById('uploadButton');
+
+    if (!form || !input) return;
+
+    function showError(message) {
+        error.textContent = message;
+        error.classList.remove('d-none');
+    }
+
+    function clearError() {
+        error.textContent = '';
+        error.classList.add('d-none');
+    }
+
+    input.addEventListener('change', function () {
+        clearError();
+        const file = input.files && input.files[0];
+        if (!file) {
+            info.textContent = '';
+            return;
+        }
+
+        const isXlsx = file.name.toLowerCase().endsWith('.xlsx');
+        if (!isXlsx) {
+            input.value = '';
+            info.textContent = '';
+            showError('Selecione um arquivo Excel no formato .xlsx.');
+            return;
+        }
+
+        const sizeKb = Math.max(1, Math.round(file.size / 1024));
+        info.textContent = `${file.name} — ${sizeKb} KB`;
+    });
+
+    form.addEventListener('submit', function (event) {
+        clearError();
+        const file = input.files && input.files[0];
+
+        if (!file) {
+            event.preventDefault();
+            showError('Selecione um arquivo Excel antes de continuar.');
+            return;
+        }
+
+        if (!file.name.toLowerCase().endsWith('.xlsx')) {
+            event.preventDefault();
+            showError('O arquivo precisa estar no formato .xlsx.');
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = 'Enviando arquivo...';
+    });
+})();
 </script>
 {% endblock %}
