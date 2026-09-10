@@ -46,11 +46,19 @@ def train_lotofacil_model(results, model_path='lotofacil_model.pkl'):
     return model, mean_accuracy
 
 
+def load_lotofacil_model(model_path='lotofacil_model.pkl'):
+    """
+    Loads trained RandomForest model from pickle file.
+    """
+    if not os.path.exists(model_path):
+        raise FileNotFoundError("Modelo não encontrado. Treine o modelo primeiro.")
+    return joblib.load(model_path)
+
+
 def predict_next_numbers(model, last_draw, top_k=10):
     """
     Uses trained model to predict top numbers for next draw given the last draw (15 integers).
     """
-    # Ensure input is 15 ball integers
     if len(last_draw) > 15:
         balls = [int(b) for b in last_draw[:15]]
     else:
@@ -59,7 +67,6 @@ def predict_next_numbers(model, last_draw, top_k=10):
     prediction = model.predict([balls])
     predicted_flat = [int(num) for num in prediction.flatten()]
 
-    # Filter valid Lotofácil numbers (1-25) and deduplicate
     valid_numbers = sorted(list(set([num for num in predicted_flat if 1 <= num <= 25])))
     return valid_numbers[:top_k]
 

@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
 import pandas as pd
 from datetime import datetime, timedelta
-import joblib
 from io import BytesIO
 from flask_mysqldb import MySQL
 import MySQLdb
@@ -16,6 +15,7 @@ from analysis import (
     analyze_consecutive_repeats,
     combine_analysis_methods,
     train_lotofacil_model,
+    load_lotofacil_model,
     predict_next_numbers,
     generate_suggested_games,
 )
@@ -105,11 +105,15 @@ app = Flask(__name__)
 app.jinja_env.globals.update(zip=zip)
 app.config.from_object(Config)
 
-# Inicializa o MySQL
+
+@app.context_processor
+def inject_now():
+    return {'now': datetime.now()}
+
+
 mysql = MySQL(app)
 
 
-# Rota principal
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -341,9 +345,9 @@ def train_model():
 def predict():
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         try:
-            model = joblib.load('lotofacil_model.pkl')
-        except FileNotFoundError:
-            return "Modelo não encontrado. Treine o modelo primeiro."
+            model = load_lotofacil_model('lotofacil_model.pkl')
+        except FileNotFoundError as e:
+            return str(e)
 
         cur = mysql.connection.cursor()
         cur.execute(
@@ -357,18 +361,39 @@ def predict():
 
         valid_numbers = predict_next_numbers(model, last_result, top_k=10)
 
-        response = "<h5>Números mais prováveis:</h5>"
-        response += "<div class='mb-4'>"
+        response = "<div class='mb-4'>"
+        response += (
+            "<h5 class='fw-bold mb-3 text-dark'><i class='fa-solid"
+            " fa-star text-warning me-2'></i>Dezenas Mais Prováveis (Top 10):</h5>"
+        )
+        response += "<div class='d-flex flex-wrap gap-2'>"
         for num in valid_numbers:
-            response += f"<span class='badge bg-primary m-1'>{num}</span>"
-        response += "</div>"
+            response += f"<span class='lottery-ball'>{num:02d}</span>"
+        response += "</div></div>"
 
         games = generate_suggested_games(valid_numbers, num_games=6)
 
-        response += "<h5>Jogos sugeridos:</h5><ul>"
+        response += (
+            "<h5 class='fw-bold mb-3 text-dark'><i class='fa-solid"
+            " fa-list-check text-success me-2'></i>Jogos Sugeridos:</h5>"
+        )
+        response += "<div class='d-flex flex-column gap-3'>"
         for i, game in enumerate(games, 1):
-            response += f"<li class='game'>Jogo {i}: {', '.join(map(str, game))}</li>"
-        response += "</ul>"
+            game_str = " ".join(f"{n:02d}" for n in game)
+            response += f"""
+            <div class='card p-3 border shadow-sm rounded-3 bg-white'>
+                <div class='d-flex justify-content-between align-items-center mb-2'>
+                    <span class='fw-bold text-primary'><i class='fa-solid fa-ticket me-2'></i>Jogo {i}</span>
+                    <button class='btn btn-sm btn-outline-secondary rounded-pill px-3' onclick='navigator.clipboard.writeText("{game_str}"); alert("Jogo {i} copiado para a área de transferência!");'>
+                        <i class='fa-regular fa-copy me-1'></i>Copiar Jogo
+                    </button>
+                </div>
+                <div class='d-flex flex-wrap gap-1'>
+            """
+            for num in game:
+                response += f"<span class='lottery-ball lottery-ball-sm'>{num:02d}</span>"
+            response += "</div></div>"
+        response += "</div>"
 
         return response
 

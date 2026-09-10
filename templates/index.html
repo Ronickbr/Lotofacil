@@ -1,8 +1,123 @@
 {% extends "base.html" %}
 
-{% block title %}Início{% endblock %}
+{% block title %}Início — Lotofácil Analytics{% endblock %}
 
 {% block content %}
-<h1>Bem-vindo ao Sistema Lotofácil</h1>
-<p>Use o menu superior para navegar pelas funcionalidades.</p>
+<div class="row align-items-center mb-5 p-4 rounded-4 text-white shadow" style="background: linear-gradient(135deg, #3c096c 0%, #5a189a 60%, #7b2cbf 100%);">
+    <div class="col-lg-8">
+        <h1 class="display-5 fw-bold mb-3">
+            <i class="fa-solid fa-clover text-warning me-2"></i>Lotofácil Analytics
+        </h1>
+        <p class="lead mb-4 opacity-90">
+            Plataforma de análise numérica estatística, inferência Bayesiana e modelos de aprendizado de máquina para otimização de jogos da Lotofácil.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('predict') }}" class="btn btn-warning btn-lg fw-semibold shadow-sm">
+                <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Gerar Previsão
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-lg fw-semibold">
+                <i class="fa-solid fa-chart-line me-2"></i>Ver Dashboard
+            </a>
+        </div>
+    </div>
+    <div class="col-lg-4 d-none d-lg-block text-center">
+        <div class="d-flex justify-content-center gap-2 flex-wrap p-3">
+            <span class="lottery-ball lottery-ball-lg">01</span>
+            <span class="lottery-ball lottery-ball-lg ball-even">05</span>
+            <span class="lottery-ball lottery-ball-lg">11</span>
+            <span class="lottery-ball lottery-ball-lg ball-odd">15</span>
+            <span class="lottery-ball lottery-ball-lg ball-even">22</span>
+            <span class="lottery-ball lottery-ball-lg">25</span>
+        </div>
+    </div>
+</div>
+
+<h3 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-grid-2 me-2"></i>Funcionalidades do Sistema</h3>
+
+<div class="row g-4">
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-custom h-100">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="mb-3 text-primary fs-2">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <h5 class="card-title fw-bold">Dashboard Geral</h5>
+                <p class="card-text text-muted flex-grow-1">
+                    Estatísticas gerais dos concursos cadastrados, ranking de frequência de dezenas e distribuição par/ímpar.
+                </p>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary w-100 fw-semibold mt-3">
+                    Acessar Dashboard <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-custom h-100">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="mb-3 text-purple fs-2" style="color: #7b2cbf;">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <h5 class="card-title fw-bold">Análise Histórica</h5>
+                <p class="card-text text-muted flex-grow-1">
+                    Análise Bayesiana, modelo probabilístico, contagem de repetições em sorteios consecutivos e scores combinados.
+                </p>
+                <a href="{{ url_for('historical_stats') }}" class="btn btn-outline-purple w-100 fw-semibold mt-3" style="color: #7b2cbf; border-color: #7b2cbf;">
+                    Análise Histórica <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-custom h-100">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="mb-3 text-success fs-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <h5 class="card-title fw-bold">Previsão de Jogos</h5>
+                <p class="card-text text-muted flex-grow-1">
+                    Gere previsões e 6 sugestões de apostas balanceadas com base na inteligência do modelo preditivo.
+                </p>
+                <a href="{{ url_for('predict') }}" class="btn btn-outline-success w-100 fw-semibold mt-3">
+                    Gerar Apostas <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-custom h-100">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="mb-3 text-warning fs-2">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <h5 class="card-title fw-bold">Treinamento de IA</h5>
+                <p class="card-text text-muted flex-grow-1">
+                    Treine o modelo RandomForestClassifier com o histórico atualizado de concursos e avalie a acurácia.
+                </p>
+                <a href="{{ url_for('train_model') }}" class="btn btn-outline-warning text-dark w-100 fw-semibold mt-3">
+                    Treinar Modelo <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-custom h-100">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="mb-3 text-danger fs-2">
+                    <i class="fa-solid fa-file-excel"></i>
+                </div>
+                <h5 class="card-title fw-bold">Gestão de Dados</h5>
+                <p class="card-text text-muted flex-grow-1">
+                    Importe arquivos Excel (.xlsx) com o histórico de sorteios, adicione novos concursos ou exporte dados.
+                </p>
+                <a href="{{ url_for('upload') }}" class="btn btn-outline-danger w-100 fw-semibold mt-3">
+                    Gerenciar Dados <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

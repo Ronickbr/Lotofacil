@@ -1,84 +1,116 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard — Lotofácil Analytics{% endblock %}
 
 {% block content %}
-<h1 class="mt-4">Dashboard de Estatísticas</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Dashboard de Estatísticas</h2>
+        <p class="text-muted mb-0">Análise geral de frequência de dezenas e distribuições</p>
+    </div>
+</div>
 
 {% if error %}
-<div class="alert alert-danger" role="alert">
-    <i class="fas fa-exclamation-triangle"></i> {{ error }}
+<div class="alert alert-danger d-flex align-items-center rounded-3 shadow-sm" role="alert">
+    <i class="fas fa-exclamation-triangle fs-4 me-3"></i>
+    <div>{{ error }}</div>
 </div>
 {% else %}
     {% if top_numbers and frequencies %}
-    <div class="row mt-4">
+    <div class="row g-4 mb-4">
+        <!-- Top Numbers Card -->
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-chart-bar"></i> 5 Números Mais Frequentes
+            <div class="card card-custom h-100">
+                <div class="card-header card-header-custom d-flex align-items-center">
+                    <i class="fas fa-trophy text-warning me-2"></i> 5 Dezenas Mais Sorteadas
                 </div>
-                <div class="card-body">
-                    <ul class="list-group">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-column gap-3">
                         {% for number, frequency in zip(top_numbers, frequencies) %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Número {{ number }}
-                                <span class="badge bg-primary rounded-pill">{{ frequency }} vezes</span>
-                            </li>
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-light">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="lottery-ball">{{ "%02d"|format(number) }}</span>
+                                    <span class="fw-semibold fs-6">Número {{ number }}</span>
+                                </div>
+                                <span class="badge bg-primary rounded-pill px-3 py-2 fs-6">{{ frequency }} sorteios</span>
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Parity Card -->
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-balance-scale"></i> Frequência de Pares e Ímpares
+            <div class="card card-custom h-100">
+                <div class="card-header card-header-custom d-flex align-items-center">
+                    <i class="fas fa-balance-scale text-success me-2"></i> Distribuição Pares vs Ímpares
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4 d-flex flex-column justify-content-center">
                     {% if even_count is defined and odd_count is defined %}
-                        <p><i class="fa-solid fa-circle-check text-success"></i> Pares: {{ even_count }}</p>
-                        <p><i class="fa-solid fa-circle-xmark text-danger"></i> Ímpares: {{ odd_count }}</p>
-                        
-                        <div class="progress mt-3">
-                            {% set total = even_count + odd_count %}
-                            {% set even_percentage = (even_count / total * 100) if total > 0 else 0 %}
-                            <div class="progress-bar bg-success" role="progressbar" 
+                        {% set total = even_count + odd_count %}
+                        {% set even_percentage = (even_count / total * 100) if total > 0 else 0 %}
+                        {% set odd_percentage = (odd_count / total * 100) if total > 0 else 0 %}
+
+                        <div class="row text-center mb-4">
+                            <div class="col-6">
+                                <div class="p-3 rounded-3 bg-success-subtle border border-success-subtle">
+                                    <h4 class="fw-bold text-success mb-1">{{ even_count }}</h4>
+                                    <span class="text-muted small">Pares ({{ "%.1f"|format(even_percentage) }}%)</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded-3 bg-danger-subtle border border-danger-subtle">
+                                    <h4 class="fw-bold text-danger mb-1">{{ odd_count }}</h4>
+                                    <span class="text-muted small">Ímpares ({{ "%.1f"|format(odd_percentage) }}%)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <label class="form-label fw-semibold text-muted mb-2">Proporção no Total de Números</label>
+                        <div class="progress rounded-pill shadow-sm" style="height: 24px;">
+                            <div class="progress-bar bg-success fw-bold" role="progressbar"
                                  style="width: {{ even_percentage }}%"
-                                 aria-valuenow="{{ even_percentage }}" 
-                                 aria-valuemin="0" 
-                                 aria-valuemax="100">
+                                 aria-valuenow="{{ even_percentage }}" aria-valuemin="0" aria-valuemax="100">
                                 {{ "%.1f"|format(even_percentage) }}%
+                            </div>
+                            <div class="progress-bar bg-danger fw-bold" role="progressbar"
+                                 style="width: {{ odd_percentage }}%"
+                                 aria-valuenow="{{ odd_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ "%.1f"|format(odd_percentage) }}%
                             </div>
                         </div>
                     {% else %}
-                        <p class="text-muted">Dados não disponíveis</p>
+                        <p class="text-muted text-center my-4">Dados não disponíveis</p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-table"></i> Frequência por Posição
+    <!-- Position Frequency Card -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card card-custom">
+                <div class="card-header card-header-custom d-flex align-items-center">
+                    <i class="fas fa-table text-primary me-2"></i> Frequência de Aparição por Posição (Bola 1 a 15)
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     {% if position_freq %}
                         <div class="table-responsive">
                             {{ position_freq | safe }}
                         </div>
                     {% else %}
-                        <p class="text-muted">Dados não disponíveis</p>
+                        <p class="text-muted text-center">Dados não disponíveis</p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
     {% else %}
-    <div class="alert alert-info" role="alert">
-        <i class="fas fa-info-circle"></i> Nenhum dado disponível para exibição. Por favor, faça o upload de resultados primeiro.
+    <div class="alert alert-info d-flex align-items-center rounded-3 shadow-sm" role="alert">
+        <i class="fas fa-info-circle fs-4 me-3"></i>
+        <div>Nenhum dado disponível para exibição. Por favor, faça o upload de resultados primeiro.</div>
     </div>
     {% endif %}
 {% endif %}

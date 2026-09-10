@@ -1,133 +1,142 @@
 {% extends "base.html" %}
 
-{% block title %}Gerenciamento de Concursos{% endblock %}
+{% block title %}Gerenciamento de Concursos — Lotofácil Analytics{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="row g-4">
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="col-12">
+                    <div class="alert alert-{{ category }} alert-dismissible fade show rounded-3 shadow-sm mb-0" role="alert">
+                        <i class="fa-solid fa-info-circle me-2"></i>{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                 </div>
             {% endfor %}
         {% endif %}
     {% endwith %}
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Adicionar Novo Concurso</h4>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('add_concurso') }}">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="concurso" class="form-label">Número do Concurso</label>
-                                <input type="number" class="form-control" id="concurso" name="concurso" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="data" class="form-label">Data do Sorteio</label>
-                                <input type="date" class="form-control" id="data" name="data" required>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Números Sorteados</label>
-                            <div class="row">
-                                {% for i in range(1, 16) %}
-                                <div class="col-md-2 mb-2">
-                                    <input type="number" class="form-control" 
-                                           name="bola{{ i }}" 
-                                           placeholder="{{ i }}"
-                                           min="1" max="25" required>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Adicionar Concurso</button>
-                    </form>
-                </div>
+    <div class="col-lg-6">
+        <div class="card card-custom h-100">
+            <div class="card-header card-header-custom d-flex align-items-center">
+                <i class="fa-solid fa-plus-circle text-primary me-2"></i> Adicionar Concurso Manualmente
             </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Upload de Arquivo Excel</h4>
-                </div>
-                <div class="card-body">
-                    <form id="excelUploadForm"
-                          method="POST"
-                          action="{{ request.path }}"
-                          enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="file" class="form-label">Selecione o arquivo (.xlsx)</label>
-                            <input class="form-control"
-                                   type="file"
-                                   id="file"
-                                   name="file"
-                                   accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                   required>
-                            <div class="form-text">A primeira linha deve conter: Concurso, Data e Bola1 até Bola15.</div>
-                            <div id="fileInfo" class="small mt-2 text-muted" aria-live="polite"></div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('add_concurso') }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="concurso" class="form-label fw-semibold">Número do Concurso</label>
+                            <input type="number" class="form-control form-control-lg" id="concurso" name="concurso" placeholder="Ex: 3000" required>
                         </div>
-                        <button id="uploadButton" type="submit" class="btn btn-secondary w-100">
-                            Processar Arquivo
-                        </button>
-                        <div id="uploadError" class="alert alert-danger mt-3 mb-0 d-none" role="alert"></div>
-                    </form>
-                </div>
+                        <div class="col-md-6">
+                            <label for="data" class="form-label fw-semibold">Data do Sorteio</label>
+                            <input type="date" class="form-control form-control-lg" id="data" name="data" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">15 Números Sorteados (1 a 25)</label>
+                        <div class="row g-2">
+                            {% for i in range(1, 16) %}
+                            <div class="col-2-4 col-sm-2 col-md-2 mb-1">
+                                <input type="number" class="form-control text-center px-1 fw-bold"
+                                       name="bola{{ i }}"
+                                       placeholder="{{ i }}"
+                                       min="1" max="25" required>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm">
+                        <i class="fa-solid fa-check me-2"></i>Adicionar Concurso
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Histórico de Concursos</h4>
-            <a href="{{ url_for('export_excel') }}" class="btn btn-success btn-sm">
-                <i class="fas fa-file-excel"></i> Exportar para Excel
-            </a>
+    <div class="col-lg-6">
+        <div class="card card-custom h-100">
+            <div class="card-header card-header-custom d-flex align-items-center">
+                <i class="fa-solid fa-file-excel text-success me-2"></i> Importar Planilha Excel (.xlsx)
+            </div>
+            <div class="card-body p-4 d-flex flex-column">
+                <form id="excelUploadForm"
+                      method="POST"
+                      action="{{ request.path }}"
+                      enctype="multipart/form-data" class="flex-grow-1 d-flex flex-column justify-content-between">
+                    <div class="mb-3">
+                        <label for="file" class="form-label fw-semibold">Selecione o Arquivo Excel</label>
+                        <input class="form-control form-control-lg"
+                               type="file"
+                               id="file"
+                               name="file"
+                               accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                               required>
+                        <div class="form-text mt-2 text-muted">
+                            <i class="fa-solid fa-circle-info me-1"></i>O arquivo deve conter colunas: <code>Concurso</code>, <code>Data</code> e <code>Bola1</code> até <code>Bola15</code>.
+                        </div>
+                        <div id="fileInfo" class="small mt-2 text-success fw-semibold" aria-live="polite"></div>
+                    </div>
+                    <button id="uploadButton" type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm mt-3">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>Processar e Importar
+                    </button>
+                    <div id="uploadError" class="alert alert-danger mt-3 mb-0 d-none rounded-3" role="alert"></div>
+                </form>
+            </div>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Concurso</th>
-                            <th>Data</th>
-                            <th>Números Sorteados</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if concursos %}
-                            {% for concurso in concursos %}
+    </div>
+
+    <div class="col-12 mt-4">
+        <div class="card card-custom">
+            <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><i class="fa-solid fa-list me-2 text-primary"></i>Histórico de Concursos Cadastrados</span>
+                <a href="{{ url_for('export_excel') }}" class="btn btn-outline-success btn-sm fw-semibold">
+                    <i class="fas fa-file-excel me-1"></i> Exportar Excel
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
                             <tr>
-                                <td>{{ concurso.concurso }}</td>
-                                <td>{{ concurso.data_sorteio.strftime('%d/%m/%Y') if concurso.data_sorteio else 'N/A' }}</td>
-                                <td>
-                                    {% for i in range(1, 16) %}
-                                        <span class="badge bg-primary">{{ concurso['bola' ~ i] }}</span>
-                                    {% endfor %}
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-danger" 
-                                            onclick="deleteConcurso('{{ concurso.concurso }}')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
+                                <th class="ps-4">Concurso</th>
+                                <th>Data</th>
+                                <th>Dezenas Sorteadas</th>
+                                <th class="text-end pe-4">Ações</th>
                             </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="4" class="text-center">Nenhum concurso registrado</td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% if concursos %}
+                                {% for concurso in concursos %}
+                                <tr>
+                                    <td class="ps-4 fw-bold text-primary">#{{ concurso.concurso }}</td>
+                                    <td class="text-muted fw-semibold">{{ concurso.data_sorteio.strftime('%d/%m/%Y') if concurso.data_sorteio else 'N/A' }}</td>
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            {% for i in range(1, 16) %}
+                                                <span class="lottery-ball lottery-ball-sm">{{ "%02d"|format(concurso['bola' ~ i]) }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                onclick="deleteConcurso('{{ concurso.concurso }}')"
+                                                title="Excluir Concurso">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">Nenhum concurso registrado até o momento.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -135,7 +144,7 @@
 
 <script>
 function deleteConcurso(concurso) {
-    if (confirm('Tem certeza que deseja excluir este concurso?')) {
+    if (confirm('Tem certeza que deseja excluir o concurso #' + concurso + '?')) {
         fetch(`/delete-concurso/${concurso}`, {
             method: 'DELETE',
             headers: {
@@ -154,8 +163,6 @@ function deleteConcurso(concurso) {
     }
 }
 
-// Validação no navegador. O envio continua sendo feito pelo POST tradicional,
-// portanto funciona mesmo sem JavaScript no backend para receber o arquivo.
 (function configureExcelUpload() {
     const form = document.getElementById('excelUploadForm');
     const input = document.getElementById('file');
@@ -192,7 +199,7 @@ function deleteConcurso(concurso) {
         }
 
         const sizeKb = Math.max(1, Math.round(file.size / 1024));
-        info.textContent = `${file.name} — ${sizeKb} KB`;
+        info.textContent = `Arquivo selecionado: ${file.name} (${sizeKb} KB)`;
     });
 
     form.addEventListener('submit', function (event) {
@@ -212,7 +219,7 @@ function deleteConcurso(concurso) {
         }
 
         button.disabled = true;
-        button.textContent = 'Enviando arquivo...';
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processando arquivo...';
     });
 })();
 </script>

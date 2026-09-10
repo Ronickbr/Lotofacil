@@ -1,36 +1,37 @@
 {% extends "base.html" %}
 
-{% block title %}Previsão de Números{% endblock %}
+{% block title %}Previsão de Números — Lotofácil Analytics{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Previsão de Números da Lotofácil</h4>
-                </div>
-                <div class="card-body">
-                    <p class="alert alert-info">
-                        <i class="fas fa-info-circle"></i>
-                        O sistema irá gerar previsões baseadas no último resultado e criar 6 jogos sugeridos.
-                    </p>
-                    
-                    <div id="loading" style="display: none;" class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Carregando...</span>
-                        </div>
-                        <p class="mt-2">Gerando previsões...</p>
+<div class="row">
+    <div class="col-lg-10 offset-lg-1">
+        <div class="card card-custom">
+            <div class="card-header card-header-custom d-flex align-items-center">
+                <i class="fa-solid fa-wand-magic-sparkles text-success me-2"></i>
+                <span>Previsão Inteligente de Jogos</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info rounded-3 shadow-sm d-flex align-items-center mb-4">
+                    <i class="fas fa-info-circle fs-3 me-3 text-info"></i>
+                    <div>
+                        O algoritmo utiliza o modelo de inteligência artificial treinado para analisar a sequência do último concurso e gerar 6 jogos otimizados e balanceados.
                     </div>
-                    
-                    <div id="prediction-result" class="mt-3">
-                        <!-- Resultados serão exibidos aqui -->
-                    </div>
-                    
-                    <button id="predictButton" class="btn btn-success btn-lg btn-block w-100">
-                        <i class="fas fa-magic"></i> Gerar Previsão
-                    </button>
                 </div>
+
+                <div id="loading" style="display: none;" class="text-center my-5">
+                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-3 fw-semibold text-muted">Processando dados e gerando previsões...</p>
+                </div>
+
+                <div id="prediction-result">
+                    <!-- Resultados serão exibidos aqui via AJAX -->
+                </div>
+
+                <button id="predictButton" class="btn btn-success btn-lg w-100 fw-bold py-3 mt-3 shadow-sm">
+                    <i class="fas fa-magic me-2"></i>Gerar Previsão & Jogos Sugeridos
+                </button>
             </div>
         </div>
     </div>
@@ -41,10 +42,10 @@ document.getElementById('predictButton').addEventListener('click', function(e) {
     e.preventDefault();
     const loading = document.getElementById('loading');
     const result = document.getElementById('prediction-result');
-    
+
     loading.style.display = 'block';
     result.innerHTML = '';
-    
+
     fetch('/predict', {
         method: 'POST',
         headers: {
@@ -55,34 +56,12 @@ document.getElementById('predictButton').addEventListener('click', function(e) {
     .then(response => response.text())
     .then(data => {
         loading.style.display = 'none';
-        result.innerHTML = `<div class="prediction-results">${data}</div>`;
+        result.innerHTML = `<div class="prediction-results my-3">${data}</div>`;
     })
     .catch(error => {
         loading.style.display = 'none';
-        result.innerHTML = `<div class="alert alert-danger">Erro: ${error}</div>`;
+        result.innerHTML = `<div class="alert alert-danger rounded-3 shadow-sm my-3"><i class="fa-solid fa-triangle-exclamation me-2"></i>Erro: ${error}</div>`;
     });
 });
 </script>
-
-<style>
-.prediction-results {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
-
-.prediction-results ul {
-    list-style: none;
-    padding: 0;
-}
-
-.prediction-results .game {
-    background: #fff;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    border: 1px solid #dee2e6;
-}
-</style>
 {% endblock %}
