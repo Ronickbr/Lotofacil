@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
 import pandas as pd
 from datetime import datetime, timedelta
-import joblib
 from io import BytesIO
 from flask_mysqldb import MySQL
 import MySQLdb
@@ -16,6 +15,7 @@ from analysis import (
     analyze_consecutive_repeats,
     combine_analysis_methods,
     train_lotofacil_model,
+    load_lotofacil_model,
     predict_next_numbers,
     generate_suggested_games,
 )
@@ -105,11 +105,15 @@ app = Flask(__name__)
 app.jinja_env.globals.update(zip=zip)
 app.config.from_object(Config)
 
-# Inicializa o MySQL
+
+@app.context_processor
+def inject_now():
+    return {'now': datetime.now()}
+
+
 mysql = MySQL(app)
 
 
-# Rota principal
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -341,9 +345,9 @@ def train_model():
 def predict():
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         try:
-            model = joblib.load('lotofacil_model.pkl')
-        except FileNotFoundError:
-            return "Modelo não encontrado. Treine o modelo primeiro."
+            model = load_lotofacil_model('lotofacil_model.pkl')
+        except FileNotFoundError as e:
+            return str(e)
 
         cur = mysql.connection.cursor()
         cur.execute(
@@ -357,18 +361,52 @@ def predict():
 
         valid_numbers = predict_next_numbers(model, last_result, top_k=10)
 
-        response = "<h5>Números mais prováveis:</h5>"
-        response += "<div class='mb-4'>"
+        response = "<div class='mb-4 p-3 rounded-4 bg-light border'>"
+        response += (
+            "<h5 class='fw-bold mb-3 text-dark d-flex align-items-center'><i"
+            " class='fa-solid fa-star text-warning me-2"
+            " fs-4'></i>Dezenas Mais Prováveis (Top 10):</h5>"
+        )
+        response += "<div class='d-flex flex-wrap gap-2'>"
         for num in valid_numbers:
-            response += f"<span class='badge bg-primary m-1'>{num}</span>"
-        response += "</div>"
+            response += f"<span class='lottery-ball'>{num:02d}</span>"
+        response += "</div></div>"
 
         games = generate_suggested_games(valid_numbers, num_games=6)
 
-        response += "<h5>Jogos sugeridos:</h5><ul>"
+        response += (
+            "<h5 class='fw-bold mb-3 text-dark d-flex align-items-center'><i"
+            " class='fa-solid fa-ticket text-danger me-2"
+            " fs-4'></i>Bilhetes Sugeridos para Aposta (6 Jogos):</h5>"
+        )
+        response += "<div class='row g-3'>"
         for i, game in enumerate(games, 1):
-            response += f"<li class='game'>Jogo {i}: {', '.join(map(str, game))}</li>"
-        response += "</ul>"
+            game_str = " ".join(f"{n:02d}" for n in game)
+            even_count = sum(1 for n in game if n % 2 == 0)
+            odd_count = 15 - even_count
+            response += f"""
+            <div class='col-md-6'>
+                <div class='ticket-card p-3 h-100 d-flex flex-column justify-content-between'>
+                    <div class='d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom'>
+                        <span class='fw-bold text-dark fs-6 d-flex align-items-center'><i class='fa-solid fa-clover text-warning me-2'></i>Bilhete {i:02d}</span>
+                        <span class='badge bg-light text-muted border'>{even_count}P / {odd_count}Í</span>
+                    </div>
+                    <div class='d-flex flex-wrap gap-1 my-2 justify-content-center'>
+            """
+            for num in game:
+                ball_class = "ball-even" if num % 2 == 0 else "ball-odd"
+                response += f"<span class='lottery-ball lottery-ball-sm {ball_class}'>{num:02d}</span>"
+            response += f"""
+                    </div>
+                    <div class='mt-2 pt-2 border-top text-end'>
+                        <button class='btn btn-sm rounded-pill px-3 fw-bold' style='color: #7b2cbf; border: 1px solid #7b2cbf;' onclick='navigator.clipboard.writeText("{game_str}"); this.innerHTML="<i class=\\"fa-solid fa-check me-1\\"></i>Copiado!"; setTimeout(() => this.innerHTML="<i class=\\"fa-regular fa-copy me-1\\"></i>Copiar Jogo", 2000);'>
+                            <i class='fa-regular fa-copy me-1'></i>Copiar Jogo
+                        </button>
+                    </div>
+                </div>
+            </div>
+            """
+        response += "</div>"
 
         return response
 

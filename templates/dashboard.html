@@ -1,84 +1,180 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard Interactive — Lotofácil Analytics Pro{% endblock %}
 
 {% block content %}
-<h1 class="mt-4">Dashboard de Estatísticas</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+        <h2 class="fw-extrabold mb-1" style="font-weight: 800; color: #10002b;">
+            <i class="fa-solid fa-chart-pie text-primary me-2"></i>Dashboard Interativo
+        </h2>
+        <p class="text-muted mb-0">Visão analítica de estatísticas, gráficos e frequências das dezenas</p>
+    </div>
+</div>
 
 {% if error %}
-<div class="alert alert-danger" role="alert">
-    <i class="fas fa-exclamation-triangle"></i> {{ error }}
+<div class="alert alert-danger d-flex align-items-center rounded-4 shadow-sm" role="alert">
+    <i class="fas fa-exclamation-triangle fs-3 me-3"></i>
+    <div>{{ error }}</div>
 </div>
 {% else %}
     {% if top_numbers and frequencies %}
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-chart-bar"></i> 5 Números Mais Frequentes
+    <!-- Summary Metrics Cards -->
+    <div class="row g-4 mb-4">
+        <!-- Top 5 Numbers Card -->
+        <div class="col-lg-6">
+            <div class="card card-custom h-100">
+                <div class="card-header card-header-custom d-flex align-items-center justify-content-between">
+                    <span><i class="fas fa-trophy text-warning me-2"></i> Top 5 Dezenas Mais Sorteadas</span>
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1 fw-bold">Ranking #1</span>
                 </div>
-                <div class="card-body">
-                    <ul class="list-group">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-wrap gap-3 justify-content-around my-2">
                         {% for number, frequency in zip(top_numbers, frequencies) %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Número {{ number }}
-                                <span class="badge bg-primary rounded-pill">{{ frequency }} vezes</span>
-                            </li>
+                            <div class="text-center">
+                                <span class="lottery-ball lottery-ball-lg mb-2">{{ "%02d"|format(number) }}</span>
+                                <div class="fw-bold fs-6 text-dark">{{ frequency }}x</div>
+                                <span class="text-muted extra-small">sorteios</span>
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top">
+                        <canvas id="topNumbersChart" height="160"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-balance-scale"></i> Frequência de Pares e Ímpares
+
+        <!-- Parity Chart Card -->
+        <div class="col-lg-6">
+            <div class="card card-custom h-100">
+                <div class="card-header card-header-custom d-flex align-items-center justify-content-between">
+                    <span><i class="fas fa-balance-scale text-success me-2"></i> Distribuição Pares vs Ímpares</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold">Proporção Geral</span>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
                     {% if even_count is defined and odd_count is defined %}
-                        <p><i class="fa-solid fa-circle-check text-success"></i> Pares: {{ even_count }}</p>
-                        <p><i class="fa-solid fa-circle-xmark text-danger"></i> Ímpares: {{ odd_count }}</p>
-                        
-                        <div class="progress mt-3">
-                            {% set total = even_count + odd_count %}
-                            {% set even_percentage = (even_count / total * 100) if total > 0 else 0 %}
-                            <div class="progress-bar bg-success" role="progressbar" 
-                                 style="width: {{ even_percentage }}%"
-                                 aria-valuenow="{{ even_percentage }}" 
-                                 aria-valuemin="0" 
-                                 aria-valuemax="100">
-                                {{ "%.1f"|format(even_percentage) }}%
+                        {% set total = even_count + odd_count %}
+                        {% set even_percentage = (even_count / total * 100) if total > 0 else 0 %}
+                        {% set odd_percentage = (odd_count / total * 100) if total > 0 else 0 %}
+
+                        <div class="row align-items-center">
+                            <div class="col-md-6 text-center mb-3 mb-md-0">
+                                <div style="max-width: 200px; margin: 0 auto;">
+                                    <canvas id="parityChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 mb-2 rounded-3 bg-success-subtle border border-success-subtle d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <div class="fw-bold text-success fs-5">{{ even_count }}</div>
+                                        <div class="text-muted small">Pares</div>
+                                    </div>
+                                    <span class="badge bg-success fs-6 rounded-pill">{{ "%.1f"|format(even_percentage) }}%</span>
+                                </div>
+                                <div class="p-3 rounded-3 bg-danger-subtle border border-danger-subtle d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <div class="fw-bold text-danger fs-5">{{ odd_count }}</div>
+                                        <div class="text-muted small">Ímpares</div>
+                                    </div>
+                                    <span class="badge bg-danger fs-6 rounded-pill">{{ "%.1f"|format(odd_percentage) }}%</span>
+                                </div>
                             </div>
                         </div>
                     {% else %}
-                        <p class="text-muted">Dados não disponíveis</p>
+                        <p class="text-muted text-center my-4">Dados não disponíveis</p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-table"></i> Frequência por Posição
+    <!-- Position Frequency Card -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card card-custom">
+                <div class="card-header card-header-custom d-flex align-items-center">
+                    <i class="fas fa-table text-primary me-2"></i> Frequência de Aparição por Posição nas Bolas (1 a 15)
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     {% if position_freq %}
-                        <div class="table-responsive">
+                        <div class="table-responsive rounded-3 border">
                             {{ position_freq | safe }}
                         </div>
                     {% else %}
-                        <p class="text-muted">Dados não disponíveis</p>
+                        <p class="text-muted text-center">Dados não disponíveis</p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart 1: Top Numbers Bar Chart
+            const topCtx = document.getElementById('topNumbersChart').getContext('2d');
+            new Chart(topCtx, {
+                type: 'bar',
+                data: {
+                    labels: [{% for num in top_numbers %}'Dezena {{ "%02d"|format(num) }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                    datasets: [{
+                        label: 'Frequência de Sorteio',
+                        data: [{% for freq in frequencies %}{{ freq }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                        backgroundColor: [
+                            'rgba(123, 44, 191, 0.85)',
+                            'rgba(157, 78, 221, 0.85)',
+                            'rgba(199, 125, 255, 0.85)',
+                            'rgba(224, 170, 255, 0.85)',
+                            'rgba(56, 176, 0, 0.85)'
+                        ],
+                        borderRadius: 8,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Chart 2: Parity Doughnut Chart
+            {% if even_count is defined and odd_count is defined %}
+            const parityCtx = document.getElementById('parityChart').getContext('2d');
+            new Chart(parityCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pares', 'Ímpares'],
+                    datasets: [{
+                        data: [{{ even_count }}, {{ odd_count }}],
+                        backgroundColor: ['#38b000', '#ff4d6d'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    cutout: '65%'
+                }
+            });
+            {% endif %}
+        });
+    </script>
     {% else %}
-    <div class="alert alert-info" role="alert">
-        <i class="fas fa-info-circle"></i> Nenhum dado disponível para exibição. Por favor, faça o upload de resultados primeiro.
+    <div class="alert alert-info d-flex align-items-center rounded-4 shadow-sm" role="alert">
+        <i class="fas fa-info-circle fs-3 me-3"></i>
+        <div>Nenhum dado disponível para exibição. Por favor, faça o upload de resultados primeiro.</div>
     </div>
     {% endif %}
 {% endif %}

@@ -17,7 +17,12 @@ from .patterns import (
     detect_seasonal_patterns,
 )
 from .ensemble import combine_analysis_methods
-from .ml import train_lotofacil_model, predict_next_numbers, generate_suggested_games
+from .ml import (
+    train_lotofacil_model,
+    load_lotofacil_model,
+    predict_next_numbers,
+    generate_suggested_games,
+)
 
 __all__ = [
     'extract_balls',
@@ -32,6 +37,7 @@ __all__ = [
     'detect_seasonal_patterns',
     'combine_analysis_methods',
     'train_lotofacil_model',
+    'load_lotofacil_model',
     'predict_next_numbers',
     'generate_suggested_games',
 ]

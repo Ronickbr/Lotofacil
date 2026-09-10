@@ -1,102 +1,142 @@
 {% extends "base.html" %}
 
-{% block title %}Análise Histórica{% endblock %}
+{% block title %}Análise Histórica — Lotofácil Analytics Pro{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header">
-            <h4>Análise Histórica e Previsões</h4>
-        </div>
-        <div class="card-body">
-            <form method="GET" action="{{ url_for('historical_stats') }}" class="row g-3">
-                <div class="col-md-6">
-                    <label for="period" class="form-label">Período de Análise</label>
-                    <select name="period" id="period" class="form-select" required>
-                        <option value="">Selecione um período...</option>
-                        <option value="week" {% if period == 'week' %}selected{% endif %}>Última Semana</option>
-                        <option value="month" {% if period == 'month' %}selected{% endif %}>Último Mês</option>
-                        <option value="year" {% if period == 'year' %}selected{% endif %}>Último Ano</option>
-                    </select>
-                </div>
-                
-                <div class="col-md-6">
-                    <label for="prediction_type" class="form-label">Método de Previsão</label>
-                    <select name="prediction_type" id="prediction_type" class="form-select" required>
-                        <option value="frequency" {% if prediction_type == 'frequency' %}selected{% endif %}>
-                            Análise de Frequência
-                        </option>
-                        <option value="bayes" {% if prediction_type == 'bayes' %}selected{% endif %}>
-                            Análise Bayesiana
-                        </option>
-                        <option value="pattern" {% if prediction_type == 'pattern' %}selected{% endif %}>
-                            Análise de Padrões
-                        </option>
-                        <option value="combined" {% if prediction_type == 'combined' %}selected{% endif %}>
-                            Análise Combinada
-                        </option>
-                    </select>
-                </div>
-                
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Analisar</button>
-                </div>
-            </form>
+<div class="card card-custom mb-4">
+    <div class="card-header card-header-custom d-flex align-items-center justify-content-between">
+        <span class="fs-5 fw-bold"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i> Análise Histórica & Modelos Probabilísticos</span>
+        <span class="badge bg-purple text-white px-3 py-1 rounded-pill fw-bold" style="background: #7b2cbf;">Filtro Avançado</span>
+    </div>
+    <div class="card-body p-4 p-md-5">
+        <form method="GET" action="{{ url_for('historical_stats') }}" class="row g-3">
+            <div class="col-md-5">
+                <label for="period" class="form-label fw-bold text-dark">Período de Análise</label>
+                <select name="period" id="period" class="form-select form-select-lg rounded-3" required>
+                    <option value="">Selecione um período...</option>
+                    <option value="week" {% if period == 'week' %}selected{% endif %}>Última Semana (7 dias)</option>
+                    <option value="month" {% if period == 'month' %}selected{% endif %}>Último Mês (30 dias)</option>
+                    <option value="year" {% if period == 'year' %}selected{% endif %}>Último Ano (365 dias)</option>
+                </select>
+            </div>
 
-            {% if error %}
-                <div class="alert alert-danger mt-3">{{ error }}</div>
-            {% endif %}
+            <div class="col-md-5">
+                <label for="prediction_type" class="form-label fw-bold text-dark">Método de Análise</label>
+                <select name="prediction_type" id="prediction_type" class="form-select form-select-lg rounded-3" required>
+                    <option value="frequency" {% if prediction_type == 'frequency' %}selected{% endif %}>
+                        Análise de Frequência Simples
+                    </option>
+                    <option value="bayes" {% if prediction_type == 'bayes' %}selected{% endif %}>
+                        Análise Bayesiana (Beta-Binomial)
+                    </option>
+                    <option value="pattern" {% if prediction_type == 'pattern' %}selected{% endif %}>
+                        Análise de Repetição de Padrões
+                    </option>
+                    <option value="combined" {% if prediction_type == 'combined' %}selected{% endif %}>
+                        Análise Combinada Ponderada (Ensemble)
+                    </option>
+                </select>
+            </div>
 
-            {% if stats %}
-                <div class="mt-4">
-                    <h5>{{ stats.method_name }}</h5>
-                    <div class="card">
-                        <div class="card-body">
-                            <h6>Números mais prováveis:</h6>
-                            <div class="number-predictions mb-3">
-                                {% for item in stats.frequent_numbers %}
-                                    <div class="number-badge">
-                                        <span class="badge bg-primary">{{ item.number }}</span>
-                                        <small class="text-muted">{{ "%.1f"|format(item.percentage) }}%</small>
-                                    </div>
-                                {% endfor %}
-                            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold rounded-3 shadow-sm" style="background: linear-gradient(135deg, #7b2cbf, #5a189a); border: none;">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i> Analisar
+                </button>
+            </div>
+        </form>
 
-                            <div class="row mt-4">
-                                <div class="col-md-6">
-                                    <h6>Estatísticas do Período</h6>
-                                    <ul class="list-unstyled">
-                                        <li>Total de Jogos: {{ stats.total_games }}</li>
-                                        <li>Média de Pares: {{ "%.1f"|format(stats.avg_even) }}</li>
-                                        <li>Média de Ímpares: {{ "%.1f"|format(stats.avg_odd) }}</li>
-                                    </ul>
+        {% if error %}
+            <div class="alert alert-danger mt-4 rounded-4 shadow-sm"><i class="fa-solid fa-triangle-exclamation me-2"></i>{{ error }}</div>
+        {% endif %}
+
+        {% if stats %}
+            <div class="mt-5">
+                <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+                    <h4 class="fw-extrabold text-dark mb-0"><i class="fa-solid fa-chart-column text-primary me-2"></i>{{ stats.method_name }}</h4>
+                    <span class="badge bg-dark text-white px-3 py-2 fs-6 rounded-pill">Amostra: {{ stats.total_games }} concursos</span>
+                </div>
+
+                <!-- Top Predicted Numbers Grid -->
+                <div class="card card-custom mb-4 bg-light border">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-uppercase text-muted mb-3"><i class="fa-solid fa-star text-warning me-1"></i> Dezenas com Maior Score de Probabilidade</h6>
+                        <div class="d-flex flex-wrap gap-3 align-items-center justify-content-start">
+                            {% for item in stats.frequent_numbers %}
+                                <div class="text-center bg-white p-3 rounded-4 shadow-sm border" style="min-width: 90px;">
+                                    <span class="lottery-ball mb-2">{{ "%02d"|format(item.number) }}</span>
+                                    <div class="fw-bold text-primary fs-6">{{ "%.1f"|format(item.percentage) }}%</div>
+                                    {% if stats.delays is defined and stats.delays[item.number] is defined %}
+                                        <span class="badge bg-secondary-subtle text-secondary extra-small border mt-1">Atraso: {{ stats.delays[item.number] }}</span>
+                                    {% endif %}
                                 </div>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
-            {% endif %}
-        </div>
+
+                <!-- Summary Statistics Grid -->
+                <h5 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-sliders text-primary me-2"></i>Resumo Numérico do Período</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white rounded-4 border text-center shadow-sm h-100">
+                            <span class="text-muted small d-block mb-1 fw-semibold">Média de Pares</span>
+                            <span class="fs-3 fw-extrabold text-success">{{ "%.2f"|format(stats.avg_even) }}</span>
+                            <span class="text-muted extra-small d-block mt-1">dezenas por jogo</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white rounded-4 border text-center shadow-sm h-100">
+                            <span class="text-muted small d-block mb-1 fw-semibold">Média de Ímpares</span>
+                            <span class="fs-3 fw-extrabold text-danger">{{ "%.2f"|format(stats.avg_odd) }}</span>
+                            <span class="text-muted extra-small d-block mt-1">dezenas por jogo</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white rounded-4 border text-center shadow-sm h-100">
+                            <span class="text-muted small d-block mb-1 fw-semibold">Média de Primos</span>
+                            <span class="fs-3 fw-extrabold" style="color: #7b2cbf;">{{ "%.2f"|format(stats.avg_primes) }}</span>
+                            <span class="text-muted extra-small d-block mt-1">dezenas por jogo</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white rounded-4 border text-center shadow-sm h-100">
+                            <span class="text-muted small d-block mb-1 fw-semibold">Média da Soma Total</span>
+                            <span class="fs-3 fw-extrabold text-primary">{{ "%.1f"|format(stats.avg_sum) }}</span>
+                            <span class="text-muted extra-small d-block mt-1">soma por jogo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hot & Cold Status Grid if Available -->
+                {% if stats.hot_cold %}
+                <div class="card card-custom">
+                    <div class="card-header card-header-custom d-flex align-items-center justify-content-between">
+                        <span><i class="fa-solid fa-temperature-half text-danger me-2"></i> Status de Dezenas Quentes e Frias (Últimos 10 Sorteios)</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-wrap gap-2 justify-content-center">
+                            {% for num in range(1, 26) %}
+                                {% set hc = stats.hot_cold[num] %}
+                                {% set ball_class = "ball-hot" if hc.status == 'quente' else ("ball-cold" if hc.status == 'frio' else "") %}
+                                <div class="text-center p-2 rounded-3 border bg-white" style="width: 70px;">
+                                    <span class="lottery-ball lottery-ball-sm {{ ball_class }}">{{ "%02d"|format(num) }}</span>
+                                    <div class="extra-small fw-bold mt-1">
+                                        {% if hc.status == 'quente' %}
+                                            <span class="text-danger"><i class="fa-solid fa-fire me-1"></i>{{ hc.count }}x</span>
+                                        {% elif hc.status == 'frio' %}
+                                            <span class="text-info"><i class="fa-solid fa-snowflake me-1"></i>{{ hc.count }}x</span>
+                                        {% else %}
+                                            <span class="text-muted">{{ hc.count }}x</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 </div>
-
-<style>
-.number-predictions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.number-badge {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.number-badge small {
-    font-size: 0.7rem;
-    margin-top: 2px;
-}
-</style>
 {% endblock %}
