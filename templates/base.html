@@ -3,127 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Lotofácil Analysis{% endblock %}</title>
+    <title>{% block title %}Lotofácil Analytics Pro{% endblock %}</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
+    <!-- Font Awesome Pro/Free -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <style>
         :root {
             --primary-purple: #7b2cbf;
             --secondary-purple: #9d4edd;
-            --dark-purple: #3c096c;
-            --light-bg: #f8f9fa;
+            --dark-purple: #240046;
+            --accent-gold: #ffb703;
+            --accent-green: #38b000;
+            --accent-pink: #ff4d6d;
+            --bg-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--light-bg);
-            color: #2b2d42;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-gradient);
+            color: #1d2d44;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
+        /* Navbar Glassmorphism */
         .navbar-custom {
-            background: linear-gradient(135deg, #240046 0%, #3c096c 50%, #5a189a 100%);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #10002b 0%, #240046 50%, #3c096c 100%);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .navbar-custom .navbar-brand {
-            font-weight: 700;
-            font-size: 1.4rem;
+            font-weight: 800;
+            font-size: 1.5rem;
             color: #ffffff !important;
-            letter-spacing: 0.5px;
+            letter-spacing: -0.5px;
         }
 
         .navbar-custom .nav-link {
-            color: rgba(255, 255, 255, 0.85) !important;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 600;
+            padding: 0.6rem 1.1rem;
+            border-radius: 10px;
+            transition: all 0.25s ease;
         }
 
         .navbar-custom .nav-link:hover,
         .navbar-custom .nav-link.active {
             color: #ffffff !important;
-            background-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
         }
 
+        /* Modern Elevated Cards */
         .card-custom {
             border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
             background: #ffffff;
+            overflow: hidden;
         }
 
         .card-custom:hover {
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
         }
 
         .card-header-custom {
-            background: transparent;
-            border-bottom: 1px solid #edf2f7;
+            background: #ffffff;
+            border-bottom: 1px solid #f1f3f5;
             padding: 1.25rem 1.5rem;
-            font-weight: 600;
-            font-size: 1.1rem;
+            font-weight: 700;
+            font-size: 1.15rem;
             color: var(--dark-purple);
         }
 
-        /* Circular Lottery Ball Badges */
+        /* 3D Realistic Lottery Balls */
         .lottery-ball {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 38px;
-            height: 38px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+            background: radial-gradient(circle at 35% 35%, #c77dff, #7b2cbf 65%, #3c096c 100%);
             color: #ffffff;
-            font-weight: 700;
-            font-size: 0.95rem;
-            box-shadow: 0 3px 6px rgba(123, 44, 191, 0.3);
-            margin: 2px;
+            font-weight: 800;
+            font-size: 1rem;
+            box-shadow: inset -3px -3px 6px rgba(0, 0, 0, 0.4), inset 2px 2px 5px rgba(255, 255, 255, 0.7), 0 5px 12px rgba(123, 44, 191, 0.35);
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             user-select: none;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+        }
+
+        .lottery-ball:hover {
+            transform: translateY(-4px) scale(1.12);
+            box-shadow: inset -3px -3px 6px rgba(0, 0, 0, 0.4), inset 2px 2px 5px rgba(255, 255, 255, 0.8), 0 8px 18px rgba(123, 44, 191, 0.5);
         }
 
         .lottery-ball.ball-even {
-            background: linear-gradient(135deg, #2b9348, #55a630);
-            box-shadow: 0 3px 6px rgba(43, 147, 72, 0.3);
+            background: radial-gradient(circle at 35% 35%, #70e000, #38b000 65%, #007200 100%);
+            box-shadow: inset -3px -3px 6px rgba(0, 0, 0, 0.4), inset 2px 2px 5px rgba(255, 255, 255, 0.7), 0 5px 12px rgba(56, 176, 0, 0.35);
         }
 
         .lottery-ball.ball-odd {
-            background: linear-gradient(135deg, #e63946, #f72585);
-            box-shadow: 0 3px 6px rgba(230, 57, 70, 0.3);
+            background: radial-gradient(circle at 35% 35%, #ff4d6d, #c9184a 65%, #800f2f 100%);
+            box-shadow: inset -3px -3px 6px rgba(0, 0, 0, 0.4), inset 2px 2px 5px rgba(255, 255, 255, 0.7), 0 5px 12px rgba(201, 24, 74, 0.35);
         }
 
         .lottery-ball-sm {
-            width: 30px;
-            height: 30px;
-            font-size: 0.82rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            width: 32px;
+            height: 32px;
+            font-size: 0.85rem;
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.35), inset 1px 1px 3px rgba(255,255,255,0.6), 0 3px 6px rgba(0,0,0,0.15);
         }
 
         .lottery-ball-lg {
-            width: 48px;
-            height: 48px;
-            font-size: 1.2rem;
+            width: 52px;
+            height: 52px;
+            font-size: 1.3rem;
+        }
+
+        /* Lottery Ticket Styling */
+        .ticket-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 2px dashed #d62828;
+            border-radius: 14px;
+            position: relative;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+            transition: all 0.25s ease;
+        }
+
+        .ticket-card:hover {
+            border-color: #7b2cbf;
+            box-shadow: 0 10px 25px rgba(123, 44, 191, 0.15);
         }
 
         .footer {
             margin-top: auto;
-            background-color: #ffffff;
-            border-top: 1px solid #e2e8f0;
-            padding: 1.5rem 0;
-            color: #718096;
+            background: #10002b;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 1.75rem 0;
             font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
@@ -131,8 +164,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}">
-                <i class="fa-solid fa-clover text-warning fs-4"></i>
-                <span>Lotofácil Analytics</span>
+                <div class="lottery-ball lottery-ball-sm" style="background: radial-gradient(circle at 30% 30%, #ffb703, #fb8500);">
+                    <i class="fa-solid fa-clover text-white fs-6"></i>
+                </div>
+                <span>Lotofácil Analytics <span class="badge bg-warning text-dark fs-6 px-2 py-1 rounded-pill ms-1">PRO</span></span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -146,7 +181,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
-                            <i class="fa-solid fa-chart-line me-1"></i> Dashboard
+                            <i class="fa-solid fa-chart-pie me-1"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
@@ -166,7 +201,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'upload' %}active{% endif %}" href="{{ url_for('upload') }}">
-                            <i class="fa-solid fa-file-excel me-1"></i> Gerenciamento
+                            <i class="fa-solid fa-database me-1"></i> Gestão de Concursos
                         </a>
                     </li>
                 </ul>
@@ -180,7 +215,7 @@
 
     <footer class="footer text-center">
         <div class="container">
-            <p class="mb-0">Lotofácil Analytics &copy; {{ now.year if now else '2025' }} — Sistema Avançado de Análise Estatística e Preditiva</p>
+            <p class="mb-0">Lotofácil Analytics Pro &copy; {{ now.year if now else '2025' }} — Inteligência Estatística & Algoritmos Preditivos Avançados</p>
         </div>
     </footer>
 

@@ -361,10 +361,11 @@ def predict():
 
         valid_numbers = predict_next_numbers(model, last_result, top_k=10)
 
-        response = "<div class='mb-4'>"
+        response = "<div class='mb-4 p-3 rounded-4 bg-light border'>"
         response += (
-            "<h5 class='fw-bold mb-3 text-dark'><i class='fa-solid"
-            " fa-star text-warning me-2'></i>Dezenas Mais Prováveis (Top 10):</h5>"
+            "<h5 class='fw-bold mb-3 text-dark d-flex align-items-center'><i"
+            " class='fa-solid fa-star text-warning me-2"
+            " fs-4'></i>Dezenas Mais Prováveis (Top 10):</h5>"
         )
         response += "<div class='d-flex flex-wrap gap-2'>"
         for num in valid_numbers:
@@ -374,25 +375,37 @@ def predict():
         games = generate_suggested_games(valid_numbers, num_games=6)
 
         response += (
-            "<h5 class='fw-bold mb-3 text-dark'><i class='fa-solid"
-            " fa-list-check text-success me-2'></i>Jogos Sugeridos:</h5>"
+            "<h5 class='fw-bold mb-3 text-dark d-flex align-items-center'><i"
+            " class='fa-solid fa-ticket text-danger me-2"
+            " fs-4'></i>Bilhetes Sugeridos para Aposta (6 Jogos):</h5>"
         )
-        response += "<div class='d-flex flex-column gap-3'>"
+        response += "<div class='row g-3'>"
         for i, game in enumerate(games, 1):
             game_str = " ".join(f"{n:02d}" for n in game)
+            even_count = sum(1 for n in game if n % 2 == 0)
+            odd_count = 15 - even_count
             response += f"""
-            <div class='card p-3 border shadow-sm rounded-3 bg-white'>
-                <div class='d-flex justify-content-between align-items-center mb-2'>
-                    <span class='fw-bold text-primary'><i class='fa-solid fa-ticket me-2'></i>Jogo {i}</span>
-                    <button class='btn btn-sm btn-outline-secondary rounded-pill px-3' onclick='navigator.clipboard.writeText("{game_str}"); alert("Jogo {i} copiado para a área de transferência!");'>
-                        <i class='fa-regular fa-copy me-1'></i>Copiar Jogo
-                    </button>
-                </div>
-                <div class='d-flex flex-wrap gap-1'>
+            <div class='col-md-6'>
+                <div class='ticket-card p-3 h-100 d-flex flex-column justify-content-between'>
+                    <div class='d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom'>
+                        <span class='fw-bold text-dark fs-6 d-flex align-items-center'><i class='fa-solid fa-clover text-warning me-2'></i>Bilhete {i:02d}</span>
+                        <span class='badge bg-light text-muted border'>{even_count}P / {odd_count}Í</span>
+                    </div>
+                    <div class='d-flex flex-wrap gap-1 my-2 justify-content-center'>
             """
             for num in game:
-                response += f"<span class='lottery-ball lottery-ball-sm'>{num:02d}</span>"
-            response += "</div></div>"
+                ball_class = "ball-even" if num % 2 == 0 else "ball-odd"
+                response += f"<span class='lottery-ball lottery-ball-sm {ball_class}'>{num:02d}</span>"
+            response += f"""
+                    </div>
+                    <div class='mt-2 pt-2 border-top text-end'>
+                        <button class='btn btn-sm rounded-pill px-3 fw-bold' style='color: #7b2cbf; border: 1px solid #7b2cbf;' onclick='navigator.clipboard.writeText("{game_str}"); this.innerHTML="<i class=\\"fa-solid fa-check me-1\\"></i>Copiado!"; setTimeout(() => this.innerHTML="<i class=\\"fa-regular fa-copy me-1\\"></i>Copiar Jogo", 2000);'>
+                            <i class='fa-regular fa-copy me-1'></i>Copiar Jogo
+                        </button>
+                    </div>
+                </div>
+            </div>
+            """
         response += "</div>"
 
         return response
