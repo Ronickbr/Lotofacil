@@ -4,10 +4,137 @@
 
 {% block extra_head %}
 <style>
-.factory-shell{display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px}.factory-menu{position:sticky;top:100px;align-self:start}.factory-menu button{width:100%;border:0;background:transparent;text-align:left;padding:12px 14px;border-radius:10px;font-weight:700;color:#5b6170;margin-bottom:6px}.factory-menu button:hover{background:#f3ebfb;color:#7b2cbf}.factory-menu button.active{background:linear-gradient(135deg,#7b2cbf,#5a189a);color:#fff;box-shadow:0 6px 18px rgba(123,44,191,.22)}
-.factory-panel{display:none}.factory-panel.active{display:block}.number-grid{display:grid;grid-template-columns:repeat(5,52px);gap:10px;margin:16px 0}.number-choice{width:52px;height:52px;border-radius:50%;border:2px solid #e5e7eb;background:#fff;color:#240046;font-weight:800;transition:.18s}.number-choice:hover{border-color:#9d4edd;transform:translateY(-2px)}.number-choice.selected{background:radial-gradient(circle at 35% 35%,#c77dff,#7b2cbf 65%,#3c096c 100%);color:#fff;border-color:#7b2cbf;box-shadow:0 5px 12px rgba(123,44,191,.28)}
-.counter-pill{display:inline-flex;align-items:center;gap:8px;background:#f3ebfb;color:#5a189a;padding:7px 12px;border-radius:999px;font-weight:800}.helper-actions{display:flex;gap:8px;flex-wrap:wrap}.form-card{border:1px solid #edf0f4;border-radius:14px;padding:18px;background:#fbfcfd}.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}.generated-card{border:1px solid #ececf2;border-radius:16px;padding:18px;background:#fff;box-shadow:0 6px 20px rgba(20,0,50,.05)}.generated-card:hover{box-shadow:0 10px 28px rgba(20,0,50,.09)}.inline-feedback{display:none}.sticky-save{position:sticky;bottom:14px;z-index:20;background:#fff;border:1px solid #eadcf7;border-radius:16px;box-shadow:0 12px 32px rgba(90,24,154,.14);padding:16px 18px}.field-label{font-weight:700;color:#343a40;margin-bottom:6px}.modern-input{border-radius:10px!important;padding:11px 12px!important}.panel-icon{width:42px;height:42px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;background:#f3ebfb;color:#7b2cbf}.legal-box{background:#fff3cd;border:1px solid #ffe69c;border-radius:14px;padding:15px;color:#664d03}
-@media(max-width:900px){.factory-shell{grid-template-columns:1fr}.factory-menu{position:static}.number-grid{grid-template-columns:repeat(5,46px)}.number-choice{width:46px;height:46px}}
+/* Modern CSS for Fábrica de Jogos */
+.factory-shell {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 24px;
+}
+.factory-menu .nav-link {
+    font-weight: 700;
+    color: #5b6170;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+    border: none;
+    text-align: left;
+}
+.factory-menu .nav-link:hover {
+    background: #f3ebfb;
+    color: #7b2cbf;
+}
+.factory-menu .nav-link.active {
+    background: linear-gradient(135deg, #7b2cbf, #5a189a);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(123, 44, 191, 0.25);
+}
+.factory-panel {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+.factory-panel.active {
+    display: block;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.number-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+}
+.number-choice {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #e9ecef;
+    background: #fff;
+    color: #495057;
+    font-weight: 800;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.number-choice:hover {
+    border-color: #9d4edd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(157, 78, 221, 0.15);
+}
+.number-choice.selected {
+    background: radial-gradient(circle at 35% 35%, #9d4edd, #5a189a);
+    color: #fff;
+    border-color: #5a189a;
+    box-shadow: 0 4px 12px rgba(90, 24, 154, 0.3);
+}
+
+.counter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f3ebfb;
+    color: #5a189a;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+.form-card {
+    border: 1px solid #edf2f7;
+    border-radius: 14px;
+    padding: 20px;
+    background: #f8f9fa;
+}
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+.generated-card {
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    transition: all 0.3s ease;
+}
+.generated-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    transform: translateY(-3px);
+}
+.sticky-save {
+    position: sticky;
+    bottom: 20px;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 16px 24px;
+}
+.panel-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3ebfb;
+    color: #7b2cbf;
+    font-size: 1.25rem;
+}
+
+@media(max-width:992px){
+    .factory-shell { grid-template-columns: 1fr; }
+}
 </style>
 {% endblock %}
 
@@ -15,100 +142,441 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
     <div>
         <h2 class="fw-bold mb-1" style="color:#10002b"><i class="fa-solid fa-industry text-primary me-2"></i>Fábrica de Jogos</h2>
-        <p class="text-muted mb-0">Gere apostas com estratégias estatísticas, combinatórias e IA.</p>
+        <p class="text-muted mb-0">Gere apostas otimizadas utilizando estatísticas, matemática e inteligência artificial.</p>
     </div>
-    <a href="{{ url_for('saved_games') }}" class="btn btn-outline-primary rounded-pill px-4 fw-bold"><i class="fa-solid fa-floppy-disk me-2"></i>Ver jogos salvos</a>
+    <a href="{{ url_for('saved_games') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+        <i class="fa-solid fa-floppy-disk me-2"></i>Ver jogos salvos
+    </a>
 </div>
 
 <div class="factory-shell">
     <aside class="factory-menu">
-        <div class="card card-custom p-3 mb-3">
-            <button class="active" data-target="panel-direto"><i class="fa-solid fa-pen-to-square me-2"></i>Jogo Direto</button>
-            <button data-target="panel-estatistico"><i class="fa-solid fa-chart-pie me-2"></i>Estratégias Estatísticas</button>
-            <button data-target="panel-matematico"><i class="fa-solid fa-calculator me-2"></i>Desdobramento</button>
-            <button data-target="panel-ia"><i class="fa-solid fa-robot me-2"></i>Inteligência Artificial</button>
-            <button data-target="panel-montecarlo"><i class="fa-solid fa-dice me-2"></i>Monte Carlo</button>
+        <div class="card card-custom p-3 mb-3 border-0 shadow-sm">
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <button class="nav-link active" data-target="panel-direto"><i class="fa-solid fa-pen-to-square me-2"></i>Jogo Direto</button>
+                <button class="nav-link" data-target="panel-estatistico"><i class="fa-solid fa-chart-pie me-2"></i>Estratégias Estatísticas</button>
+                <button class="nav-link" data-target="panel-matematico"><i class="fa-solid fa-calculator me-2"></i>Desdobramento</button>
+                <button class="nav-link" data-target="panel-ia"><i class="fa-solid fa-robot me-2"></i>Inteligência Artificial</button>
+                <button class="nav-link" data-target="panel-montecarlo"><i class="fa-solid fa-dice me-2"></i>Monte Carlo</button>
+            </div>
         </div>
-        <div class="legal-box small"><strong><i class="fa-solid fa-circle-info me-1"></i>Aviso</strong><br>As estratégias melhoram organização e cobertura, mas não garantem premiação.</div>
+        <div class="alert alert-warning border-0 shadow-sm rounded-4 small">
+            <strong><i class="fa-solid fa-circle-info me-1"></i>Aviso Importante</strong><br>
+            As estratégias melhoram sua organização e cobertura probabilística, mas não garantem premiação. Jogue com responsabilidade.
+        </div>
     </aside>
 
     <section>
-        <div id="factory-feedback" class="alert inline-feedback rounded-4 shadow-sm"></div>
+        <div id="factory-feedback" class="alert rounded-4 shadow-sm" style="display:none;"></div>
 
-        <div class="card card-custom factory-panel active" id="panel-direto">
-            <div class="card-header card-header-custom d-flex align-items-center gap-3"><span class="panel-icon"><i class="fa-solid fa-pen-to-square"></i></span><div><div class="fw-bold">Jogo Direto</div><small class="text-muted">Selecione exatamente 15 dezenas</small></div></div>
+        <!-- Panel: Jogo Direto -->
+        <div class="card card-custom factory-panel active border-0 shadow-sm" id="panel-direto">
+            <div class="card-header card-header-custom bg-white border-bottom-0 d-flex align-items-center gap-3 pt-4 pb-0">
+                <span class="panel-icon"><i class="fa-solid fa-pen-to-square"></i></span>
+                <div>
+                    <h5 class="fw-bold mb-0">Jogo Direto</h5>
+                    <small class="text-muted">Selecione exatamente 15 dezenas no volante manual</small>
+                </div>
+            </div>
             <div class="card-body p-4">
-                <p class="text-muted">Clique nas dezenas abaixo. Você não precisa digitar uma lista manualmente.</p>
                 <form class="generation-form" id="form-direto">
-                    <input type="hidden" name="strategy" value="direto"><input type="hidden" name="num_games" value="1"><input type="hidden" name="numbers" id="direct-numbers">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2"><span class="counter-pill"><i class="fa-solid fa-check-double"></i><span id="direct-count">0</span>/15 selecionadas</span><div class="helper-actions"><button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" data-random="direct" data-count="15">Selecionar 15 aleatórias</button><button type="button" class="btn btn-sm btn-outline-danger rounded-pill" data-clear="direct">Limpar</button></div></div>
-                    <div class="number-grid" data-selector="direct"></div>
-                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-bold"><i class="fa-solid fa-gears me-2"></i>Avaliar e Gerar</button>
+                    <input type="hidden" name="strategy" value="direto">
+                    <input type="hidden" name="num_games" value="1">
+                    <input type="hidden" name="numbers" id="direct-numbers">
+                    
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 bg-light p-3 rounded-4 mb-3 border">
+                        <span class="counter-pill"><i class="fa-solid fa-check-double"></i><span id="direct-count">0</span>/15 selecionadas</span>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary rounded-pill fw-bold" data-random="direct" data-count="15">
+                                <i class="fa-solid fa-shuffle me-1"></i> Surpresinha
+                            </button>
+                            <button type="button" class="btn btn-outline-danger rounded-pill fw-bold" data-clear="direct">
+                                <i class="fa-solid fa-trash-can me-1"></i> Limpar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="number-grid justify-content-center mb-4" data-selector="direct"></div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm">
+                        <i class="fa-solid fa-gears me-2"></i>Avaliar e Gerar Jogo
+                    </button>
                 </form>
             </div>
         </div>
 
-        <div class="card card-custom factory-panel" id="panel-estatistico">
-            <div class="card-header card-header-custom d-flex align-items-center gap-3"><span class="panel-icon"><i class="fa-solid fa-chart-pie"></i></span><div><div class="fw-bold">Estratégias Estatísticas</div><small class="text-muted">Frequência, atraso e repetição</small></div></div>
-            <div class="card-body p-4"><form class="generation-form"><div class="form-card mb-3"><label class="field-label">Estratégia</label><select name="strategy" class="form-select modern-input"><option value="frequency">Baseado em Frequência</option><option value="delay">Baseado em Atraso</option><option value="repetition">Baseado em Repetição do Último Concurso</option></select><label class="field-label mt-3">Quantidade de jogos</label><input type="number" name="num_games" class="form-control modern-input" value="6" min="1" max="50"></div><button class="btn btn-success w-100 py-3 rounded-3 fw-bold" type="submit"><i class="fa-solid fa-gears me-2"></i>Gerar Jogos</button></form></div>
+        <!-- Panel: Estatístico -->
+        <div class="card card-custom factory-panel border-0 shadow-sm" id="panel-estatistico">
+            <div class="card-header card-header-custom bg-white border-bottom-0 d-flex align-items-center gap-3 pt-4 pb-0">
+                <span class="panel-icon"><i class="fa-solid fa-chart-pie"></i></span>
+                <div>
+                    <h5 class="fw-bold mb-0">Estratégias Estatísticas</h5>
+                    <small class="text-muted">Geração baseada em tendências históricas</small>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <form class="generation-form">
+                    <div class="form-card mb-4">
+                        <label class="form-label fw-bold">Selecione a Estratégia</label>
+                        <select name="strategy" class="form-select form-select-lg mb-4 rounded-3 shadow-sm border-0">
+                            <option value="frequency">Mais Frequentes (Gera jogos com números quentes)</option>
+                            <option value="delay">Mais Atrasadas (Gera jogos com números que não saem há muito tempo)</option>
+                            <option value="repetition">Repetição do Último (Mantém 8 a 10 dezenas do último sorteio)</option>
+                        </select>
+                        
+                        <label class="form-label fw-bold">Quantidade de Jogos</label>
+                        <input type="number" name="num_games" class="form-control form-control-lg rounded-3 shadow-sm border-0" value="6" min="1" max="50">
+                    </div>
+                    <button class="btn btn-success w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm" type="submit">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Gerar Jogos Estatísticos
+                    </button>
+                </form>
+            </div>
         </div>
 
-        <div class="card card-custom factory-panel" id="panel-matematico">
-            <div class="card-header card-header-custom d-flex align-items-center gap-3"><span class="panel-icon"><i class="fa-solid fa-calculator"></i></span><div><div class="fw-bold">Desdobramento e Fechamento</div><small class="text-muted">Selecione entre 16 e 20 dezenas base</small></div></div>
+        <!-- Panel: Desdobramento -->
+        <div class="card card-custom factory-panel border-0 shadow-sm" id="panel-matematico">
+            <div class="card-header card-header-custom bg-white border-bottom-0 d-flex align-items-center gap-3 pt-4 pb-0">
+                <span class="panel-icon bg-warning bg-opacity-25 text-warning"><i class="fa-solid fa-calculator"></i></span>
+                <div>
+                    <h5 class="fw-bold mb-0">Desdobramento Matemático</h5>
+                    <small class="text-muted">Gere fechamentos combinatórios escolhendo 16 a 20 dezenas</small>
+                </div>
+            </div>
             <div class="card-body p-4">
                 <form class="generation-form" id="form-matematico">
-                    <div class="form-card mb-3"><label class="field-label">Modo</label><select name="strategy" id="math-mode-select" class="form-select modern-input"><option value="combinatorial_unfold">Desdobramento Completo</option><option value="reduced_closure">Fechamento Reduzido (Greedy Set Cover)</option></select></div>
+                    <div class="form-card mb-3">
+                        <label class="form-label fw-bold">Modo de Desdobramento</label>
+                        <select name="strategy" id="math-mode-select" class="form-select form-select-lg rounded-3 border-0 shadow-sm mb-2">
+                            <option value="combinatorial_unfold">Desdobramento Completo (Todas as combinações)</option>
+                            <option value="reduced_closure">Fechamento Reduzido (Mais econômico)</option>
+                        </select>
+                    </div>
+                    
                     <input type="hidden" name="numbers" id="math-numbers">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2"><span class="counter-pill"><i class="fa-solid fa-check-double"></i><span id="math-count">0</span>/16–20 selecionadas</span><div class="helper-actions"><button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" data-random="math" data-count="18">Selecionar 18 aleatórias</button><button type="button" class="btn btn-sm btn-outline-danger rounded-pill" data-clear="math">Limpar</button></div></div>
-                    <div class="number-grid" data-selector="math"></div>
-                    <div id="closure-settings" class="form-card mb-3" style="display:none"><div class="row g-3"><div class="col-md-6"><label class="field-label">Garantia de acertos</label><input type="number" name="guarantee" class="form-control modern-input" value="14" min="11" max="15"></div><div class="col-md-6"><label class="field-label">Condição</label><input type="number" name="condition" class="form-control modern-input" value="15" min="11" max="15"></div></div></div>
-                    <div class="form-card mb-3"><label class="field-label">Limite de jogos gerados</label><input type="number" name="num_games" class="form-control modern-input" value="100" min="1" max="2000"></div>
-                    <button class="btn btn-warning w-100 py-3 rounded-3 fw-bold" type="submit"><i class="fa-solid fa-gears me-2"></i>Executar Algoritmo</button>
+                    
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 bg-light p-3 rounded-4 mb-3 border">
+                        <span class="counter-pill text-warning bg-warning bg-opacity-10"><i class="fa-solid fa-check-double"></i><span id="math-count">0</span> de 16–20 selecionadas</span>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-warning text-dark rounded-pill fw-bold" data-random="math" data-count="18">
+                                <i class="fa-solid fa-shuffle"></i> 18 Aleatórias
+                            </button>
+                            <button type="button" class="btn btn-outline-danger rounded-pill fw-bold" data-clear="math">Limpar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="number-grid justify-content-center mb-4" data-selector="math"></div>
+                    
+                    <div id="closure-settings" class="form-card mb-4" style="display:none">
+                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-filter text-muted me-2"></i>Regras do Fechamento</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Garantir acertos de (ex: 14)</label>
+                                <input type="number" name="guarantee" class="form-control form-control-lg border-0 shadow-sm" value="14" min="11" max="15">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Se acertar (ex: 15) das escolhidas</label>
+                                <input type="number" name="condition" class="form-control form-control-lg border-0 shadow-sm" value="15" min="11" max="15">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-card mb-4">
+                        <label class="form-label fw-bold">Limite máximo de jogos para gerar</label>
+                        <input type="number" name="num_games" class="form-control form-control-lg border-0 shadow-sm" value="100" min="1" max="2000">
+                    </div>
+                    
+                    <button class="btn btn-warning w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm text-dark" type="submit">
+                        <i class="fa-solid fa-calculator me-2"></i>Executar Desdobramento
+                    </button>
                 </form>
             </div>
         </div>
 
-        <div class="card card-custom factory-panel" id="panel-ia">
-            <div class="card-header card-header-custom d-flex align-items-center gap-3"><span class="panel-icon"><i class="fa-solid fa-robot"></i></span><div><div class="fw-bold">Inteligência Artificial & Diversidade</div><small class="text-muted">Top 18 + distância de Hamming</small></div></div>
-            <div class="card-body p-4"><form class="generation-form"><input type="hidden" name="strategy" value="ai_based"><div class="form-card mb-3"><p class="text-muted mb-3">A IA seleciona as 18 dezenas mais promissoras e cria combinações diversas.</p><label class="field-label">Quantidade de jogos</label><input type="number" name="num_games" class="form-control modern-input" value="10" min="1" max="50"></div><button class="btn btn-danger w-100 py-3 rounded-3 fw-bold" type="submit"><i class="fa-solid fa-brain me-2"></i>Gerar via IA</button></form></div>
+        <!-- Panel: IA -->
+        <div class="card card-custom factory-panel border-0 shadow-sm" id="panel-ia">
+            <div class="card-header card-header-custom bg-white border-bottom-0 d-flex align-items-center gap-3 pt-4 pb-0">
+                <span class="panel-icon bg-danger bg-opacity-10 text-danger"><i class="fa-solid fa-robot"></i></span>
+                <div>
+                    <h5 class="fw-bold mb-0">Inteligência Artificial</h5>
+                    <small class="text-muted">Redes neurais buscando a máxima probabilidade</small>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <form class="generation-form">
+                    <input type="hidden" name="strategy" value="ai_based">
+                    <div class="form-card mb-4">
+                        <p class="text-muted mb-4"><i class="fa-solid fa-microchip me-2"></i>O modelo Random Forest seleciona as 18 dezenas mais prováveis para o próximo concurso, e o algoritmo otimiza a distância de Hamming para garantir diversidade nos jogos gerados.</p>
+                        <label class="form-label fw-bold">Quantidade de Jogos</label>
+                        <input type="number" name="num_games" class="form-control form-control-lg border-0 shadow-sm" value="10" min="1" max="50">
+                    </div>
+                    <button class="btn btn-danger w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm" type="submit">
+                        <i class="fa-solid fa-brain me-2"></i>Gerar via IA
+                    </button>
+                </form>
+            </div>
         </div>
 
-        <div class="card card-custom factory-panel" id="panel-montecarlo">
-            <div class="card-header card-header-custom d-flex align-items-center gap-3"><span class="panel-icon"><i class="fa-solid fa-dice"></i></span><div><div class="fw-bold">Filtros & Monte Carlo</div><small class="text-muted">Simulação com restrições estatísticas</small></div></div>
-            <div class="card-body p-4"><form class="generation-form"><input type="hidden" name="strategy" value="montecarlo"><div class="form-card mb-3"><div class="row g-3"><div class="col-md-6"><label class="field-label">Pares mínimos</label><input type="number" name="min_even" class="form-control modern-input" value="6"></div><div class="col-md-6"><label class="field-label">Pares máximos</label><input type="number" name="max_even" class="form-control modern-input" value="9"></div><div class="col-md-6"><label class="field-label">Máx. consecutivas</label><input type="number" name="max_consecutive" class="form-control modern-input" value="5"></div><div class="col-md-6"><label class="field-label">Mín. repetidas</label><input type="number" name="min_repeat" class="form-control modern-input" value="8"></div><div class="col-12"><label class="field-label">Quantidade de jogos</label><input type="number" name="num_games" class="form-control modern-input" value="6" min="1" max="50"></div></div></div><button class="btn btn-info text-white w-100 py-3 rounded-3 fw-bold" type="submit"><i class="fa-solid fa-dice me-2"></i>Simular e Gerar</button></form></div>
+        <!-- Panel: Monte Carlo -->
+        <div class="card card-custom factory-panel border-0 shadow-sm" id="panel-montecarlo">
+            <div class="card-header card-header-custom bg-white border-bottom-0 d-flex align-items-center gap-3 pt-4 pb-0">
+                <span class="panel-icon bg-info bg-opacity-10 text-info"><i class="fa-solid fa-dice"></i></span>
+                <div>
+                    <h5 class="fw-bold mb-0">Monte Carlo Avançado</h5>
+                    <small class="text-muted">Geração aleatória aplicando filtros estatísticos rígidos</small>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <form class="generation-form">
+                    <input type="hidden" name="strategy" value="montecarlo">
+                    <div class="form-card mb-4">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Mínimo de números Pares</label>
+                                <input type="number" name="min_even" class="form-control border-0 shadow-sm" value="6">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Máximo de números Pares</label>
+                                <input type="number" name="max_even" class="form-control border-0 shadow-sm" value="9">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Máximo de Sequência Consecutiva</label>
+                                <input type="number" name="max_consecutive" class="form-control border-0 shadow-sm" value="5">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Mín. Repetidas do Sorteio Anterior</label>
+                                <input type="number" name="min_repeat" class="form-control border-0 shadow-sm" value="8">
+                            </div>
+                            <div class="col-12 mt-4 pt-3 border-top">
+                                <label class="form-label fw-bold">Quantidade de Jogos para gerar</label>
+                                <input type="number" name="num_games" class="form-control form-control-lg border-0 shadow-sm" value="6" min="1" max="50">
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-info text-white w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm" type="submit">
+                        <i class="fa-solid fa-dice me-2"></i>Rodar Simulação
+                    </button>
+                </form>
+            </div>
         </div>
 
+        <!-- Results Area -->
         <div id="results-area" style="display:none" class="mt-4">
-            <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3"><div><h3 class="fw-bold mb-1"><i class="fa-solid fa-circle-check text-success me-2"></i>Resultados</h3><p id="results-stats" class="text-muted mb-0"></p></div></div>
-            <div class="sticky-save d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4"><div><strong id="cost-display" class="fs-5" style="color:#7b2cbf">Custo: R$ 0,00</strong><div class="small text-muted"><span id="games-count">0</span> jogos gerados</div></div><button id="btn-save-games" class="btn btn-success rounded-pill px-4 py-2 fw-bold"><i class="fa-solid fa-floppy-disk me-2"></i>Salvar jogos exibidos</button></div>
+            <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
+                <div>
+                    <h3 class="fw-bold mb-1"><i class="fa-solid fa-circle-check text-success me-2"></i>Jogos Gerados</h3>
+                    <p id="results-stats" class="text-muted mb-0"></p>
+                </div>
+            </div>
+            
+            <div class="sticky-save d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+                <div>
+                    <strong id="cost-display" class="fs-4" style="color:#7b2cbf">Custo: R$ 0,00</strong>
+                    <div class="small text-muted"><span id="games-count" class="fw-bold">0</span> jogos na lista</div>
+                </div>
+                <button id="btn-save-games" class="btn btn-success rounded-pill px-4 py-3 fw-bold fs-5 shadow-sm">
+                    <i class="fa-solid fa-cloud-arrow-up me-2"></i>Salvar Jogos no Banco
+                </button>
+            </div>
+            
             <div class="results-grid" id="games-grid"></div>
         </div>
     </section>
 </div>
 
 <script>
-let currentGeneratedGames=[];let currentStrategy='';let currentAiRanking=null;
-const selections={direct:new Set(),math:new Set()};
+let currentGeneratedGames = [];
+let currentStrategy = '';
+let currentAiRanking = null;
+const selections = { direct: new Set(), math: new Set() };
 
-function buildSelector(key){const grid=document.querySelector(`[data-selector="${key}"]`);for(let n=1;n<=25;n++){const b=document.createElement('button');b.type='button';b.className='number-choice';b.textContent=String(n).padStart(2,'0');b.dataset.number=n;b.addEventListener('click',()=>toggleNumber(key,n,b));grid.appendChild(b)}}
-function limitFor(key){return key==='direct'?15:20}
-function minFor(key){return key==='direct'?15:16}
-function toggleNumber(key,n,button){const set=selections[key];if(set.has(n)){set.delete(n);button.classList.remove('selected')}else{if(set.size>=limitFor(key)){showFeedback(`Você pode selecionar no máximo ${limitFor(key)} dezenas.`, 'warning');return}set.add(n);button.classList.add('selected')}syncSelection(key)}
-function syncSelection(key){const arr=[...selections[key]].sort((a,b)=>a-b);document.getElementById(`${key}-numbers`).value=arr.join(',');document.getElementById(`${key}-count`).textContent=arr.length}
-function clearSelection(key){selections[key].clear();document.querySelectorAll(`[data-selector="${key}"] .number-choice`).forEach(b=>b.classList.remove('selected'));syncSelection(key)}
-function randomSelection(key,count){clearSelection(key);const nums=[...Array(25)].map((_,i)=>i+1);for(let i=nums.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[nums[i],nums[j]]=[nums[j],nums[i]]}nums.slice(0,count).forEach(n=>{selections[key].add(n);document.querySelector(`[data-selector="${key}"] [data-number="${n}"]`).classList.add('selected')});syncSelection(key)}
-function showFeedback(message,type='danger'){const el=document.getElementById('factory-feedback');el.className=`alert alert-${type} inline-feedback rounded-4 shadow-sm`;el.innerHTML=`<i class="fa-solid fa-circle-info me-2"></i>${message}`;el.style.display='block';el.scrollIntoView({behavior:'smooth',block:'center'})}
-function hideFeedback(){document.getElementById('factory-feedback').style.display='none'}
+function buildSelector(key) {
+    const grid = document.querySelector(`[data-selector="${key}"]`);
+    for(let n = 1; n <= 25; n++) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'number-choice';
+        b.textContent = String(n).padStart(2,'0');
+        b.dataset.number = n;
+        b.addEventListener('click', () => toggleNumber(key, n, b));
+        grid.appendChild(b);
+    }
+}
 
-buildSelector('direct');buildSelector('math');
-document.querySelectorAll('[data-random]').forEach(b=>b.addEventListener('click',()=>randomSelection(b.dataset.random,Number(b.dataset.count))));document.querySelectorAll('[data-clear]').forEach(b=>b.addEventListener('click',()=>clearSelection(b.dataset.clear)));
-document.querySelectorAll('.factory-menu button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.factory-menu button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.factory-panel').forEach(x=>x.classList.remove('active'));btn.classList.add('active');document.getElementById(btn.dataset.target).classList.add('active');hideFeedback()}));
-document.getElementById('math-mode-select').addEventListener('change',function(){document.getElementById('closure-settings').style.display=this.value==='reduced_closure'?'block':'none'});
+function limitFor(key) { return key === 'direct' ? 15 : 20; }
 
-document.querySelectorAll('.generation-form').forEach(form=>form.addEventListener('submit',async e=>{e.preventDefault();hideFeedback();if(form.id==='form-direto'&&selections.direct.size!==15){showFeedback('Selecione exatamente 15 dezenas no volante antes de gerar.','warning');return}if(form.id==='form-matematico'&&(selections.math.size<16||selections.math.size>20)){showFeedback('Selecione entre 16 e 20 dezenas no volante para o desdobramento.','warning');return}const btn=form.querySelector('button[type="submit"]');const original=btn.innerHTML;btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin me-2"></i>Processando...';try{const response=await fetch('{{ url_for("smart_generate") }}',{method:'POST',body:new FormData(form),headers:{'X-Requested-With':'XMLHttpRequest'}});const contentType=response.headers.get('content-type')||'';const data=contentType.includes('application/json')?await response.json():{error:await response.text()};if(!response.ok||data.error)throw new Error(data.error||`HTTP ${response.status}`);displayResults(data)}catch(err){showFeedback(err.message||String(err),'danger')}finally{btn.disabled=false;btn.innerHTML=original}}));
+function toggleNumber(key, n, button) {
+    const set = selections[key];
+    if (set.has(n)) {
+        set.delete(n);
+        button.classList.remove('selected');
+    } else {
+        if (set.size >= limitFor(key)) {
+            showFeedback(`Você pode selecionar no máximo ${limitFor(key)} dezenas.`, 'warning');
+            return;
+        }
+        set.add(n);
+        button.classList.add('selected');
+    }
+    syncSelection(key);
+}
 
-function displayResults(data){document.getElementById('results-area').style.display='block';currentGeneratedGames=data.games||[];currentStrategy=data.strategy||'';currentAiRanking=data.ai_ranking||null;document.getElementById('games-count').textContent=data.total_generated||currentGeneratedGames.length;document.getElementById('cost-display').textContent=`Custo: R$ ${Number(data.cost||0).toFixed(2).replace('.',',')}`;document.getElementById('results-stats').textContent=`Exibindo ${currentGeneratedGames.length} jogo(s) da estratégia ${currentStrategy}.`;const grid=document.getElementById('games-grid');grid.innerHTML='';currentGeneratedGames.forEach((g,idx)=>{const balls=g.numbers.map(n=>`<span class="lottery-ball lottery-ball-sm ${n%2===0?'ball-even':'ball-odd'}">${String(n).padStart(2,'0')}</span>`).join('');grid.innerHTML+=`<div class="generated-card"><div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3"><strong><i class="fa-solid fa-ticket text-primary me-2"></i>Jogo ${String(idx+1).padStart(2,'0')}</strong><span class="badge bg-light text-dark border"><i class="fa-solid fa-star text-warning"></i> ${Number(g.total_score||0).toFixed(1)}</span></div><div class="d-flex flex-wrap gap-2 mb-3">${balls}</div><div class="small text-muted">${g.explanation||'Jogo gerado pela estratégia selecionada.'}</div></div>`});document.getElementById('results-area').scrollIntoView({behavior:'smooth'})}
+function syncSelection(key) {
+    const arr = [...selections[key]].sort((a,b) => a - b);
+    document.getElementById(`${key}-numbers`).value = arr.join(',');
+    document.getElementById(`${key}-count`).textContent = arr.length;
+}
 
-document.getElementById('btn-save-games').addEventListener('click',async()=>{if(!currentGeneratedGames.length)return;const btn=document.getElementById('btn-save-games');const original=btn.innerHTML;btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin me-2"></i>Salvando...';try{const response=await fetch('{{ url_for("save_games") }}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({strategy:currentStrategy,games:currentGeneratedGames,ai_ranking:currentAiRanking})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Falha ao salvar jogos.');window.location.href='{{ url_for("saved_games") }}'}catch(err){showFeedback(err.message||String(err),'danger')}finally{btn.disabled=false;btn.innerHTML=original}});
+function clearSelection(key) {
+    selections[key].clear();
+    document.querySelectorAll(`[data-selector="${key}"] .number-choice`).forEach(b => b.classList.remove('selected'));
+    syncSelection(key);
+}
+
+function randomSelection(key, count) {
+    clearSelection(key);
+    const nums = [...Array(25)].map((_, i) => i + 1);
+    for(let i = nums.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [nums[i], nums[j]] = [nums[j], nums[i]];
+    }
+    nums.slice(0, count).forEach(n => {
+        selections[key].add(n);
+        document.querySelector(`[data-selector="${key}"] [data-number="${n}"]`).classList.add('selected');
+    });
+    syncSelection(key);
+}
+
+function showFeedback(message, type='danger') {
+    const el = document.getElementById('factory-feedback');
+    el.className = `alert alert-${type} mb-4 rounded-4 shadow-sm border-0`;
+    el.innerHTML = `<i class="fa-solid fa-circle-info me-2"></i>${message}`;
+    el.style.display = 'block';
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function hideFeedback() {
+    document.getElementById('factory-feedback').style.display = 'none';
+}
+
+buildSelector('direct');
+buildSelector('math');
+
+document.querySelectorAll('[data-random]').forEach(b => b.addEventListener('click', () => randomSelection(b.dataset.random, Number(b.dataset.count))));
+document.querySelectorAll('[data-clear]').forEach(b => b.addEventListener('click', () => clearSelection(b.dataset.clear)));
+
+document.querySelectorAll('.factory-menu .nav-link').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('.factory-menu .nav-link').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.factory-panel').forEach(x => x.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+    hideFeedback();
+}));
+
+document.getElementById('math-mode-select').addEventListener('change', function() {
+    document.getElementById('closure-settings').style.display = this.value === 'reduced_closure' ? 'block' : 'none';
+});
+
+document.querySelectorAll('.generation-form').forEach(form => form.addEventListener('submit', async e => {
+    e.preventDefault();
+    hideFeedback();
+    
+    if(form.id === 'form-direto' && selections.direct.size !== 15) {
+        showFeedback('Selecione exatamente 15 dezenas no volante manual antes de gerar.', 'warning');
+        return;
+    }
+    if(form.id === 'form-matematico' && (selections.math.size < 16 || selections.math.size > 20)) {
+        showFeedback('Selecione entre 16 e 20 dezenas no volante para o desdobramento.', 'warning');
+        return;
+    }
+    
+    const btn = form.querySelector('button[type="submit"]');
+    const original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Processando...';
+    
+    try {
+        const response = await fetch('{{ url_for("smart_generate") }}', {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        });
+        const contentType = response.headers.get('content-type') || '';
+        const data = contentType.includes('application/json') ? await response.json() : {error: await response.text()};
+        
+        if(!response.ok || data.error) throw new Error(data.error || `HTTP ${response.status}`);
+        
+        displayResults(data);
+    } catch(err) {
+        showFeedback(err.message || String(err), 'danger');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+    }
+}));
+
+function displayResults(data) {
+    document.getElementById('results-area').style.display = 'block';
+    currentGeneratedGames = data.games || [];
+    currentStrategy = data.strategy || '';
+    currentAiRanking = data.ai_ranking || null;
+    
+    document.getElementById('games-count').textContent = data.total_generated || currentGeneratedGames.length;
+    document.getElementById('cost-display').textContent = `Custo: R$ ${Number(data.cost || 0).toFixed(2).replace('.', ',')}`;
+    document.getElementById('results-stats').textContent = `Exibindo ${currentGeneratedGames.length} jogo(s) otimizado(s).`;
+    
+    const grid = document.getElementById('games-grid');
+    grid.innerHTML = '';
+    
+    currentGeneratedGames.forEach((g, idx) => {
+        // Use the beautiful lottery-ball classes from base.css
+        const balls = g.numbers.map(n => `<span class="lottery-ball lottery-ball-sm ${n % 2 === 0 ? 'ball-even' : 'ball-odd'}">${String(n).padStart(2,'0')}</span>`).join('');
+        
+        grid.innerHTML += `
+        <div class="generated-card">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                <strong class="fs-5"><i class="fa-solid fa-ticket text-primary me-2"></i>Jogo ${String(idx+1).padStart(2,'0')}</strong>
+                <span class="badge rounded-pill bg-light text-dark border shadow-sm px-3 py-2"><i class="fa-solid fa-star text-warning me-1"></i>Score: ${Number(g.total_score||0).toFixed(1)}</span>
+            </div>
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+                ${balls}
+            </div>
+            <div class="small text-muted text-center bg-light p-2 rounded-3 border">
+                ${g.explanation || 'Jogo gerado pela estratégia.'}
+            </div>
+        </div>`;
+    });
+    
+    document.getElementById('results-area').scrollIntoView({behavior: 'smooth'});
+}
+
+document.getElementById('btn-save-games').addEventListener('click', async () => {
+    if(!currentGeneratedGames.length) return;
+    const btn = document.getElementById('btn-save-games');
+    const original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Salvando no Banco...';
+    
+    try {
+        const response = await fetch('{{ url_for("save_games") }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                strategy: currentStrategy,
+                games: currentGeneratedGames,
+                ai_ranking: currentAiRanking
+            })
+        });
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.error || 'Falha ao salvar jogos.');
+        
+        window.location.href = '{{ url_for("saved_games") }}';
+    } catch(err) {
+        showFeedback(err.message || String(err), 'danger');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+    }
+});
 </script>
 {% endblock %}

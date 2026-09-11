@@ -4,7 +4,152 @@
 
 {% block extra_head %}
 <style>
-.saved-hero{background:linear-gradient(135deg,#10002b 0%,#240046 55%,#3c096c 100%);color:#fff;border-radius:20px;padding:26px 28px;box-shadow:0 14px 35px rgba(36,0,70,.18);position:relative;overflow:hidden}.saved-hero:after{content:'';position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,183,3,.12);right:-65px;top:-90px}.saved-hero .eyebrow{color:#ffb703;font-weight:800;text-transform:uppercase;font-size:.75rem;letter-spacing:.08em}.summary-card{background:#fff;border:1px solid #ececf2;border-radius:16px;padding:18px;height:100%;box-shadow:0 7px 24px rgba(20,0,50,.05)}.summary-icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:#f3ebfb;color:#7b2cbf;font-size:1.2rem}.latest-draw{background:#fff;border:1px solid #ececf2;border-radius:18px;padding:20px;box-shadow:0 8px 26px rgba(20,0,50,.05)}.latest-balls{display:flex;gap:7px;flex-wrap:wrap}.latest-ball{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 35%,#c77dff,#7b2cbf 65%,#3c096c 100%);color:#fff;font-weight:800;font-size:.8rem;box-shadow:inset -2px -2px 4px rgba(0,0,0,.25),0 3px 7px rgba(123,44,191,.22)}.saved-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:20px}.saved-card{background:#fff;border:1px solid #ececf2;border-radius:18px;padding:20px;box-shadow:0 8px 24px rgba(20,0,50,.05);transition:.2s;position:relative;overflow:hidden}.saved-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(20,0,50,.09)}.saved-card.prize-15{border:2px solid #ffb703;box-shadow:0 12px 30px rgba(255,183,3,.2)}.saved-card.prize-14{border:2px solid #adb5bd}.saved-card.prize-13{border:2px solid #cd7f32}.strategy-pill{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#f3ebfb;color:#6a1b9a;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em}.status-pill{font-size:.72rem;font-weight:800;padding:6px 10px;border-radius:999px}.status-wait{background:#fff3cd;color:#856404}.status-done{background:#d8f3dc;color:#137333}.ticket-meta{font-size:.78rem;color:#7a7f89}.game-balls{display:flex;flex-wrap:wrap;gap:7px}.saved-ball{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 35%,#f4f5f7,#d9dde3 70%,#adb5bd);color:#343a40;font-weight:800;font-size:.82rem;border:1px solid #d6dae0}.saved-ball.hit{background:radial-gradient(circle at 35% 35%,#70e000,#38b000 65%,#007200);color:#fff;border-color:#38b000;box-shadow:0 3px 8px rgba(56,176,0,.24)}.detail-box{background:#f8f9fa;border-radius:12px;padding:11px 13px;color:#6c757d;font-size:.82rem;line-height:1.45}.score-box{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f0f1f3;padding-top:14px;margin-top:14px}.score-value{font-size:1.15rem;font-weight:800;color:#7b2cbf}.hits-pill{padding:7px 12px;border-radius:999px;font-weight:800;font-size:.8rem;background:#f1f3f5;color:#495057}.hits-pill.win{background:linear-gradient(135deg,#ffb703,#fb8500);color:#fff}.empty-state{background:#fff;border:1px dashed #d7c4ea;border-radius:18px;padding:48px 20px;text-align:center}.empty-icon{width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;background:#f3ebfb;color:#7b2cbf;font-size:1.8rem}.legend-dot{width:11px;height:11px;border-radius:50%;display:inline-block}.pagination-note{font-size:.8rem;color:#8a8f99}
+/* Modern styling for Meus Jogos */
+.saved-hero {
+    background: linear-gradient(135deg, #10002b 0%, #240046 55%, #3c096c 100%);
+    color: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 14px 35px rgba(36,0,70,.18);
+    position: relative;
+    overflow: hidden;
+}
+.saved-hero:after {
+    content: '';
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    background: rgba(255, 183, 3, 0.15);
+    right: -80px;
+    top: -100px;
+}
+.saved-hero .eyebrow {
+    color: #ffb703;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+}
+
+.summary-card {
+    background: #fff;
+    border: 1px solid #ececf2;
+    border-radius: 16px;
+    padding: 20px;
+    height: 100%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    transition: all 0.3s ease;
+}
+.summary-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    transform: translateY(-2px);
+}
+.summary-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3ebfb;
+    color: #7b2cbf;
+    font-size: 1.4rem;
+}
+
+.latest-draw {
+    background: #fff;
+    border: 1px solid #ececf2;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.saved-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.saved-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+.saved-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    transform: translateY(-3px);
+}
+
+/* Prize Highlights */
+.saved-card.prize-15 { border: 2px solid #ffb703; box-shadow: 0 12px 30px rgba(255,183,3,.2); }
+.saved-card.prize-14 { border: 2px solid #adb5bd; }
+.saved-card.prize-13 { border: 2px solid #cd7f32; }
+
+.strategy-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #f3ebfb;
+    color: #6a1b9a;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.status-pill {
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 999px;
+}
+.status-wait { background: #fff3cd; color: #856404; }
+.status-done { background: #d8f3dc; color: #137333; }
+
+.ticket-meta {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* For hit numbers */
+.ball-hit {
+    box-shadow: 0 0 0 3px #38b000 !important;
+    border-color: #38b000 !important;
+}
+
+.empty-state {
+    background: #fff;
+    border: 2px dashed #d7c4ea;
+    border-radius: 18px;
+    padding: 60px 20px;
+    text-align: center;
+}
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    background: #f3ebfb;
+    color: #7b2cbf;
+    font-size: 2rem;
+}
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
 </style>
 {% endblock %}
 
@@ -21,28 +166,57 @@
         <div class="d-flex justify-content-between align-items-end flex-wrap gap-3">
             <div>
                 <h2 class="fw-bold mb-2">Meus Jogos Salvos</h2>
-                <p class="mb-0" style="color:rgba(255,255,255,.72)">Acompanhe os jogos gerados, concurso-alvo, score e desempenho contra o último resultado cadastrado.</p>
+                <p class="mb-0" style="color:rgba(255,255,255,.8)">Acompanhe os jogos gerados, pontuações de IA e o desempenho contra o último resultado oficial.</p>
             </div>
-            <a href="{{ url_for('smart_generate') }}" class="btn btn-warning rounded-pill fw-bold px-4 py-2"><i class="fa-solid fa-plus me-2"></i>Gerar novos jogos</a>
+            <a href="{{ url_for('smart_generate') }}" class="btn btn-warning rounded-pill fw-bold px-4 py-2 shadow-sm">
+                <i class="fa-solid fa-plus me-2"></i>Gerar novos jogos
+            </a>
         </div>
     </div>
 </div>
 
-<div class="row g-3 mb-4">
-    <div class="col-md-4"><div class="summary-card d-flex align-items-center gap-3"><div class="summary-icon"><i class="fa-solid fa-ticket"></i></div><div><div class="text-muted small fw-semibold">Jogos armazenados</div><div class="fs-3 fw-bold" style="color:#240046">{{ saved_games|length }}</div></div></div></div>
-    <div class="col-md-4"><div class="summary-card d-flex align-items-center gap-3"><div class="summary-icon"><i class="fa-solid fa-trophy"></i></div><div><div class="text-muted small fw-semibold">Melhor resultado no último sorteio</div><div class="fs-3 fw-bold" style="color:#240046">{{ ns.best }} <span class="fs-6 text-muted fw-normal">acertos</span></div></div></div></div>
-    <div class="col-md-4"><div class="summary-card d-flex align-items-center gap-3"><div class="summary-icon"><i class="fa-solid fa-chart-line"></i></div><div><div class="text-muted small fw-semibold">Status</div><div class="fw-bold" style="color:#240046">{{ ns.evaluated }} avaliados · {{ ns.pending }} pendentes</div></div></div></div>
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="summary-card d-flex align-items-center gap-3">
+            <div class="summary-icon"><i class="fa-solid fa-ticket"></i></div>
+            <div>
+                <div class="text-muted small fw-bold text-uppercase">Jogos Armazenados</div>
+                <div class="fs-3 fw-bold" style="color:#240046">{{ saved_games|length }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="summary-card d-flex align-items-center gap-3">
+            <div class="summary-icon"><i class="fa-solid fa-trophy"></i></div>
+            <div>
+                <div class="text-muted small fw-bold text-uppercase">Melhor Resultado Recente</div>
+                <div class="fs-3 fw-bold" style="color:#240046">{{ ns.best }} <span class="fs-6 text-muted fw-normal">acertos</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="summary-card d-flex align-items-center gap-3">
+            <div class="summary-icon"><i class="fa-solid fa-chart-line"></i></div>
+            <div>
+                <div class="text-muted small fw-bold text-uppercase">Status de Avaliação</div>
+                <div class="fw-bold" style="color:#240046">{{ ns.evaluated }} <span class="fw-normal text-muted">avaliados</span></div>
+                <div class="fw-bold" style="color:#240046">{{ ns.pending }} <span class="fw-normal text-muted">pendentes</span></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="latest-draw mb-4">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-            <h5 class="fw-bold mb-1" style="color:#240046"><i class="fa-solid fa-bullseye text-warning me-2"></i>Último sorteio cadastrado</h5>
-            <p class="text-muted small mb-0">As dezenas verdes nos cards abaixo coincidem com este resultado.</p>
+            <h5 class="fw-bold mb-1" style="color:#240046"><i class="fa-solid fa-bullseye text-warning me-2"></i>Último Sorteio Oficial</h5>
+            <p class="text-muted small mb-0">Dezenas com contorno verde nos cartões abaixo coincidem com este resultado.</p>
         </div>
-        <div class="latest-balls">
-            {% for b in last_draw|sort %}<span class="latest-ball">{{ "%02d"|format(b) }}</span>{% endfor %}
-            {% if not last_draw %}<span class="text-muted small">Nenhum concurso cadastrado.</span>{% endif %}
+        <div class="d-flex flex-wrap gap-2">
+            {% for b in last_draw|sort %}
+                <span class="lottery-ball lottery-ball-sm {{ 'ball-even' if b % 2 == 0 else 'ball-odd' }}">{{ "%02d"|format(b) }}</span>
+            {% endfor %}
+            {% if not last_draw %}<span class="text-muted small">Nenhum concurso cadastrado no banco.</span>{% endif %}
         </div>
     </div>
 </div>
@@ -51,47 +225,71 @@
 <div class="empty-state">
     <div class="empty-icon"><i class="fa-solid fa-ticket"></i></div>
     <h4 class="fw-bold" style="color:#240046">Nenhum jogo salvo ainda</h4>
-    <p class="text-muted mb-4">Crie jogos na Fábrica de Jogos e salve as combinações que deseja acompanhar.</p>
-    <a href="{{ url_for('smart_generate') }}" class="btn btn-primary rounded-pill px-4 fw-bold"><i class="fa-solid fa-industry me-2"></i>Abrir Fábrica de Jogos</a>
+    <p class="text-muted mb-4 fs-5">Crie jogos utilizando a nossa Fábrica de Jogos e salve as combinações que deseja acompanhar.</p>
+    <a href="{{ url_for('smart_generate') }}" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+        <i class="fa-solid fa-industry me-2"></i>Abrir Fábrica de Jogos
+    </a>
 </div>
 {% else %}
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-    <h4 class="fw-bold mb-0" style="color:#240046"><i class="fa-solid fa-layer-group text-primary me-2"></i>Jogos recentes</h4>
-    <div class="d-flex gap-3 small text-muted"><span><span class="legend-dot me-1" style="background:#38b000"></span>Acertou no último sorteio</span><span><span class="legend-dot me-1" style="background:#d9dde3"></span>Não sorteada</span></div>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 mt-5">
+    <h4 class="fw-bold mb-0" style="color:#240046"><i class="fa-solid fa-layer-group text-primary me-2"></i>Histórico Completo</h4>
+    <div class="d-flex gap-3 small text-muted">
+        <span><span class="legend-dot me-1" style="background:#38b000"></span>Acertou no último</span>
+        <span><span class="legend-dot me-1 bg-secondary"></span>Não sorteada</span>
+    </div>
 </div>
 
 <div class="saved-grid">
 {% for game in saved_games %}
     <article class="saved-card {% if game.hits_last_draw >= 13 %}prize-{{ game.hits_last_draw }}{% endif %}">
-        <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
-            <div>
-                <span class="strategy-pill"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>{{ game.strategy }}</span>
-                <div class="ticket-meta mt-2"><i class="fa-regular fa-clock me-1"></i>{{ game.created_at.strftime('%d/%m/%Y %H:%M') if game.created_at else 'Data indisponível' }}</div>
-            </div>
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+            <span class="strategy-pill shadow-sm"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>{{ game.strategy }}</span>
+            <span class="badge rounded-pill bg-light text-dark border shadow-sm px-3 py-2">
+                <i class="fa-solid fa-star text-warning me-1"></i>Score: {{ "%.1f"|format(game.score or 0) }}
+            </span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3 ticket-meta">
+            <span><i class="fa-regular fa-clock me-1"></i>{{ game.created_at.strftime('%d/%m/%y %H:%M') if game.created_at else 'Data N/A' }}</span>
             {% if game.locked_at %}
-                <span class="status-pill status-done"><i class="fa-solid fa-lock me-1"></i>Avaliado</span>
+                <span class="status-pill status-done"><i class="fa-solid fa-lock me-1"></i>Finalizado</span>
             {% else %}
-                <span class="status-pill status-wait"><i class="fa-solid fa-hourglass-half me-1"></i>Conc. {{ game.target_contest or '-' }}</span>
+                <span class="status-pill status-wait"><i class="fa-solid fa-hourglass-half me-1"></i>Alvo: {{ game.target_contest or 'N/A' }}</span>
             {% endif %}
         </div>
-
+        
         {% if game.generation_id %}
-        <div class="ticket-meta mb-3 d-flex justify-content-between"><span><i class="fa-solid fa-barcode me-1"></i>Geração {{ game.generation_id[-6:] }}</span><span>Alvo: {{ game.target_contest or '-' }}</span></div>
+        <div class="ticket-meta mb-3 bg-light p-2 rounded text-center border">
+            <i class="fa-solid fa-barcode me-1"></i>Lote: {{ game.generation_id[-6:] }}
+        </div>
         {% endif %}
 
-        <div class="game-balls mb-3">
-            {% for n in game.numbers %}<span class="saved-ball {% if n in last_draw %}hit{% endif %}">{{ "%02d"|format(n) }}</span>{% endfor %}
+        <div class="d-flex flex-wrap justify-content-center gap-2 mb-4 mt-auto">
+            {% for n in game.numbers %}
+                <span class="lottery-ball lottery-ball-sm {{ 'ball-even' if n % 2 == 0 else 'ball-odd' }} {% if n in last_draw %}ball-hit{% endif %}">
+                    {{ "%02d"|format(n) }}
+                </span>
+            {% endfor %}
         </div>
 
-        <div class="detail-box"><i class="fa-solid fa-circle-info me-1"></i>{{ game.details_obj.explanation if game.details_obj.explanation else 'Jogo salvo sem explicação adicional.' }}</div>
+        <div class="small text-muted text-center bg-light p-2 rounded-3 border mb-3">
+            {{ game.details_obj.explanation if game.details_obj.explanation else 'Jogo gerado pela estratégia.' }}
+        </div>
 
-        <div class="score-box">
-            <div><div class="text-muted small">Score do jogo</div><div class="score-value">{{ "%.1f"|format(game.score or 0) }}</div></div>
-            <span class="hits-pill {% if game.hits_last_draw >= 11 %}win{% endif %}"><i class="fa-solid fa-bullseye me-1"></i>{{ game.hits_last_draw }} acertos</span>
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+            <div class="text-muted fw-bold small">Desempenho no Sorteio:</div>
+            <span class="badge rounded-pill {% if game.hits_last_draw >= 11 %}bg-success{% else %}bg-secondary{% endif %} px-3 py-2 shadow-sm">
+                <i class="fa-solid fa-bullseye me-1"></i>{{ game.hits_last_draw }} acertos
+            </span>
         </div>
     </article>
 {% endfor %}
 </div>
-<p class="pagination-note mt-3 mb-0"><i class="fa-solid fa-circle-info me-1"></i>Exibindo até os 500 jogos salvos mais recentes.</p>
+<div class="text-center mt-5 mb-4">
+    <p class="pagination-note mb-0 bg-white d-inline-block px-4 py-2 rounded-pill border shadow-sm">
+        <i class="fa-solid fa-circle-info text-primary me-2"></i>Exibindo até os 500 jogos salvos mais recentes.
+    </p>
+</div>
 {% endif %}
 {% endblock %}
+
