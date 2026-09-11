@@ -269,26 +269,7 @@ def setup_db():
     if not _db_initialized:
         try:
             cur = mysql.connection.cursor()
-            cur.execute("""
-            CREATE TABLE IF NOT EXISTS saved_games (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                created_at DATETIME,
-                strategy VARCHAR(100),
-                balls VARCHAR(100),
-                score FLOAT,
-                details JSON,
-                hash VARCHAR(32) UNIQUE,
-                generation_id VARCHAR(50),
-                target_contest INT,
-                locked_at DATETIME,
-                hits INT
-            ),
-                balls VARCHAR(100),
-                score FLOAT,
-                details JSON,
-                hash VARCHAR(32) UNIQUE
-            )
-            """)
+            cur.execute("SELECT 1")
             mysql.connection.commit()
             cur.close()
             _db_initialized = True
