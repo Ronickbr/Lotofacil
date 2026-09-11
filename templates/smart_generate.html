@@ -4,382 +4,531 @@
 
 {% block extra_head %}
 <style>
-/* Modern CSS for Fábrica de Jogos */
+/* Ultra-Premium Factory UI Redesign */
+.factory-hero {
+    background: linear-gradient(135deg, #240046 0%, #3c096c 40%, #5a189a 75%, #7b2cbf 100%);
+    color: white;
+    padding: 40px 45px;
+    border-radius: 24px;
+    margin-bottom: 35px;
+    box-shadow: 0 20px 45px rgba(60, 9, 108, 0.35);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.factory-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 550px;
+    height: 550px;
+    background: radial-gradient(circle, rgba(255, 183, 3, 0.2) 0%, rgba(123, 44, 191, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+.factory-hero h1 {
+    font-weight: 800;
+    font-size: 2.6rem;
+    letter-spacing: -0.5px;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+.factory-hero p {
+    font-size: 1.15rem;
+    opacity: 0.92;
+    max-width: 680px;
+    line-height: 1.6;
+}
+
 .factory-shell {
     display: grid;
-    grid-template-columns: 280px minmax(0, 1fr);
-    gap: 24px;
+    grid-template-columns: 290px minmax(0, 1fr);
+    gap: 30px;
+    align-items: start;
+}
+
+.factory-menu-card {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(123, 44, 191, 0.08);
 }
 .factory-menu .nav-link {
     font-weight: 700;
-    color: #5b6170;
-    padding: 12px 16px;
-    border-radius: 10px;
-    margin-bottom: 8px;
-    transition: all 0.2s ease;
-    border: none;
+    color: #495057;
+    padding: 15px 20px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    border: 1px solid transparent;
     text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 0.98rem;
+    background: #f8f9fa;
+}
+.factory-menu .nav-link i {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+    width: 24px;
+    text-align: center;
 }
 .factory-menu .nav-link:hover {
-    background: #f3ebfb;
+    background: rgba(123, 44, 191, 0.08);
     color: #7b2cbf;
+    border-color: rgba(123, 44, 191, 0.2);
+    transform: translateX(5px);
 }
 .factory-menu .nav-link.active {
-    background: linear-gradient(135deg, #7b2cbf, #5a189a);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(123, 44, 191, 0.25);
+    background: linear-gradient(135deg, #7b2cbf 0%, #5a189a 100%);
+    color: #ffffff;
+    box-shadow: 0 8px 25px rgba(123, 44, 191, 0.35);
+    border-color: transparent;
+    transform: translateX(0);
 }
+.factory-menu .nav-link.active i {
+    color: #ffb703;
+    transform: scale(1.15);
+}
+
 .factory-panel {
     display: none;
-    animation: fadeIn 0.3s ease-in-out;
+    animation: fadeInSlide 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(123, 44, 191, 0.08);
+    overflow: hidden;
 }
-.factory-panel.active {
-    display: block;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+.factory-panel.active { display: block; }
+
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-.number-grid {
+.panel-header-custom {
+    background: linear-gradient(to right, #fcfbfe, #f8f9fa);
+    padding: 28px 35px;
+    border-bottom: 1px solid #f1f3f5;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+.panel-icon-box {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.form-card-section {
+    border: 1px solid #edf2f7;
+    border-radius: 20px;
+    padding: 28px;
+    background: #fcfbfe;
+    margin-bottom: 25px;
+}
+
+.number-grid-interactive {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin: 20px 0;
+    gap: 12px;
+    justify-content: center;
+    margin: 25px 0;
 }
-.number-choice {
-    width: 48px;
-    height: 48px;
+.num-ball-btn {
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     border: 2px solid #e9ecef;
-    background: #fff;
-    color: #495057;
+    background: #ffffff;
+    color: #2b2d42;
     font-weight: 800;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
-.number-choice:hover {
+.num-ball-btn:hover {
     border-color: #9d4edd;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(157, 78, 221, 0.15);
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: 0 8px 20px rgba(157, 78, 221, 0.25);
+    color: #7b2cbf;
 }
-.number-choice.selected {
-    background: radial-gradient(circle at 35% 35%, #9d4edd, #5a189a);
-    color: #fff;
+.num-ball-btn.selected {
+    background: radial-gradient(circle at 35% 35%, #9d4edd, #7b2cbf 65%, #3c096c 100%);
+    color: #ffffff;
     border-color: #5a189a;
-    box-shadow: 0 4px 12px rgba(90, 24, 154, 0.3);
+    box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.3), inset 2px 2px 4px rgba(255, 255, 255, 0.6), 0 8px 20px rgba(90, 24, 154, 0.4);
+    transform: scale(1.08);
 }
 
-.counter-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #f3ebfb;
+.counter-badge {
+    background: linear-gradient(135deg, rgba(123, 44, 191, 0.1), rgba(90, 24, 154, 0.15));
     color: #5a189a;
-    padding: 8px 16px;
-    border-radius: 999px;
+    padding: 10px 22px;
+    border-radius: 99px;
     font-weight: 800;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    border: 1px solid rgba(123, 44, 191, 0.2);
 }
-.form-card {
-    border: 1px solid #edf2f7;
-    border-radius: 14px;
-    padding: 20px;
-    background: #f8f9fa;
-}
-.results-grid {
+
+.results-grid-2col {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
 }
-.generated-card {
-    border: 1px solid #e9ecef;
-    border-radius: 16px;
-    padding: 20px;
-    background: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    transition: all 0.3s ease;
+.generated-game-card {
+    background: #ffffff;
+    border: 1px solid rgba(123, 44, 191, 0.12);
+    border-radius: 24px;
+    padding: 26px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
 }
-.generated-card:hover {
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-    transform: translateY(-3px);
+.generated-game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 40px rgba(123, 44, 191, 0.15);
+    border-color: #9d4edd;
 }
-.sticky-save {
+
+.sticky-bottom-bar {
     position: sticky;
-    bottom: 20px;
+    bottom: 25px;
     z-index: 100;
     background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid #e9ecef;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    padding: 16px 24px;
-}
-.panel-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: #f3ebfb;
-    color: #7b2cbf;
-    font-size: 1.25rem;
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(123, 44, 191, 0.15);
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    padding: 20px 32px;
+    margin-top: 35px;
 }
 
-@media(max-width:992px){
+@media (max-width: 992px) {
     .factory-shell { grid-template-columns: 1fr; }
+    .results-grid-2col { grid-template-columns: 1fr; }
+    .factory-hero { padding: 30px 25px; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-    <div>
-        <h2 class="fw-bold mb-1" style="color:#10002b"><i class="fa-solid fa-industry text-primary me-2"></i>Fábrica de Jogos</h2>
-        <p class="text-muted mb-0">Gere apostas otimizadas utilizando estatísticas, matemática e inteligência artificial.</p>
+<!-- Top Hero Banner -->
+<div class="factory-hero">
+    <div class="position-relative" style="z-index: 2;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-4">
+            <div>
+                <h1 class="d-flex align-items-center gap-3">
+                    <i class="fa-solid fa-industry text-warning"></i> Fábrica de Jogos
+                </h1>
+                <p class="mb-0">Crie cartões competitivos utilizando inteligência probabilística, análise combinatorial e redes neurais avançadas.</p>
+            </div>
+            <a href="{{ url_for('data.saved_games') }}" class="btn btn-warning btn-lg rounded-pill fw-bold px-4 py-3 shadow-sm d-inline-flex align-items-center gap-2 text-dark">
+                <i class="fa-solid fa-box-archive"></i> Ver Meus Jogos
+            </a>
+        </div>
     </div>
-    <a href="{{ url_for('data.saved_games') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
-        <i class="fa-solid fa-floppy-disk me-2"></i>Ver jogos salvos
-    </a>
 </div>
 
 <div class="factory-shell">
-    <aside class="factory-menu">
-        <div class="card card-custom p-3 mb-3 border-0 shadow-sm">
-            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                <button class="nav-link active" data-target="panel-direto"><i class="fa-solid fa-pen-to-square me-2"></i>Jogo Direto</button>
-                <button class="nav-link" data-target="panel-estatistico"><i class="fa-solid fa-chart-pie me-2"></i>Estratégias Estatísticas</button>
-                <button class="nav-link" data-target="panel-matematico"><i class="fa-solid fa-calculator me-2"></i>Desdobramento</button>
-                <button class="nav-link" data-target="panel-ia"><i class="fa-solid fa-robot me-2"></i>Inteligência Artificial</button>
-                <button class="nav-link" data-target="panel-montecarlo"><i class="fa-solid fa-dice me-2"></i>Monte Carlo</button>
+    <!-- Sidebar Menu Navigation -->
+    <aside>
+        <div class="factory-menu-card mb-4">
+            <h6 class="fw-extrabold text-uppercase text-muted mb-3 px-2 fs-7 letter-spacing-1">Estratégias de Geração</h6>
+            <div class="nav flex-column factory-menu" id="v-pills-tab" role="tablist">
+                <button class="nav-link active" data-target="panel-direto">
+                    <i class="fa-solid fa-pen-to-square"></i> Jogo Direto
+                </button>
+                <button class="nav-link" data-target="panel-estatistico">
+                    <i class="fa-solid fa-chart-pie"></i> Estatística
+                </button>
+                <button class="nav-link" data-target="panel-matematico">
+                    <i class="fa-solid fa-calculator"></i> Desdobramento
+                </button>
+                <button class="nav-link" data-target="panel-ia">
+                    <i class="fa-solid fa-robot"></i> Inteligência Artificial
+                </button>
+                <button class="nav-link" data-target="panel-montecarlo">
+                    <i class="fa-solid fa-dice"></i> Monte Carlo
+                </button>
             </div>
         </div>
-        <div class="alert alert-warning border-0 shadow-sm rounded-4 small">
-            <strong><i class="fa-solid fa-circle-info me-1"></i>Aviso Importante</strong><br>
-            As estratégias melhoram sua organização e cobertura probabilística, mas não garantem premiação. Jogue com responsabilidade.
+        
+        <div class="alert alert-warning border border-warning-subtle shadow-sm rounded-4 small p-3">
+            <div class="d-flex gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-warning fs-5"></i>
+                <div>
+                    <strong class="d-block mb-1 text-dark">Aviso Legal</strong>
+                    <span class="text-dark opacity-75">Nossas ferramentas otimizam a matemática da aposta, porém não garantem resultados futuros. Jogue com responsabilidade.</span>
+                </div>
+            </div>
         </div>
     </aside>
 
+    <!-- Main Content Panels -->
     <section>
         <div id="factory-feedback" class="alert rounded-4 shadow-sm" style="display:none;"></div>
 
         <!-- Panel: Jogo Direto -->
-        <div class="card card-custom factory-panel active border-0 shadow-sm" id="panel-direto">
-            <div class="card-header card-header-custom bg-white border-bottom-0 d-flex align-items-center gap-3 pt-4 pb-0">
-                <span class="panel-icon"><i class="fa-solid fa-pen-to-square"></i></span>
+        <div class="factory-panel active" id="panel-direto">
+            <div class="panel-header-custom">
+                <span class="panel-icon-box bg-primary bg-opacity-10 text-primary">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </span>
                 <div>
-                    <h5 class="fw-bold mb-0">Jogo Direto</h5>
-                    <small class="text-muted">Selecione exatamente 15 dezenas no volante manual</small>
+                    <h3 class="fw-bold mb-1 text-dark fs-4">Jogo Direto (Manual)</h3>
+                    <p class="text-muted mb-0 font-medium">Selecione exatamente 15 dezenas no volante interativo para análise de score</p>
                 </div>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-4 p-md-5">
                 <form class="generation-form" id="form-direto">
                     <input type="hidden" name="strategy" value="direto">
                     <input type="hidden" name="num_games" value="1">
                     <input type="hidden" name="numbers" id="direct-numbers">
                     
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 bg-light p-3 rounded-4 mb-3 border">
-                        <span class="counter-pill"><i class="fa-solid fa-check-double"></i><span id="direct-count">0</span>/15 selecionadas</span>
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 bg-light p-3 rounded-4 mb-4 border">
+                        <span class="counter-badge">
+                            <i class="fa-solid fa-check-double me-2"></i><span id="direct-count">0</span> / 15 Selecionadas
+                        </span>
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-outline-primary rounded-pill fw-bold" data-random="direct" data-count="15">
-                                <i class="fa-solid fa-shuffle me-1"></i> Surpresinha
+                            <button type="button" class="btn btn-outline-primary rounded-pill fw-bold px-4" data-random="direct" data-count="15">
+                                <i class="fa-solid fa-shuffle me-2"></i> Surpresinha
                             </button>
-                            <button type="button" class="btn btn-outline-danger rounded-pill fw-bold" data-clear="direct">
-                                <i class="fa-solid fa-trash-can me-1"></i> Limpar
+                            <button type="button" class="btn btn-outline-danger rounded-pill fw-bold px-4" data-clear="direct">
+                                <i class="fa-solid fa-trash-can me-2"></i> Limpar
                             </button>
                         </div>
                     </div>
                     
-                    <div class="number-grid justify-content-center mb-4" data-selector="direct"></div>
+                    <div class="number-grid-interactive" data-selector="direct"></div>
                     
-                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm">
-                        <i class="fa-solid fa-gears me-2"></i>Avaliar e Gerar Jogo
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm mt-3">
+                        <i class="fa-solid fa-gears me-2"></i> Avaliar e Gerar Cartão
                     </button>
                 </form>
             </div>
         </div>
 
         <!-- Panel: Estatístico -->
-        <div class="card card-custom factory-panel border-0 shadow-sm" id="panel-estatistico">
-            <div class="card-header card-header-custom bg-white border-bottom-0 d-flex align-items-center gap-3 pt-4 pb-0">
-                <span class="panel-icon"><i class="fa-solid fa-chart-pie"></i></span>
+        <div class="factory-panel" id="panel-estatistico">
+            <div class="panel-header-custom">
+                <span class="panel-icon-box bg-success bg-opacity-10 text-success">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </span>
                 <div>
-                    <h5 class="fw-bold mb-0">Estratégias Estatísticas</h5>
-                    <small class="text-muted">Geração baseada em tendências históricas</small>
+                    <h3 class="fw-bold mb-1 text-dark fs-4">Estratégias Estatísticas</h3>
+                    <p class="text-muted mb-0 font-medium">Algoritmo automático baseado nas métricas históricas de frequência e atraso</p>
                 </div>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-4 p-md-5">
                 <form class="generation-form">
-                    <div class="form-card mb-4">
-                        <label class="form-label fw-bold">Selecione a Estratégia</label>
-                        <select name="strategy" class="form-select form-select-lg mb-4 rounded-3 shadow-sm border-0">
-                            <option value="frequency">Mais Frequentes (Gera jogos com números quentes)</option>
-                            <option value="delay">Mais Atrasadas (Gera jogos com números que não saem há muito tempo)</option>
-                            <option value="repetition">Repetição do Último (Mantém 8 a 10 dezenas do último sorteio)</option>
+                    <div class="form-card-section">
+                        <label class="form-label fw-bold fs-5 text-dark mb-3">
+                            <i class="fa-solid fa-filter me-2 text-primary"></i>Selecione o Modelo Estatístico
+                        </label>
+                        <select name="strategy" class="form-select form-select-lg mb-4 rounded-4 shadow-sm border-0 py-3">
+                            <option value="frequency">🔥 Mais Frequentes (Foca nos números quentes)</option>
+                            <option value="delay">❄️ Mais Atrasadas (Foca em números com maior atraso)</option>
+                            <option value="repetition">🔄 Repetição (Otimiza de 8 a 10 dezenas do último sorteio)</option>
                         </select>
                         
-                        <label class="form-label fw-bold">Quantidade de Jogos</label>
-                        <input type="number" name="num_games" class="form-control form-control-lg rounded-3 shadow-sm border-0" value="6" min="1" max="50">
+                        <label class="form-label fw-bold fs-5 text-dark mt-2 mb-3">
+                            <i class="fa-solid fa-copy me-2 text-primary"></i>Quantidade de Jogos Desejados
+                        </label>
+                        <input type="number" name="num_games" class="form-control form-control-lg rounded-4 shadow-sm border-0 py-3" value="6" min="1" max="50">
                     </div>
-                    <button class="btn btn-success w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm" type="submit">
-                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Gerar Jogos Estatísticos
+                    <button class="btn btn-success w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm text-white" type="submit">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i> Gerar Jogos Estatísticos
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- Panel: Desdobramento -->
-        <div class="card card-custom factory-panel border-0 shadow-sm" id="panel-matematico">
-            <div class="card-header card-header-custom bg-white border-bottom-0 d-flex align-items-center gap-3 pt-4 pb-0">
-                <span class="panel-icon bg-warning bg-opacity-25 text-warning"><i class="fa-solid fa-calculator"></i></span>
+        <!-- Panel: Desdobramento Matemático -->
+        <div class="factory-panel" id="panel-matematico">
+            <div class="panel-header-custom">
+                <span class="panel-icon-box bg-warning bg-opacity-20 text-dark">
+                    <i class="fa-solid fa-calculator text-dark"></i>
+                </span>
                 <div>
-                    <h5 class="fw-bold mb-0">Desdobramento Matemático</h5>
-                    <small class="text-muted">Gere fechamentos combinatórios escolhendo 16 a 20 dezenas</small>
+                    <h3 class="fw-bold mb-1 text-dark fs-4">Desdobramento Combinatorial</h3>
+                    <p class="text-muted mb-0 font-medium">Gere fechamentos combinatórios escolhendo de 16 a 20 dezenas</p>
                 </div>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-4 p-md-5">
                 <form class="generation-form" id="form-matematico">
-                    <div class="form-card mb-3">
-                        <label class="form-label fw-bold">Modo de Desdobramento</label>
-                        <select name="strategy" id="math-mode-select" class="form-select form-select-lg rounded-3 border-0 shadow-sm mb-2">
+                    <div class="form-card-section">
+                        <label class="form-label fw-bold fs-5 text-dark mb-3">
+                            <i class="fa-solid fa-network-wired text-primary me-2"></i>Modo de Desdobramento
+                        </label>
+                        <select name="strategy" id="math-mode-select" class="form-select form-select-lg rounded-4 border-0 shadow-sm py-3 mb-2">
                             <option value="combinatorial_unfold">Desdobramento Completo (Todas as combinações)</option>
-                            <option value="reduced_closure">Fechamento Reduzido (Mais econômico)</option>
+                            <option value="reduced_closure">Fechamento Reduzido (Econômico e Otimizado)</option>
                         </select>
                     </div>
                     
                     <input type="hidden" name="numbers" id="math-numbers">
                     
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 bg-light p-3 rounded-4 mb-3 border">
-                        <span class="counter-pill text-warning bg-warning bg-opacity-10"><i class="fa-solid fa-check-double"></i><span id="math-count">0</span> de 16–20 selecionadas</span>
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 bg-light p-3 rounded-4 mb-4 border">
+                        <span class="counter-badge">
+                            <i class="fa-solid fa-check-double me-2 text-warning"></i><span id="math-count">0</span> de 16–20 Selecionadas
+                        </span>
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-outline-warning text-dark rounded-pill fw-bold" data-random="math" data-count="18">
-                                <i class="fa-solid fa-shuffle"></i> 18 Aleatórias
+                            <button type="button" class="btn btn-warning text-dark rounded-pill fw-bold px-4 shadow-sm" data-random="math" data-count="18">
+                                <i class="fa-solid fa-shuffle me-2"></i> 18 Aleatórias
                             </button>
-                            <button type="button" class="btn btn-outline-danger rounded-pill fw-bold" data-clear="math">Limpar</button>
+                            <button type="button" class="btn btn-outline-danger rounded-pill fw-bold px-4" data-clear="math">
+                                Limpar
+                            </button>
                         </div>
                     </div>
                     
-                    <div class="number-grid justify-content-center mb-4" data-selector="math"></div>
+                    <div class="number-grid-interactive" data-selector="math"></div>
                     
-                    <div id="closure-settings" class="form-card mb-4" style="display:none">
-                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-filter text-muted me-2"></i>Regras do Fechamento</h6>
-                        <div class="row g-3">
+                    <div id="closure-settings" class="form-card-section mb-4" style="display:none; background: #fffdf5; border-color: #ffe69c;">
+                        <h5 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-sliders text-warning me-2"></i>Garantias do Fechamento</h5>
+                        <div class="row g-4">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Garantir acertos de (ex: 14)</label>
-                                <input type="number" name="guarantee" class="form-control form-control-lg border-0 shadow-sm" value="14" min="11" max="15">
+                                <label class="form-label fw-bold text-dark">Garantir acertos de:</label>
+                                <input type="number" name="guarantee" class="form-control form-control-lg rounded-3 border-0 shadow-sm" value="14" min="11" max="15">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Se acertar (ex: 15) das escolhidas</label>
-                                <input type="number" name="condition" class="form-control form-control-lg border-0 shadow-sm" value="15" min="11" max="15">
+                                <label class="form-label fw-bold text-dark">Se acertar das escolhidas:</label>
+                                <input type="number" name="condition" class="form-control form-control-lg rounded-3 border-0 shadow-sm" value="15" min="11" max="15">
                             </div>
                         </div>
                     </div>
                     
-                    <div class="form-card mb-4">
-                        <label class="form-label fw-bold">Limite máximo de jogos para gerar</label>
-                        <input type="number" name="num_games" class="form-control form-control-lg border-0 shadow-sm" value="100" min="1" max="2000">
+                    <div class="form-card-section mb-4">
+                        <label class="form-label fw-bold fs-5 text-dark mb-3"><i class="fa-solid fa-ban text-danger me-2"></i>Limite máximo de cartões</label>
+                        <input type="number" name="num_games" class="form-control form-control-lg rounded-4 border-0 shadow-sm py-3" value="100" min="1" max="2000">
                     </div>
                     
-                    <button class="btn btn-warning w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm text-dark" type="submit">
-                        <i class="fa-solid fa-calculator me-2"></i>Executar Desdobramento
+                    <button class="btn btn-warning text-dark w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm" type="submit">
+                        <i class="fa-solid fa-calculator me-2"></i> Executar Desdobramento
                     </button>
                 </form>
             </div>
         </div>
 
         <!-- Panel: IA -->
-        <div class="card card-custom factory-panel border-0 shadow-sm" id="panel-ia">
-            <div class="card-header card-header-custom bg-white border-bottom-0 d-flex align-items-center gap-3 pt-4 pb-0">
-                <span class="panel-icon bg-danger bg-opacity-10 text-danger"><i class="fa-solid fa-robot"></i></span>
+        <div class="factory-panel" id="panel-ia">
+            <div class="panel-header-custom">
+                <span class="panel-icon-box bg-danger bg-opacity-10 text-danger">
+                    <i class="fa-solid fa-robot"></i>
+                </span>
                 <div>
-                    <h5 class="fw-bold mb-0">Inteligência Artificial</h5>
-                    <small class="text-muted">Redes neurais buscando a máxima probabilidade</small>
+                    <h3 class="fw-bold mb-1 text-dark fs-4">Inteligência Artificial & Machine Learning</h3>
+                    <p class="text-muted mb-0 font-medium">Predição probabilística via Random Forest com otimização genética de cartões</p>
                 </div>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-4 p-md-5">
                 <form class="generation-form">
                     <input type="hidden" name="strategy" value="ai_based">
-                    <div class="form-card mb-4">
-                        <p class="text-muted mb-4"><i class="fa-solid fa-microchip me-2"></i>O modelo Random Forest seleciona as 18 dezenas mais prováveis para o próximo concurso, e o algoritmo otimiza a distância de Hamming para garantir diversidade nos jogos gerados.</p>
-                        <label class="form-label fw-bold">Quantidade de Jogos</label>
-                        <input type="number" name="num_games" class="form-control form-control-lg border-0 shadow-sm" value="10" min="1" max="50">
+                    
+                    <div class="d-flex gap-4 mb-4 bg-light p-4 rounded-4 border align-items-center">
+                        <i class="fa-solid fa-microchip text-danger fs-1"></i>
+                        <p class="text-dark fw-medium mb-0 fs-6">O modelo seleciona dinamicamente as 18 dezenas com maior propensão estatística para o próximo sorteio e otimiza a dispersão de Hamming entre as apostas para garantir máxima cobertura.</p>
                     </div>
+                    
+                    <div class="form-card-section mb-4">
+                        <label class="form-label fw-bold fs-5 text-dark mb-3"><i class="fa-solid fa-copy text-primary me-2"></i>Quantidade de Cartões</label>
+                        <input type="number" name="num_games" class="form-control form-control-lg rounded-4 border-0 shadow-sm py-3" value="10" min="1" max="50">
+                    </div>
+                    
                     <button class="btn btn-danger w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm" type="submit">
-                        <i class="fa-solid fa-brain me-2"></i>Gerar via IA
+                        <i class="fa-solid fa-brain me-2"></i> Gerar via IA
                     </button>
                 </form>
             </div>
         </div>
 
         <!-- Panel: Monte Carlo -->
-        <div class="card card-custom factory-panel border-0 shadow-sm" id="panel-montecarlo">
-            <div class="card-header card-header-custom bg-white border-bottom-0 d-flex align-items-center gap-3 pt-4 pb-0">
-                <span class="panel-icon bg-info bg-opacity-10 text-info"><i class="fa-solid fa-dice"></i></span>
+        <div class="factory-panel" id="panel-montecarlo">
+            <div class="panel-header-custom">
+                <span class="panel-icon-box bg-info bg-opacity-10 text-info">
+                    <i class="fa-solid fa-dice"></i>
+                </span>
                 <div>
-                    <h5 class="fw-bold mb-0">Monte Carlo Avançado</h5>
-                    <small class="text-muted">Geração aleatória aplicando filtros estatísticos rígidos</small>
+                    <h3 class="fw-bold mb-1 text-dark fs-4">Simuladores de Monte Carlo</h3>
+                    <p class="text-muted mb-0 font-medium">Milhares de simulações aleatórias filtradas por balanço par/ímpar e sequências</p>
                 </div>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-4 p-md-5">
                 <form class="generation-form">
                     <input type="hidden" name="strategy" value="montecarlo">
-                    <div class="form-card mb-4">
+                    
+                    <div class="form-card-section mb-4">
+                        <h5 class="fw-bold text-dark mb-4"><i class="fa-solid fa-sliders text-primary me-2"></i>Filtros de Restrição</h5>
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Mínimo de números Pares</label>
-                                <input type="number" name="min_even" class="form-control border-0 shadow-sm" value="6">
+                                <label class="form-label fw-bold text-muted">Mín. Pares</label>
+                                <input type="number" name="min_even" class="form-control form-control-lg rounded-4 border-0 shadow-sm" value="6">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Máximo de números Pares</label>
-                                <input type="number" name="max_even" class="form-control border-0 shadow-sm" value="9">
+                                <label class="form-label fw-bold text-muted">Máx. Pares</label>
+                                <input type="number" name="max_even" class="form-control form-control-lg rounded-4 border-0 shadow-sm" value="9">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Máximo de Sequência Consecutiva</label>
-                                <input type="number" name="max_consecutive" class="form-control border-0 shadow-sm" value="5">
+                                <label class="form-label fw-bold text-muted">Máx. Sequência Consecutiva</label>
+                                <input type="number" name="max_consecutive" class="form-control form-control-lg rounded-4 border-0 shadow-sm" value="5">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Mín. Repetidas do Sorteio Anterior</label>
-                                <input type="number" name="min_repeat" class="form-control border-0 shadow-sm" value="8">
-                            </div>
-                            <div class="col-12 mt-4 pt-3 border-top">
-                                <label class="form-label fw-bold">Quantidade de Jogos para gerar</label>
-                                <input type="number" name="num_games" class="form-control form-control-lg border-0 shadow-sm" value="6" min="1" max="50">
+                                <label class="form-label fw-bold text-muted">Mín. Repetidas (do último sorteio)</label>
+                                <input type="number" name="min_repeat" class="form-control form-control-lg rounded-4 border-0 shadow-sm" value="8">
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="form-card-section mb-4">
+                        <label class="form-label fw-bold fs-5 text-dark mb-3">Quantidade de Jogos</label>
+                        <input type="number" name="num_games" class="form-control form-control-lg rounded-4 border-0 shadow-sm py-3" value="6" min="1" max="50">
+                    </div>
+                    
                     <button class="btn btn-info text-white w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm" type="submit">
-                        <i class="fa-solid fa-dice me-2"></i>Rodar Simulação
+                        <i class="fa-solid fa-dice me-2"></i> Executar Monte Carlo
                     </button>
                 </form>
             </div>
         </div>
 
         <!-- Results Area -->
-        <div id="results-area" style="display:none" class="mt-4">
-            <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
+        <div id="results-area" style="display:none" class="mt-5">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
                 <div>
-                    <h3 class="fw-bold mb-1"><i class="fa-solid fa-circle-check text-success me-2"></i>Jogos Gerados</h3>
-                    <p id="results-stats" class="text-muted mb-0"></p>
+                    <h2 class="fw-extrabold text-dark mb-1 d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-success fs-3"></i> Lote Gerado com Sucesso
+                    </h2>
+                    <p id="results-stats" class="text-muted mb-0 fs-5"></p>
                 </div>
             </div>
             
-            <div class="sticky-save d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-                <div>
-                    <strong id="cost-display" class="fs-4" style="color:#7b2cbf">Custo: R$ 0,00</strong>
-                    <div class="small text-muted"><span id="games-count" class="fw-bold">0</span> jogos na lista</div>
-                </div>
-                <button id="btn-save-games" class="btn btn-success rounded-pill px-4 py-3 fw-bold fs-5 shadow-sm">
-                    <i class="fa-solid fa-cloud-arrow-up me-2"></i>Salvar Jogos no Banco
-                </button>
-            </div>
+            <div class="results-grid-2col" id="games-grid"></div>
             
-            <div class="results-grid" id="games-grid"></div>
+            <div class="sticky-bottom-bar">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div>
+                        <strong id="cost-display" class="fw-extrabold d-block text-primary fs-2 line-height-1">Custo: R$ 0,00</strong>
+                        <div class="fs-6 text-muted"><span id="games-count" class="fw-bold text-dark">0</span> cartões prontos nesta execução.</div>
+                    </div>
+                    <button id="btn-save-games" class="btn btn-success btn-lg rounded-pill px-5 py-3 fw-bold fs-5 shadow">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i> Salvar Lote no Banco de Dados
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
 </div>
@@ -392,10 +541,11 @@ const selections = { direct: new Set(), math: new Set() };
 
 function buildSelector(key) {
     const grid = document.querySelector(`[data-selector="${key}"]`);
+    grid.innerHTML = '';
     for(let n = 1; n <= 25; n++) {
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'number-choice';
+        b.className = 'num-ball-btn';
         b.textContent = String(n).padStart(2,'0');
         b.dataset.number = n;
         b.addEventListener('click', () => toggleNumber(key, n, b));
@@ -429,7 +579,7 @@ function syncSelection(key) {
 
 function clearSelection(key) {
     selections[key].clear();
-    document.querySelectorAll(`[data-selector="${key}"] .number-choice`).forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll(`[data-selector="${key}"] .num-ball-btn`).forEach(b => b.classList.remove('selected'));
     syncSelection(key);
 }
 
@@ -442,16 +592,17 @@ function randomSelection(key, count) {
     }
     nums.slice(0, count).forEach(n => {
         selections[key].add(n);
-        document.querySelector(`[data-selector="${key}"] [data-number="${n}"]`).classList.add('selected');
+        const btn = document.querySelector(`[data-selector="${key}"] [data-number="${n}"]`);
+        if(btn) btn.classList.add('selected');
     });
     syncSelection(key);
 }
 
 function showFeedback(message, type='danger') {
     const el = document.getElementById('factory-feedback');
-    el.className = `alert alert-${type} mb-4 rounded-4 shadow-sm border-0`;
-    el.innerHTML = `<i class="fa-solid fa-circle-info me-2"></i>${message}`;
-    el.style.display = 'block';
+    el.className = `alert alert-${type} mb-4 rounded-4 shadow-sm border-0 d-flex align-items-center gap-3`;
+    el.innerHTML = `<i class="fa-solid fa-circle-info fs-4"></i><div>${message}</div>`;
+    el.style.display = 'flex';
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
@@ -493,7 +644,7 @@ document.querySelectorAll('.generation-form').forEach(form => form.addEventListe
     const btn = form.querySelector('button[type="submit"]');
     const original = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Processando...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> Processando Algoritmo...';
     
     try {
         const response = await fetch('{{ url_for('ml.smart_generate') }}', {
@@ -523,31 +674,30 @@ function displayResults(data) {
     
     document.getElementById('games-count').textContent = data.total_generated || currentGeneratedGames.length;
     document.getElementById('cost-display').textContent = `Custo: R$ ${Number(data.cost || 0).toFixed(2).replace('.', ',')}`;
-    document.getElementById('results-stats').textContent = `Exibindo ${currentGeneratedGames.length} jogo(s) otimizado(s).`;
+    document.getElementById('results-stats').textContent = `Exibindo ${currentGeneratedGames.length} jogo(s) perfeitamente otimizado(s).`;
     
     const grid = document.getElementById('games-grid');
     grid.innerHTML = '';
     
     currentGeneratedGames.forEach((g, idx) => {
-        // Use the beautiful lottery-ball classes from base.css
-        const balls = g.numbers.map(n => `<span class="lottery-ball lottery-ball-sm ${n % 2 === 0 ? 'ball-even' : 'ball-odd'}">${String(n).padStart(2,'0')}</span>`).join('');
+        const balls = g.numbers.map(n => `<span class="lottery-ball lottery-ball-sm ${n % 2 === 0 ? 'ball-even' : 'ball-odd'} shadow-sm">${String(n).padStart(2,'0')}</span>`).join('');
         
         grid.innerHTML += `
-        <div class="generated-card">
+        <div class="generated-game-card">
             <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-                <strong class="fs-5"><i class="fa-solid fa-ticket text-primary me-2"></i>Jogo ${String(idx+1).padStart(2,'0')}</strong>
-                <span class="badge rounded-pill bg-light text-dark border shadow-sm px-3 py-2"><i class="fa-solid fa-star text-warning me-1"></i>Score: ${Number(g.total_score||0).toFixed(1)}</span>
+                <strong class="fs-5 text-dark"><i class="fa-solid fa-ticket text-primary me-2"></i>Jogo ${String(idx+1).padStart(2,'0')}</strong>
+                <span class="badge rounded-pill bg-light text-dark border shadow-sm px-3 py-2 fs-6"><i class="fa-solid fa-star text-warning me-1"></i>Score: ${Number(g.total_score||0).toFixed(1)}</span>
             </div>
-            <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-3 p-3 bg-light rounded-4 border">
                 ${balls}
             </div>
-            <div class="small text-muted text-center bg-light p-2 rounded-3 border">
-                ${g.explanation || 'Jogo gerado pela estratégia.'}
+            <div class="small text-muted text-center bg-white p-3 rounded-4 border shadow-sm font-medium">
+                ${g.explanation || 'Jogo gerado e otimizado pela estratégia.'}
             </div>
         </div>`;
     });
     
-    document.getElementById('results-area').scrollIntoView({behavior: 'smooth'});
+    document.getElementById('results-area').scrollIntoView({behavior: 'smooth', block: 'start'});
 }
 
 document.getElementById('btn-save-games').addEventListener('click', async () => {
@@ -555,7 +705,7 @@ document.getElementById('btn-save-games').addEventListener('click', async () => 
     const btn = document.getElementById('btn-save-games');
     const original = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Salvando no Banco...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> Salvando no Banco de Dados...';
     
     try {
         const response = await fetch('{{ url_for('data.save_games') }}', {

@@ -4,73 +4,209 @@
 
 {% block extra_head %}
 <style>
-    .mlops-header { margin-bottom: 30px; }
-    .status-badge { font-size: 0.9rem; padding: 6px 12px; border-radius: 20px; font-weight: bold; }
-    .status-aguardando { background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid #ffc107; }
-    .status-avaliado { background: rgba(40, 167, 69, 0.2); color: #28a745; border: 1px solid #28a745; }
+    /* CSS for MLOps Redesign */
+    .mlops-header {
+        background: linear-gradient(135deg, #3c096c 0%, #5a189a 60%, #7b2cbf 100%);
+        color: white;
+        padding: 40px 30px;
+        border-radius: 20px;
+        margin-bottom: 40px;
+        box-shadow: 0 15px 35px rgba(90, 24, 154, 0.25);
+        position: relative;
+        overflow: hidden;
+    }
+    .mlops-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+        transform: rotate(30deg);
+        pointer-events: none;
+    }
+    .mlops-header h1 {
+        font-weight: 800;
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .mlops-header p {
+        font-size: 1.15rem;
+        opacity: 0.9;
+        max-width: 700px;
+    }
     
-    .card-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
-    .card-metric h3 { font-size: 2rem; margin: 10px 0 0; color: var(--primary-color); }
-    .card-metric p { color: var(--text-muted); margin: 0; font-size: 0.9rem; }
+    .status-badge { font-size: 0.8rem; padding: 6px 14px; border-radius: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;}
+    .status-aguardando { background: rgba(255, 193, 7, 0.15); color: #d39e00; border: 1px solid rgba(255,193,7,0.4); }
+    .status-avaliado { background: rgba(40, 167, 69, 0.15); color: #28a745; border: 1px solid rgba(40,167,69,0.4); }
     
-    .table-container { background: var(--bg-card); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); overflow-x: auto; }
+    .metric-wrapper {
+        perspective: 1000px;
+        margin-bottom: 25px;
+    }
+    .card-metric { 
+        background: rgba(255, 255, 255, 1);
+        border-radius: 20px; 
+        padding: 30px 20px; 
+        text-align: center; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        border: 1px solid rgba(0,0,0,0.04);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .card-metric::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 5px;
+        background: linear-gradient(90deg, #ffb703, #fb8500);
+        opacity: 0.9;
+    }
+    .card-metric:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    }
+    .card-metric i {
+        font-size: 2.2rem;
+        color: #7b2cbf;
+        margin-bottom: 15px;
+        display: block;
+    }
+    .card-metric h3 { font-size: 2.5rem; margin: 5px 0 5px; color: #10002b; font-weight: 800; line-height: 1;}
+    .card-metric p { color: #6c757d; margin: 0; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    .table-container { 
+        background: white; 
+        border-radius: 20px; 
+        padding: 25px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        border: 1px solid rgba(0,0,0,0.03);
+        overflow-x: auto; 
+        margin-bottom: 40px;
+    }
+    .table-custom {
+        margin-bottom: 0;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table-custom thead th {
+        background: #f8f9fa;
+        color: #495057;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        border-bottom: none;
+        padding: 18px 15px;
+    }
+    .table-custom thead th:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+    .table-custom thead th:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+    
+    .table-custom tbody td {
+        padding: 18px 15px;
+        vertical-align: middle;
+        color: #495057;
+        border-bottom: 1px solid #f1f3f5;
+        font-weight: 500;
+    }
+    .table-custom tbody tr:last-child td { border-bottom: none; }
+    .table-custom tbody tr { transition: background-color 0.2s ease; }
+    .table-custom tbody tr:hover { background-color: rgba(123, 44, 191, 0.04); }
+    
+    .section-title {
+        font-weight: 800;
+        color: #10002b;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 1.5rem;
+    }
+    .section-title i {
+        color: #7b2cbf;
+        background: rgba(123, 44, 191, 0.1);
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 1.3rem;
+    }
+    
+    .id-hash {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        padding: 4px 8px;
+        border-radius: 6px;
+        color: #6c757d;
+        font-family: monospace;
+        font-size: 0.85rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="header-section mlops-header">
-    <h1><i class="fas fa-network-wired"></i> MLOps & Aprendizado Contínuo</h1>
-    <p>Monitoramento automatizado do ciclo de vida dos modelos preditivos e das gerações de apostas.</p>
+    <h1><i class="fas fa-network-wired me-2"></i> MLOps & Aprendizado Contínuo</h1>
+    <p class="mb-0">Monitoramento automatizado do ciclo de vida dos modelos preditivos, avaliando precisão temporal e evolução das estratégias de IA.</p>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-3">
+<div class="row mb-5 g-4">
+    <div class="col-md-6 col-lg-3 metric-wrapper">
         <div class="card-metric">
-            <p>Concursos Avaliados</p>
+            <i class="fa-solid fa-microscope"></i>
             <h3>{{ model_perf|length }}</h3>
+            <p>Concursos Avaliados</p>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-6 col-lg-3 metric-wrapper">
         <div class="card-metric">
-            <p>Sessões de Geração</p>
+            <i class="fa-solid fa-bolt"></i>
             <h3>{{ generations|length }}</h3>
+            <p>Sessões de Geração</p>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-6 col-lg-3 metric-wrapper">
         <div class="card-metric">
-            <p>Brier Score Médio (Últ. 20)</p>
+            <i class="fa-solid fa-bullseye"></i>
             <h3>
                 {% if model_perf %}
                     {{ "%.3f"|format(model_perf|map(attribute='brier_score')|sum / model_perf|length) }}
                 {% else %}
-                    N/A
+                    <span class="text-muted fs-4">N/A</span>
                 {% endif %}
             </h3>
+            <p>Brier Score Médio (Últ. 20)</p>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-6 col-lg-3 metric-wrapper">
         <div class="card-metric">
-            <p>Média Top15 (Últ. 20)</p>
+            <i class="fa-solid fa-ranking-star"></i>
             <h3>
                 {% if model_perf %}
                     {{ "%.1f"|format(model_perf|map(attribute='top15_hits')|sum / model_perf|length) }}
                 {% else %}
-                    N/A
+                    <span class="text-muted fs-4">N/A</span>
                 {% endif %}
             </h3>
+            <p>Média Top15 (Últ. 20)</p>
         </div>
     </div>
 </div>
 
-<div class="mb-4">
-    <h4 class="mb-3"><i class="fas fa-list"></i> Histórico de Gerações e Validação Temporal</h4>
+<div class="mb-5">
+    <h3 class="section-title"><i class="fas fa-list"></i> Histórico de Gerações e Validação</h3>
     <div class="table-container">
-        <table class="table table-dark table-striped table-hover align-middle">
+        <table class="table table-custom">
             <thead>
                 <tr>
                     <th>ID Geração</th>
                     <th>Data</th>
-                    <th>Concurso Alvo</th>
+                    <th>Alvo</th>
                     <th>Estratégia</th>
                     <th>Jogos</th>
                     <th>Status</th>
@@ -81,40 +217,43 @@
             <tbody>
                 {% for gen in generations %}
                 <tr>
-                    <td><small><code>{{ gen.id }}</code></small></td>
+                    <td><span class="id-hash">{{ gen.id }}</span></td>
                     <td>{{ gen.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
-                    <td><strong class="text-warning">{{ gen.target_contest }}</strong></td>
-                    <td>{{ gen.strategy }}</td>
-                    <td>{{ gen.num_games }}</td>
+                    <td><strong class="text-primary fs-5">{{ gen.target_contest }}</strong></td>
+                    <td><span class="badge bg-light text-dark border"><i class="fa-solid fa-brain text-warning me-1"></i> {{ gen.strategy }}</span></td>
+                    <td><span class="fw-bold">{{ gen.num_games }}</span></td>
                     <td>
                         {% if gen.status == 'AGUARDANDO_RESULTADO' %}
-                            <span class="status-badge status-aguardando"><i class="fas fa-clock"></i> Aguardando {{ gen.target_contest }}</span>
+                            <span class="status-badge status-aguardando"><i class="fas fa-clock me-1"></i> Aguardando {{ gen.target_contest }}</span>
                         {% else %}
-                            <span class="status-badge status-avaliado"><i class="fas fa-check"></i> Avaliado</span>
+                            <span class="status-badge status-avaliado"><i class="fas fa-check me-1"></i> Avaliado</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if gen.status == 'AVALIADO' %}
-                            <strong>{{ "%.1f"|format(gen.metrics_obj.mean_game_hits) }}</strong> pts
+                            <strong class="text-success">{{ "%.1f"|format(gen.metrics_obj.mean_game_hits) }}</strong> <span class="text-muted small">pts</span>
                         {% else %}
-                            -
+                            <span class="text-muted">-</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if gen.status == 'AVALIADO' %}
                             {% if gen.metrics_obj.top15_hits %}
-                                <span class="badge bg-primary">{{ gen.metrics_obj.top15_hits }} / 15</span>
+                                <span class="badge bg-primary px-3 py-2 rounded-pill">{{ gen.metrics_obj.top15_hits }} / 15</span>
                             {% else %}
-                                -
+                                <span class="text-muted">-</span>
                             {% endif %}
                         {% else %}
-                            -
+                            <span class="text-muted">-</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="8" class="text-center">Nenhuma geração registrada ainda.</td>
+                    <td colspan="8" class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-ghost fs-1 mb-3 d-block opacity-50"></i>
+                        Nenhuma geração registrada ainda.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -122,14 +261,14 @@
     </div>
 </div>
 
-<div class="mb-4">
-    <h4 class="mb-3"><i class="fas fa-chart-line"></i> Desempenho Isolado do Modelo IA (Champion)</h4>
+<div class="mb-5">
+    <h3 class="section-title"><i class="fas fa-chart-line"></i> Desempenho Isolado do Modelo (Champion)</h3>
     <div class="table-container">
-        <table class="table table-dark table-striped table-hover align-middle">
+        <table class="table table-custom">
             <thead>
                 <tr>
-                    <th>Concurso</th>
-                    <th>Modelo</th>
+                    <th>Concurso Avaliado</th>
+                    <th>Versão do Modelo</th>
                     <th>Top 15 Hits</th>
                     <th>Top 18 Hits</th>
                     <th>Melhor Jogo Feito</th>
@@ -140,23 +279,26 @@
             <tbody>
                 {% for perf in model_perf %}
                 <tr>
-                    <td><strong>{{ perf.evaluated_contest }}</strong></td>
-                    <td><code>{{ perf.model_version }}</code></td>
-                    <td>{{ perf.top15_hits }}</td>
-                    <td>{{ perf.top18_hits }}</td>
+                    <td><strong class="text-primary fs-5">{{ perf.evaluated_contest }}</strong></td>
+                    <td><span class="id-hash"><i class="fa-solid fa-code-branch text-muted me-1"></i>{{ perf.model_version }}</span></td>
+                    <td><strong class="text-dark">{{ perf.top15_hits }}</strong> <span class="text-muted small">/ 15</span></td>
+                    <td><strong class="text-dark">{{ perf.top18_hits }}</strong> <span class="text-muted small">/ 18</span></td>
                     <td>
                         {% if perf.best_game_hits >= 14 %}
-                            <span class="badge bg-warning text-dark">{{ perf.best_game_hits }}</span>
+                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm fs-6"><i class="fa-solid fa-trophy me-1"></i> {{ perf.best_game_hits }} Acertos</span>
                         {% else %}
-                            {{ perf.best_game_hits }}
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">{{ perf.best_game_hits }} Acertos</span>
                         {% endif %}
                     </td>
-                    <td>{{ "%.4f"|format(perf.brier_score) }}</td>
-                    <td>{{ perf.status }}</td>
+                    <td><span class="fw-semibold">{{ "%.4f"|format(perf.brier_score) }}</span></td>
+                    <td><span class="status-badge status-avaliado">{{ perf.status }}</span></td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="7" class="text-center">Nenhum modelo avaliado até o momento.</td>
+                    <td colspan="7" class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-robot fs-1 mb-3 d-block opacity-50"></i>
+                        Nenhum modelo avaliado até o momento.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

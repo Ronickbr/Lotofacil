@@ -1,35 +1,43 @@
-# 🍀 Sistema de Análise da Lotofácil
+# 🍀 Sistema de Análise da Lotofácil — Analytics Pro
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)
 ![Flask](https://img.shields.io/badge/flask-%23000.svg?style=flat&logo=flask&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/bootstrap-5.3-purple)
 
-Uma plataforma avançada para análise estatística, gestão de resultados e previsão inteligente de sorteios da Lotofácil utilizando Machine Learning.
+Uma plataforma avançada para análise estatística, gestão de resultados, aprendizado contínuo (MLOps) e geração inteligente de cartões para a Lotofácil utilizando Machine Learning e combinações matemáticas.
 
 ---
 
 ## 📖 Sobre o Projeto
 
-Este sistema foi desenvolvido para oferecer ferramentas completas de análise estatística dos resultados da Lotofácil. Ele combina análises probabilísticas tradicionais (como estatística bayesiana e detecção de padrões) com modelos de aprendizado de máquina para prever as melhores dezenas para os próximos sorteios.
+Este sistema foi desenvolvido para oferecer ferramentas completas de análise estatística e geração estratégica dos resultados da Lotofácil. Ele combina análises probabilísticas avançadas (estatística bayesiana, filtros de Monte Carlo e desdobramentos combinatórios) com modelos de aprendizado de máquina (*RandomForest* e algoritmos genéticos).
+
+---
 
 ## ✨ Funcionalidades Principais
 
-- **📊 Dashboard Interativo:** Estatísticas gerais de frequência de números, distribuição de pares/ímpares e frequência por posição nas cartelas.
-- **📈 Análise Histórica:** Consulte períodos específicos (semana, mês, ano) com diferentes métodos preditivos (frequência, bayesiano, padrões sequenciais e método combinado).
-- **🤖 Machine Learning:** Previsão de próximos sorteios utilizando modelo RandomForest treinado com dados históricos em pares sequenciais.
-- **💾 Gerenciamento de Dados:** Upload de novos resultados manuais ou importação em lote para manter a base de dados atualizada.
-- **🔄 Sincronização CAIXA:** Consulta incremental gratuita do Portal Loterias CAIXA ao abrir a Gestão de Concursos, sem duplicar ou sobrescrever resultados existentes.
-- **🎯 Geração de Jogos:** Sugestão inteligente de jogos (cartelas) com base nas probabilidades calculadas e no modelo de IA.
+- **🏭 Fábrica de Jogos (`/smart-generate`):** Interface redesenhada com Hero Banner, menu lateral de estratégias (*Jogo Direto*, *Estatística*, *Desdobramento Combinatorial*, *IA* e *Monte Carlo*), volante numérico 3D interativo, visualização dos cartões em grid de 2 colunas com esferas codificadas por cor e barra flutuante para salvamento no banco.
+- **💾 Meus Jogos (`/saved-games`):** Gerenciamento e acompanhamento dos cartões salvos exibidos em layout responsivo de 2 colunas, com comparativo de acertos em relação ao último sorteio oficial.
+- **⚙️ MLOps & Aprendizado Contínuo (`/mlops`):** Painel de avaliação automatizada da acurácia dos modelos e histórico de performance das gerações.
+- **📊 Dashboard Interativo:** Estatísticas gerais de frequência de números, distribuição par/ímpar e análise por posição nas cartelas.
+- **📈 Análise Histórica:** Consultas por período (semana, mês, ano) com métodos de cálculo bayesiano, frequência e padrões sequenciais.
+- **🤖 Machine Learning:** Previsão de próximos sorteios utilizando modelo *RandomForest* treinado com pares sequenciais e distância de Hamming para diversidade de bilhetes.
+- **🔄 Sincronização CAIXA (`/sync-caixa`):** Atualização automática incremental a partir do serviço da CAIXA Econômica Federal.
 
-## 🛠️ Tecnologias Utilizadas
+---
 
-- **Backend:** Python, Flask (Arquitetura Modular em Blueprints)
-- **Machine Learning & Dados:** Scikit-Learn, Pandas, NumPy
-- **Documentação de API:** Flasgger (Swagger UI)
-- **Banco de Dados:** MySQL
-- **Infraestrutura:** Docker, Docker Compose
-- **Frontend:** HTML5, CSS3, JavaScript (Templates Bootstrap)
+## 🛠️ Arquitetura & Tecnologias Utilizadas
+
+- **Arquitetura Modular:** Aplicação Flask refatorada com Blueprints (`routes/main.py`, `routes/data.py`, `routes/analysis.py`, `routes/ml.py`).
+- **Camada de Serviços:** Regras de negócio e estatística isoladas em `services/stats_service.py`.
+- **Backend:** Python 3.8+, Flask, MySQL, Flasgger (Swagger UI).
+- **Machine Learning & Dados:** Scikit-Learn, Pandas, NumPy, SciPy.
+- **Frontend Moderno:** HTML5, CSS3 com variáveis customizadas, Glassmorphism, Font Awesome Pro/Free, Bootstrap 5.3.
+- **Infraestrutura:** Docker e Docker Compose com `.env` para gestão de segredos.
+
+---
 
 ## 🚀 Como Executar
 
@@ -41,48 +49,41 @@ Este sistema foi desenvolvido para oferecer ferramentas completas de análise es
 
 1. **Clone o repositório:**
    ```bash
-   git clone https://github.com/seu-usuario/lotofacil-analise.git
-   cd lotofacil-analise
+   git clone https://github.com/seu-usuario/lotofacil.git
+   cd lotofacil
    ```
 
-3. **Configuração de Variáveis de Ambiente:**
+2. **Configuração de Variáveis de Ambiente:**
    Copie o arquivo de exemplo e crie o seu `.env`:
    ```bash
    cp .env.example .env
    ```
-   *As credenciais padrão do banco já estão configuradas para rodar localmente.*
 
-4. **Inicie os containers com Docker:**
+3. **Inicie a aplicação com Docker:**
    ```bash
    docker-compose up --build -d
    ```
 
-5. **Acesse a aplicação:**
+4. **Acesse no seu navegador:**
    - **App Principal:** [http://localhost:5000](http://localhost:5000)
-   - **Documentação da API (Swagger):** [http://localhost:5000/apidocs/](http://localhost:5000/apidocs/)
-   - **Banco de Dados (phpMyAdmin):** [http://localhost:8081](http://localhost:8081)
+   - **Fábrica de Jogos:** [http://localhost:5000/smart-generate](http://localhost:5000/smart-generate)
+   - **Documentação Swagger:** [http://localhost:5000/apidocs/](http://localhost:5000/apidocs/)
+   - **phpMyAdmin:** [http://localhost:8081](http://localhost:8081)
 
-## 🧠 Como Funciona o Modelo Preditivo
-
-O sistema utiliza um **RandomForestClassifier** para encontrar padrões sequenciais nos sorteios (ex: Sorteio N -> Sorteio N+1).
-Antes de realizar previsões na tela de IA, é necessário treinar o modelo através da rota interna ou pelo painel do sistema, o que irá gerar o arquivo `lotofacil_model.pkl`.
-
-> **Nota:** Para que a previsão e análise histórica funcionem corretamente e com maior precisão, é necessário popular o banco de dados com os resultados oficiais mais recentes da Caixa.
+---
 
 ## 🔒 Segurança
 
-**Aviso Importante para Produção:** As senhas e dados sensíveis não são mais armazenadas no repositório. O banco de dados agora utiliza o arquivo `.env` para carregar as credenciais:
-- Sempre adicione seu arquivo `.env` ao `.gitignore`.
-- Ocultar a interface do phpMyAdmin ou desabilitar o container para implantação em produção.
+As credenciais do banco de dados e chave secreta do Flask utilizam o arquivo `.env` (ignorado pelo Git). Nunca envie o `.env` para o repositório público.
+
+---
 
 ## 🤝 Contribuindo
 
-Contribuições são muito bem-vindas! Se você tem alguma ideia para melhorar as análises, detectar novos padrões temporais ou otimizar o código:
-
 1. Faça um Fork do projeto
-2. Crie sua Feature Branch (`git checkout -b feature/NovaAnalise`)
-3. Faça o Commit de suas mudanças (`git commit -m 'Add: Nova análise temporal'`)
-4. Faça o Push para a Branch (`git push origin feature/NovaAnalise`)
+2. Crie sua Feature Branch (`git checkout -b feature/NovaFeature`)
+3. Commit suas alterações (`git commit -m 'feat: Adiciona nova funcionalidade'`)
+4. Push para a Branch (`git push origin feature/NovaFeature`)
 5. Abra um Pull Request.
 
 ---
