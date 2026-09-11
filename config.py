@@ -10,3 +10,5 @@ class Config:
     MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', 'secret')
     MYSQL_DB = os.getenv('MYSQL_DB', 'lotofacil')
     MYSQL_PORT = int(os.getenv('MYSQL_PORT', 3306))
+    CAIXA_SYNC_MAX_BATCH = int(os.getenv('CAIXA_SYNC_MAX_BATCH', 250))
+    CAIXA_SYNC_TIMEOUT = int(os.getenv('CAIXA_SYNC_TIMEOUT', 12))
