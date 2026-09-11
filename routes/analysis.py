@@ -52,7 +52,7 @@ def historical_stats():
                    data_sorteio
             FROM results
             WHERE data_sorteio >= %s
-            ORDER BY data_sorteio DESC
+            ORDER BY data_sorteio ASC
         """,
             (start_date.strftime('%Y-%m-%d'),),
         )

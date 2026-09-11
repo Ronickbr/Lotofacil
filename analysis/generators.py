@@ -47,7 +47,8 @@ def monte_carlo_generate(results, num_games=6, num_simulations=100000, filters=N
         hist_mean_sum = 195
         hist_std_sum = 15
 
-    last_draw = set(balls_list[0]) if balls_list else set()
+    # Results are fetched in chronological order (oldest -> newest).
+    last_draw = set(balls_list[-1]) if balls_list else set()
 
     # Filter params
     min_even = filters.get('min_even', 5)
@@ -340,7 +341,7 @@ def explain_game(game, results):
     explanation = f"{evens} pares / {odds} ímpares; soma {game_sum}; {primes} primos"
     
     if balls_list:
-        repeats = len(game_set & set(balls_list[0]))
+        repeats = len(game_set & set(balls_list[-1]))
         explanation += f"; {repeats} repetidas do último"
         
     return explanation
@@ -388,7 +389,7 @@ def generate_delay_based(results, num_games=6, mode='most_delayed'):
         
     delays = {}
     for num in range(1, 26):
-        for i, draw in enumerate(balls_list):
+        for i, draw in enumerate(reversed(balls_list)):
             if num in draw:
                 delays[num] = i
                 break
@@ -413,7 +414,7 @@ def generate_repetition_based(results, num_games=6, min_repeat=8, max_repeat=10)
     if not balls_list:
         return [sorted(random.sample(range(1, 26), 15)) for _ in range(num_games)]
         
-    last_draw = list(balls_list[0])
+    last_draw = list(balls_list[-1])
     pool = [n for n in range(1, 26) if n not in last_draw]
     
     games = []

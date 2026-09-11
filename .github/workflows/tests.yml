@@ -33,7 +33,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run route and MLOps regression tests
+      - name: Run complete test suite
         env:
           SECRET_KEY: test-secret
-        run: python -m unittest tests.test_routes -v
+        run: python -m unittest discover -s tests -v

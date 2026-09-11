@@ -92,7 +92,7 @@ def calculate_delays(results):
     """
     Calculates delay ('atraso') for each number (1-25).
     Delay is the number of consecutive draws since the number last appeared.
-    Results are assumed to be ordered DESC (most recent draw first).
+    Results are assumed to be ordered ASC (oldest draw first).
     """
     balls_list = extract_balls(results)
     delays = {}
@@ -100,7 +100,7 @@ def calculate_delays(results):
     for num in range(1, 26):
         delay = 0
         found = False
-        for draw in balls_list:
+        for draw in reversed(balls_list):
             if num in draw:
                 found = True
                 break
@@ -127,24 +127,15 @@ def calculate_full_delays(results):
 
     result = {}
     for num in range(1, 26):
-        delays = []
-        current_delay = 0
-        in_streak = True
-
-        for draw in balls_list:
-            if num in draw:
-                if in_streak:
-                    result_current = current_delay
-                    in_streak = False
-                delays.append(current_delay)
-                current_delay = 0
-            else:
-                current_delay += 1
-
-        if in_streak:
-            result_current = current_delay
-
-        if not delays:
+        occurrences = [index for index, draw in enumerate(balls_list) if num in draw]
+        if occurrences:
+            result_current = total - 1 - occurrences[-1]
+            delays = [occurrences[0]]
+            delays.extend(
+                current - previous - 1
+                for previous, current in zip(occurrences, occurrences[1:])
+            )
+        else:
             delays = [total]
             result_current = total
 
@@ -169,7 +160,7 @@ def calculate_hot_cold(results, recent_window=10):
     Expected occurrences in N draws = N * (15 / 25) = N * 0.6.
     """
     balls_list = extract_balls(results)
-    recent_draws = balls_list[:recent_window] if balls_list else []
+    recent_draws = balls_list[-recent_window:] if balls_list else []
     actual_window = len(recent_draws)
     expected = actual_window * 0.6
 
@@ -222,7 +213,7 @@ def calculate_windowed_frequency(results, windows=None):
         weighted_score = 0.0
 
         for w in windows:
-            subset = balls_list[:min(w, total)]
+            subset = balls_list[-min(w, total):]
             count = sum(1 for draw in subset if num in draw)
             freq = count / len(subset) if subset else 0
             window_freqs[w] = {

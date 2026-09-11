@@ -7,6 +7,7 @@ from datetime import datetime
 from extensions import mysql
 import MySQLdb
 from analysis.mlops import check_and_evaluate_generations
+from analysis.combinatorics import get_game_hash
 
 data_bp = Blueprint('data', __name__)
 
@@ -170,27 +171,42 @@ def upload():
 
 @data_bp.route('/save-games', methods=['POST'])
 def save_games():
+    cur = None
     try:
         data = request.get_json()
         if not data or 'games' not in data:
-            return (jsonify({'error': 'Dados inv├ílidos.'}), 400)
-        strategy = data.get('strategy', 'Unknown')
+            return jsonify({'error': 'Dados inválidos.'}), 400
+        if not isinstance(data['games'], list) or not data['games']:
+            return jsonify({'error': 'Envie ao menos um jogo para salvar.'}), 400
+
+        strategy = str(data.get('strategy') or 'unknown')[:100]
         games = data['games']
         ai_ranking = data.get('ai_ranking')
+        validated_games = []
+        for game in games:
+            if not isinstance(game, dict) or not isinstance(game.get('numbers'), list):
+                return jsonify({'error': 'Formato de jogo inválido.'}), 400
+            try:
+                numbers = sorted(int(number) for number in game['numbers'])
+            except (TypeError, ValueError):
+                return jsonify({'error': 'As dezenas devem ser números inteiros.'}), 400
+            if len(numbers) != 15 or len(set(numbers)) != 15 or any(number < 1 or number > 25 for number in numbers):
+                return jsonify({'error': 'Cada jogo deve ter 15 dezenas únicas entre 1 e 25.'}), 400
+            validated_games.append((game, numbers, game.get('hash') or get_game_hash(numbers)))
+
         target_contest = _get_next_contest_number()
         import uuid
         generation_id = f'GEN-{target_contest}-{uuid.uuid4().hex[:6].upper()}'
         cur = mysql.connection.cursor()
         saved_count = 0
-        cur.execute("\n            INSERT INTO generations\n            (id, target_contest, created_at, model_version, strategy, num_games, status)\n            VALUES (%s, %s, NOW(), %s, %s, %s, 'AGUARDANDO_RESULTADO')\n        ", (generation_id, target_contest, 'current', strategy, len(games)))
+        cur.execute("\n            INSERT INTO generations\n            (id, target_contest, created_at, model_version, strategy, num_games, status)\n            VALUES (%s, %s, NOW(), %s, %s, %s, 'AGUARDANDO_RESULTADO')\n        ", (generation_id, target_contest, 'current', strategy, len(validated_games)))
         if ai_ranking and isinstance(ai_ranking, list):
-            for i, r in enumerate(ai_ranking):
+            for i, r in enumerate(ai_ranking[:25]):
+                if not isinstance(r, dict) or 'dezena' not in r or 'score' not in r:
+                    continue
                 cur.execute('\n                    INSERT INTO prediction_history\n                    (generation_id, target_contest, number, predicted_probability, ranking_position, model_version, created_at)\n                    VALUES (%s, %s, %s, %s, %s, %s, NOW())\n                ', (generation_id, target_contest, r['dezena'], r['score'], i + 1, 'current'))
-        for g in games:
-            hash_val = g.get('hash')
-            if not hash_val:
-                continue
-            balls_str = ','.join(map(str, g['numbers']))
+        for g, numbers, hash_val in validated_games:
+            balls_str = ','.join(map(str, numbers))
             score = g.get('total_score', 0)
             import json
             details_json = json.dumps({'explanation': g.get('explanation', ''), 'evens': g.get('evens', 0), 'odds': g.get('odds', 0), 'primes': g.get('primes', 0), 'game_sum': g.get('game_sum', 0)})
@@ -198,34 +214,46 @@ def save_games():
             if cur.rowcount > 0:
                 saved_count += 1
         mysql.connection.commit()
-        cur.close()
         return jsonify({'message': f'{saved_count} novos jogos salvos com sucesso (ignoradas duplicatas).', 'generation_id': generation_id, 'target_contest': target_contest})
-    except Exception as e:
+    except Exception:
         mysql.connection.rollback()
-        import traceback
-        traceback.print_exc()
-        return (jsonify({'error': str(e)}), 500)
+        return jsonify({'error': 'Não foi possível salvar os jogos.'}), 500
+    finally:
+        if cur is not None:
+            cur.close()
 
 
 
 @data_bp.route('/saved-games')
 def saved_games():
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute('SELECT * FROM saved_games ORDER BY created_at DESC LIMIT 500')
-    saved = cur.fetchall()
-    cur.close()
-    latest_result = _fetch_latest_result()
-    last_draw = set(latest_result[:15]) if latest_result else set()
     import json
-    for game in saved:
-        balls = [int(n) for n in game['balls'].split(',')]
-        game['numbers'] = balls
-        if game['details']:
-            game['details_obj'] = json.loads(game['details'])
-        else:
-            game['details_obj'] = {}
-        game['hits_last_draw'] = len(set(balls) & last_draw) if last_draw else 0
-    return render_template('saved_games.html', saved_games=saved, last_draw=sorted(last_draw))
+
+    cur = None
+    try:
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute('SELECT * FROM saved_games ORDER BY created_at DESC LIMIT 500')
+        saved = cur.fetchall()
+        latest_result = _fetch_latest_result()
+        last_draw = set(latest_result[:15]) if latest_result else set()
+        for game in saved:
+            balls = [int(n) for n in game['balls'].split(',')]
+            game['numbers'] = balls
+            try:
+                game['details_obj'] = json.loads(game['details']) if game['details'] else {}
+            except (TypeError, json.JSONDecodeError):
+                game['details_obj'] = {}
+            game['hits_last_draw'] = len(set(balls) & last_draw) if last_draw else 0
+        return render_template('saved_games.html', saved_games=saved, last_draw=sorted(last_draw))
+    except Exception:
+        return render_template(
+            'saved_games.html',
+            saved_games=[],
+            last_draw=[],
+            error='Não foi possível carregar os jogos salvos.',
+        )
+    finally:
+        if cur is not None:
+            cur.close()
 
 
 
@@ -254,4 +282,3 @@ def export_excel():
         df.to_excel(writer, index=False, sheet_name='Resultados')
     output.seek(0)
     return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', as_attachment=True, download_name='resultados_lotofacil.xlsx')
-

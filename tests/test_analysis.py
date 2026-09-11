@@ -16,7 +16,6 @@ from analysis import (
     analyze_temporal_patterns,
     detect_seasonal_patterns,
     combine_analysis_methods,
-    train_lotofacil_model,
     predict_next_numbers,
     generate_suggested_games,
 )
@@ -55,12 +54,10 @@ class TestAnalysisModules(unittest.TestCase):
 
     def test_calculate_delays(self):
         delays = calculate_delays(self.sample_results)
-        # Most recent draw is the first item in sample_results: (1..15)
-        # So number 1 is in draw 0 (delay = 0)
-        self.assertEqual(delays[1], 0)
+        # Results are chronological; the final item is the most recent draw.
+        self.assertEqual(delays[1], 4)
         self.assertEqual(delays[15], 0)
-        # Number 19 is in draw 4 (fifth item, so 4 draws away from index 0)
-        self.assertEqual(delays[19], 4)
+        self.assertEqual(delays[19], 0)
 
     def test_calculate_hot_cold(self):
         hot_cold = calculate_hot_cold(self.sample_results, recent_window=5)
@@ -101,19 +98,21 @@ class TestAnalysisModules(unittest.TestCase):
         self.assertIsInstance(seasonal, dict)
 
     def test_ml_model_and_predictions(self):
-        # Generate 15 fake draws to train model
+        # Exercise inference without running the expensive training pipeline in a unit test.
         extended_results = []
         for i in range(20):
             draw = sorted(np.random.choice(range(1, 26), 15, replace=False).tolist())
             draw.append(datetime.date(2023, 1, 1))
             extended_results.append(draw)
 
-        model, mean_acc = train_lotofacil_model(extended_results, 'test_model.pkl')
-        self.assertIsNotNone(model)
-        self.assertTrue(0.0 <= mean_acc <= 1.0)
+        class FakeModel:
+            def predict_proba(self, features):
+                probabilities = np.linspace(0.1, 0.9, len(features))
+                return np.column_stack((1 - probabilities, probabilities))
 
-        preds = predict_next_numbers(model, extended_results[0], top_k=10)
-        self.assertLessEqual(len(preds), 10)
+        preds = predict_next_numbers(FakeModel(), extended_results, top_k=10)
+        self.assertEqual(len(preds), 10)
+        self.assertEqual(len(set(preds)), 10)
 
         games = generate_suggested_games(preds, num_games=6)
         self.assertEqual(len(games), 6)
