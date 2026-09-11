@@ -33,7 +33,7 @@ def calculate_shannon_entropy(results, windows=None):
             subset = balls_list
             label = 'Histórico Completo'
         else:
-            subset = balls_list[:min(w, total)]
+            subset = balls_list[-min(w, total):]
             label = f'Últimos {w} concursos'
 
         if not subset:
@@ -152,8 +152,8 @@ def detect_mean_regression(results, recent_window=20):
     if total < recent_window + 10:
         return {}
 
-    recent = balls_list[:recent_window]
-    historical = balls_list[recent_window:]
+    recent = balls_list[-recent_window:]
+    historical = balls_list[:-recent_window]
 
     # Historical baseline
     hist_counts = Counter()

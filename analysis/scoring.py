@@ -38,7 +38,7 @@ class GameScorer:
         # Precompute delays
         self.delays = {}
         for num in range(1, 26):
-            for i, draw in enumerate(self.balls_list):
+            for i, draw in enumerate(reversed(self.balls_list)):
                 if num in draw:
                     self.delays[num] = i
                     break
@@ -47,7 +47,8 @@ class GameScorer:
         self.max_delay = max(self.delays.values()) if self.delays else 1
         
         # Precompute repeats
-        self.last_draw = set(self.balls_list[0]) if self.balls_list else set()
+        # Results are fetched in chronological order (oldest -> newest).
+        self.last_draw = set(self.balls_list[-1]) if self.balls_list else set()
         
         # Precompute sums
         sums_hist = [sum(d) for d in self.balls_list]

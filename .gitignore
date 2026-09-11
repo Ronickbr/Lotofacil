@@ -3,8 +3,12 @@ __pycache__/
 *.pyo
 *.pkl
 .pytest_cache/
+.coverage
+htmlcov/
+.venv/
 
 .env
+training_history.json
 
 analises.txt
 prompt_aprendizado_continuo_lotofacil.md

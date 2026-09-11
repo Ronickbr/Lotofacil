@@ -2,12 +2,15 @@ from flask import Flask
 from config import Config
 from extensions import mysql
 from flasgger import Swagger
-from extensions import mysql
 
-def create_app():
+
+def create_app(config_override=None):
     app = Flask(__name__)
     app.jinja_env.globals.update(zip=zip)
     app.config.from_object(Config)
+    app.config.setdefault('INIT_DB_ON_REQUEST', True)
+    if config_override:
+        app.config.update(config_override)
 
     # Inicializar extensões
     mysql.init_app(app)
@@ -19,20 +22,21 @@ def create_app():
     }
     Swagger(app)
 
-    _db_initialized = False
+    db_state = {'initialized': False}
 
     @app.before_request
     def setup_db():
-        nonlocal _db_initialized
-        if not _db_initialized:
+        if not app.config['INIT_DB_ON_REQUEST'] or db_state['initialized']:
+            return
+        if not db_state['initialized']:
             try:
                 cur = mysql.connection.cursor()
                 cur.execute("SELECT 1")
                 mysql.connection.commit()
                 cur.close()
-                _db_initialized = True
+                db_state['initialized'] = True
             except Exception as e:
-                print(f"Database setup failed: {e}")
+                app.logger.warning("Database setup failed: %s", e)
 
     from datetime import datetime
     @app.context_processor

@@ -154,6 +154,11 @@
 {% endblock %}
 
 {% block content %}
+{% if error %}
+<div class="alert alert-danger rounded-4 shadow-sm border-0 mb-4" role="alert">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i>{{ error }}
+</div>
+{% endif %}
 {% set ns = namespace(best=0, evaluated=0, pending=0) %}
 {% for game in saved_games %}
     {% if game.hits_last_draw > ns.best %}{% set ns.best = game.hits_last_draw %}{% endif %}
@@ -292,4 +297,3 @@
 </div>
 {% endif %}
 {% endblock %}
-

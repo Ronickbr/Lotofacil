@@ -65,11 +65,6 @@ predictButton.addEventListener('click', async (e) => {
             throw new Error('O servidor não conseguiu processar a previsão. Retreine o modelo em IA / Modelo e tente novamente.');
         }
 
-        if (/Modelo não encontrado|incompatível|corrompido/i.test(body)) {
-            result.innerHTML = `<div class="alert alert-warning rounded-4 shadow-sm my-3"><i class="fa-solid fa-triangle-exclamation me-2"></i>${body}<div class="mt-2"><a class="btn btn-sm btn-warning fw-bold" href="{{ url_for('ml.train_model') }}">Ir para treinamento</a></div></div>`;
-            return;
-        }
-
         result.innerHTML = `<div class="prediction-results my-4">${body}</div>`;
     } catch (error) {
         const msg = error && error.message ? error.message : String(error);
