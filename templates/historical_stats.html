@@ -1,102 +1,621 @@
 {% extends "base.html" %}
 
-{% block title %}Análise Histórica{% endblock %}
+{% block title %}Análise Histórica — Lotofácil Analytics Pro{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header">
-            <h4>Análise Histórica e Previsões</h4>
-        </div>
-        <div class="card-body">
-            <form method="GET" action="{{ url_for('historical_stats') }}" class="row g-3">
-                <div class="col-md-6">
-                    <label for="period" class="form-label">Período de Análise</label>
-                    <select name="period" id="period" class="form-select" required>
-                        <option value="">Selecione um período...</option>
-                        <option value="week" {% if period == 'week' %}selected{% endif %}>Última Semana</option>
-                        <option value="month" {% if period == 'month' %}selected{% endif %}>Último Mês</option>
-                        <option value="year" {% if period == 'year' %}selected{% endif %}>Último Ano</option>
-                    </select>
-                </div>
-                
-                <div class="col-md-6">
-                    <label for="prediction_type" class="form-label">Método de Previsão</label>
-                    <select name="prediction_type" id="prediction_type" class="form-select" required>
+<div class="card card-custom mb-4">
+    <div class="card-header card-header-custom d-flex align-items-center justify-content-between">
+        <span class="fs-5 fw-bold"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i> Análise Histórica & Modelos Probabilísticos</span>
+        <span class="badge bg-purple text-white px-3 py-1 rounded-pill fw-bold" style="background: #7b2cbf;">Filtro Avançado</span>
+    </div>
+    <div class="card-body p-4 p-md-5">
+        <form method="GET" action="{{ url_for('historical_stats') }}" class="row g-3">
+            <div class="col-md-5">
+                <label for="period" class="form-label fw-bold text-dark">Período de Análise</label>
+                <select name="period" id="period" class="form-select form-select-lg rounded-3" required>
+                    <option value="">Selecione um período...</option>
+                    <option value="week" {% if period == 'week' %}selected{% endif %}>Última Semana (7 dias)</option>
+                    <option value="month" {% if period == 'month' %}selected{% endif %}>Último Mês (30 dias)</option>
+                    <option value="year" {% if period == 'year' %}selected{% endif %}>Último Ano (365 dias)</option>
+                    <option value="all" {% if period == 'all' %}selected{% endif %}>Histórico Completo</option>
+                </select>
+            </div>
+
+            <div class="col-md-5">
+                <label for="prediction_type" class="form-label fw-bold text-dark">Método de Análise</label>
+                <select name="prediction_type" id="prediction_type" class="form-select form-select-lg rounded-3" required>
+                    <optgroup label="📊 Camada Estatística">
                         <option value="frequency" {% if prediction_type == 'frequency' %}selected{% endif %}>
-                            Análise de Frequência
+                            Frequência Simples
                         </option>
+                        <option value="windowed" {% if prediction_type == 'windowed' %}selected{% endif %}>
+                            Frequência por Janelas Temporais
+                        </option>
+                        <option value="delay" {% if prediction_type == 'delay' %}selected{% endif %}>
+                            Análise de Atraso Completa
+                        </option>
+                        <option value="parity" {% if prediction_type == 'parity' %}selected{% endif %}>
+                            Distribuição Par/Ímpar
+                        </option>
+                        <option value="sum_analysis" {% if prediction_type == 'sum_analysis' %}selected{% endif %}>
+                            Soma das Dezenas
+                        </option>
+                        <option value="spatial" {% if prediction_type == 'spatial' %}selected{% endif %}>
+                            Distribuição Espacial (Volante 5×5)
+                        </option>
+                        <option value="consecutive" {% if prediction_type == 'consecutive' %}selected{% endif %}>
+                            Sequências Consecutivas
+                        </option>
+                        <option value="primes" {% if prediction_type == 'primes' %}selected{% endif %}>
+                            Primos, Fibonacci & Classes Especiais
+                        </option>
+                        <option value="correlation" {% if prediction_type == 'correlation' %}selected{% endif %}>
+                            Correlação & Pares Frequentes
+                        </option>
+                    </optgroup>
+                    <optgroup label="🧮 Camada Probabilística">
                         <option value="bayes" {% if prediction_type == 'bayes' %}selected{% endif %}>
-                            Análise Bayesiana
+                            Análise Bayesiana (Beta-Binomial)
+                        </option>
+                        <option value="entropy" {% if prediction_type == 'entropy' %}selected{% endif %}>
+                            Entropia de Shannon
+                        </option>
+                        <option value="regression" {% if prediction_type == 'regression' %}selected{% endif %}>
+                            Regressão à Média
                         </option>
                         <option value="pattern" {% if prediction_type == 'pattern' %}selected{% endif %}>
-                            Análise de Padrões
+                            Repetição de Padrões Consecutivos
                         </option>
+                    </optgroup>
+                    <optgroup label="🎯 Ensemble">
                         <option value="combined" {% if prediction_type == 'combined' %}selected{% endif %}>
-                            Análise Combinada
+                            Análise Combinada Ponderada
                         </option>
-                    </select>
-                </div>
-                
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Analisar</button>
-                </div>
-            </form>
+                    </optgroup>
+                </select>
+            </div>
 
-            {% if error %}
-                <div class="alert alert-danger mt-3">{{ error }}</div>
-            {% endif %}
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold rounded-3 shadow-sm" style="background: linear-gradient(135deg, #7b2cbf, #5a189a); border: none;">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i> Analisar
+                </button>
+            </div>
+        </form>
 
-            {% if stats %}
-                <div class="mt-4">
-                    <h5>{{ stats.method_name }}</h5>
-                    <div class="card">
-                        <div class="card-body">
-                            <h6>Números mais prováveis:</h6>
-                            <div class="number-predictions mb-3">
-                                {% for item in stats.frequent_numbers %}
-                                    <div class="number-badge">
-                                        <span class="badge bg-primary">{{ item.number }}</span>
-                                        <small class="text-muted">{{ "%.1f"|format(item.percentage) }}%</small>
-                                    </div>
-                                {% endfor %}
+        {% if error %}
+            <div class="alert alert-danger mt-4 rounded-4 shadow-sm"><i class="fa-solid fa-triangle-exclamation me-2"></i>{{ error }}</div>
+        {% endif %}
+
+        {% if stats %}
+            <div class="mt-5">
+                <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+                    <h4 class="fw-extrabold text-dark mb-0"><i class="fa-solid fa-chart-column text-primary me-2"></i>{{ stats.method_name }}</h4>
+                    <span class="badge bg-dark text-white px-3 py-2 fs-6 rounded-pill">Amostra: {{ stats.total_games }} concursos</span>
+                </div>
+
+                <!-- Top Predicted Numbers Grid -->
+                <div class="card card-custom mb-4 bg-light border">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-uppercase text-muted mb-3"><i class="fa-solid fa-star text-warning me-1"></i> Dezenas com Maior Score de Probabilidade</h6>
+                        <div class="d-flex flex-wrap gap-3 align-items-center justify-content-start">
+                            {% for item in stats.frequent_numbers %}
+                                <div class="text-center bg-white p-3 rounded-4 shadow-sm border" style="min-width: 90px;">
+                                    <span class="lottery-ball mb-2">{{ "%02d"|format(item.number) }}</span>
+                                    <div class="fw-bold text-primary fs-6">{{ "%.1f"|format(item.percentage) }}%</div>
+                                    {% if stats.delays is defined and stats.delays[item.number] is defined %}
+                                        <span class="badge bg-secondary-subtle text-secondary extra-small border mt-1">Atraso: {{ stats.delays[item.number] }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== DELAY ANALYSIS ===== -->
+                {% if stats.full_delays is defined %}
+                <div class="card card-custom mb-4">
+                    <div class="card-header card-header-custom">
+                        <i class="fa-solid fa-hourglass-half text-warning me-2"></i>Análise Completa de Atraso
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Dezena</th>
+                                        <th>Atraso Atual</th>
+                                        <th>Atraso Médio</th>
+                                        <th>Atraso Máximo</th>
+                                        <th>Desvio Padrão</th>
+                                        <th>Percentil</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for num in range(1, 26) %}
+                                    {% set d = stats.full_delays[num] %}
+                                    <tr>
+                                        <td><span class="lottery-ball lottery-ball-sm">{{ "%02d"|format(num) }}</span></td>
+                                        <td class="fw-bold {% if d.current > d.mean + d.std %}text-danger{% elif d.current < d.mean - d.std %}text-success{% endif %}">{{ d.current }}</td>
+                                        <td>{{ d.mean }}</td>
+                                        <td>{{ d.max }}</td>
+                                        <td>{{ d.std }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px; min-width: 80px;">
+                                                <div class="progress-bar {% if d.percentile > 80 %}bg-danger{% elif d.percentile > 60 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ d.percentile }}%">{{ d.percentile }}%</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if d.current > d.mean + 2 * d.std %}
+                                                <span class="badge bg-danger">Muito Atrasado</span>
+                                            {% elif d.current > d.mean + d.std %}
+                                                <span class="badge bg-warning text-dark">Atrasado</span>
+                                            {% elif d.current < d.mean - d.std %}
+                                                <span class="badge bg-success">Recente</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Normal</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ===== PARITY DISTRIBUTION ===== -->
+                {% if stats.parity_distribution is defined %}
+                <div class="card card-custom mb-4">
+                    <div class="card-header card-header-custom">
+                        <i class="fa-solid fa-circle-half-stroke text-info me-2"></i>Distribuição Par/Ímpar — Observado vs. Teórico
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped align-middle">
+                                <thead class="table-dark">
+                                    <tr><th>Config</th><th>Pares</th><th>Ímpares</th><th>Observado</th><th>Obs %</th><th>Teórico %</th><th>Desvio</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for n_even, data in stats.parity_distribution.distribution.items() %}
+                                    {% if data.observed > 0 or data.theoretical_pct > 0.1 %}
+                                    <tr>
+                                        <td class="fw-bold">{{ data.even }}P / {{ data.odd }}I</td>
+                                        <td>{{ data.even }}</td>
+                                        <td>{{ data.odd }}</td>
+                                        <td>{{ data.observed }}</td>
+                                        <td>{{ data.observed_pct }}%</td>
+                                        <td>{{ data.theoretical_pct }}%</td>
+                                        <td>
+                                            {% set diff = data.observed_pct - data.theoretical_pct %}
+                                            <span class="{% if diff > 2 %}text-success{% elif diff < -2 %}text-danger{% endif %}">
+                                                {{ "%+.1f"|format(diff) }}%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ===== SUM ANALYSIS ===== -->
+                {% if stats.sum_analysis is defined %}
+                <div class="card card-custom mb-4">
+                    <div class="card-header card-header-custom">
+                        <i class="fa-solid fa-calculator text-success me-2"></i>Análise da Soma das Dezenas
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-2"><div class="p-3 bg-light rounded-4 text-center border"><span class="text-muted small d-block">Média</span><span class="fs-4 fw-bold text-primary">{{ stats.sum_analysis.mean }}</span></div></div>
+                            <div class="col-md-2"><div class="p-3 bg-light rounded-4 text-center border"><span class="text-muted small d-block">Mediana</span><span class="fs-4 fw-bold text-success">{{ stats.sum_analysis.median }}</span></div></div>
+                            <div class="col-md-2"><div class="p-3 bg-light rounded-4 text-center border"><span class="text-muted small d-block">Desvio</span><span class="fs-4 fw-bold text-warning">{{ stats.sum_analysis.std }}</span></div></div>
+                            <div class="col-md-2"><div class="p-3 bg-light rounded-4 text-center border"><span class="text-muted small d-block">Mínimo</span><span class="fs-4 fw-bold text-danger">{{ stats.sum_analysis.min }}</span></div></div>
+                            <div class="col-md-2"><div class="p-3 bg-light rounded-4 text-center border"><span class="text-muted small d-block">Máximo</span><span class="fs-4 fw-bold text-danger">{{ stats.sum_analysis.max }}</span></div></div>
+                            <div class="col-md-2"><div class="p-3 bg-light rounded-4 text-center border"><span class="text-muted small d-block">P50</span><span class="fs-4 fw-bold" style="color:#7b2cbf">{{ stats.sum_analysis.percentiles['50'] }}</span></div></div>
+                        </div>
+                        <h6 class="fw-bold mb-3">Percentis da Soma</h6>
+                        <div class="d-flex gap-3 flex-wrap mb-4">
+                            {% for pct, val in stats.sum_analysis.percentiles.items() %}
+                            <div class="p-2 bg-white rounded-3 border text-center" style="min-width: 70px;">
+                                <span class="text-muted small d-block">P{{ pct }}</span>
+                                <span class="fw-bold">{{ val }}</span>
                             </div>
+                            {% endfor %}
+                        </div>
+                        <h6 class="fw-bold mb-3">Histograma de Somas</h6>
+                        <canvas id="sumHistogramChart" height="120"></canvas>
+                    </div>
+                </div>
+                <script>
+                    (function() {
+                        var chartData = {{ stats.sum_analysis.histogram | tojson }};
+                        new Chart(document.getElementById('sumHistogramChart'), {
+                            type: 'bar',
+                            data: {
+                                labels: chartData.map(function(b) { return b.range; }),
+                                datasets: [{
+                                    label: 'Concursos',
+                                    data: chartData.map(function(b) { return b.count; }),
+                                    backgroundColor: 'rgba(123, 44, 191, 0.6)',
+                                    borderColor: '#7b2cbf',
+                                    borderWidth: 1,
+                                    borderRadius: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { display: false } },
+                                scales: { y: { beginAtZero: true, title: { display: true, text: 'Nº de Concursos' } } }
+                            }
+                        });
+                    })();
+                </script>
+                {% endif %}
 
-                            <div class="row mt-4">
-                                <div class="col-md-6">
-                                    <h6>Estatísticas do Período</h6>
-                                    <ul class="list-unstyled">
-                                        <li>Total de Jogos: {{ stats.total_games }}</li>
-                                        <li>Média de Pares: {{ "%.1f"|format(stats.avg_even) }}</li>
-                                        <li>Média de Ímpares: {{ "%.1f"|format(stats.avg_odd) }}</li>
-                                    </ul>
+                <!-- ===== SPATIAL ANALYSIS ===== -->
+                {% if stats.spatial is defined %}
+                <div class="card card-custom mb-4">
+                    <div class="card-header card-header-custom">
+                        <i class="fa-solid fa-grip text-info me-2"></i>Distribuição Espacial — Volante 5×5
+                    </div>
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3">Heatmap de Frequência</h6>
+                        <div class="d-flex justify-content-center mb-4">
+                            <table class="table table-bordered text-center" style="max-width: 450px;">
+                                {% for row in stats.spatial.heatmap %}
+                                <tr>
+                                    {% for cell in row %}
+                                    {% set intensity = (cell.pct / 70 * 100) | int %}
+                                    <td style="background: rgba(123, 44, 191, {{ cell.pct / 100 }}); color: {% if cell.pct > 50 %}white{% else %}#333{% endif %}; width: 90px; height: 70px; font-weight: 700;" class="align-middle">
+                                        <div class="fs-5">{{ "%02d"|format(cell.number) }}</div>
+                                        <div class="small">{{ cell.pct }}%</div>
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded-4 border">
+                                    <h6 class="fw-bold mb-2"><i class="fa-solid fa-arrows-left-right me-1"></i>Média por Linha</h6>
+                                    {% for label, avg in zip(stats.spatial.rows.labels, stats.spatial.rows.averages) %}
+                                    <div class="d-flex justify-content-between small mb-1"><span>{{ label }}</span><span class="fw-bold">{{ avg }}</span></div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded-4 border">
+                                    <h6 class="fw-bold mb-2"><i class="fa-solid fa-arrows-up-down me-1"></i>Média por Coluna</h6>
+                                    {% for label, avg in zip(stats.spatial.columns.labels, stats.spatial.columns.averages) %}
+                                    <div class="d-flex justify-content-between small mb-1"><span>{{ label }}</span><span class="fw-bold">{{ avg }}</span></div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded-4 border">
+                                    <h6 class="fw-bold mb-2"><i class="fa-solid fa-border-all me-1"></i>Borda vs Centro</h6>
+                                    <div class="d-flex justify-content-between small mb-1"><span>Borda ({{ stats.spatial.border_center.border_total_pool }} nºs)</span><span class="fw-bold">{{ stats.spatial.border_center.border_avg }}</span></div>
+                                    <div class="d-flex justify-content-between small mb-1"><span>Centro ({{ stats.spatial.border_center.center_total_pool }} nºs)</span><span class="fw-bold">{{ stats.spatial.border_center.center_avg }}</span></div>
+                                    <hr class="my-2">
+                                    <h6 class="fw-bold mb-2 mt-2"><i class="fa-solid fa-slash me-1"></i>Diagonais</h6>
+                                    <div class="d-flex justify-content-between small mb-1"><span>Principal ↘</span><span class="fw-bold">{{ stats.spatial.diagonals.main_avg }}</span></div>
+                                    <div class="d-flex justify-content-between small mb-1"><span>Secundária ↙</span><span class="fw-bold">{{ stats.spatial.diagonals.anti_avg }}</span></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            {% endif %}
-        </div>
+                {% endif %}
+
+                <!-- ===== CONSECUTIVE SEQUENCES ===== -->
+                {% if stats.consecutive is defined %}
+                <div class="card card-custom mb-4">
+                    <div class="card-header card-header-custom">
+                        <i class="fa-solid fa-link text-warning me-2"></i>Análise de Sequências Consecutivas
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3"><div class="p-3 bg-light rounded-4 text-center border"><span class="text-muted small d-block">Maior Seq. Média</span><span class="fs-3 fw-bold text-primary">{{ stats.consecutive.max_sequence.avg }}</span></div></div>
+                            <div class="col-md-3"><div class="p-3 bg-light rounded-4 text-center border"><span class="text-muted small d-block">Maior Seq. Máxima</span><span class="fs-3 fw-bold text-danger">{{ stats.consecutive.max_sequence.max }}</span></div></div>
+                            <div class="col-md-3"><div class="p-3 bg-light rounded-4 text-center border"><span class="text-muted small d-block">Blocos Médios</span><span class="fs-3 fw-bold text-success">{{ stats.consecutive.blocks.avg }}</span></div></div>
+                            <div class="col-md-3"><div class="p-3 bg-light rounded-4 text-center border"><span class="text-muted small d-block">Pares Consec. Médios</span><span class="fs-3 fw-bold" style="color:#7b2cbf">{{ stats.consecutive.consecutive_pairs.avg }}</span></div></div>
+                        </div>
+                        <h6 class="fw-bold mb-3">Distribuição do Tamanho da Maior Sequência</h6>
+                        <canvas id="seqDistChart" height="100"></canvas>
+                    </div>
+                </div>
+                <script>
+                    (function() {
+                        var chartData = {{ stats.consecutive.max_sequence.distribution | tojson }};
+                        new Chart(document.getElementById('seqDistChart'), {
+                            type: 'bar',
+                            data: {
+                                labels: Object.keys(chartData).map(function(k) { return k + ' números'; }),
+                                datasets: [{
+                                    label: 'Concursos',
+                                    data: Object.values(chartData),
+                                    backgroundColor: ['#38b000', '#70e000', '#ffb703', '#fb8500', '#ff4d6d', '#c9184a'],
+                                    borderRadius: 6
+                                }]
+                            },
+                            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                        });
+                    })();
+                </script>
+                {% endif %}
+
+                <!-- ===== NUMBER CLASSES ===== -->
+                {% if stats.number_classes is defined %}
+                <div class="card card-custom mb-4">
+                    <div class="card-header card-header-custom">
+                        <i class="fa-solid fa-superscript text-success me-2"></i>Classes Numéricas Especiais
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            {% for key, cls in stats.number_classes.items() %}
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded-4 border h-100">
+                                    <h6 class="fw-bold mb-2">{{ cls.label }}</h6>
+                                    <div class="d-flex flex-wrap gap-1 mb-2">
+                                        {% for n in cls.pool_numbers %}
+                                        <span class="lottery-ball lottery-ball-sm">{{ "%02d"|format(n) }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="small text-muted">Pool: {{ cls.pool_size }} números | Média por jogo: <strong>{{ cls.avg }}</strong> ± {{ cls.std }}</div>
+                                    <div class="mt-2">
+                                        {% for count, freq in cls.distribution.items() %}
+                                        <span class="badge bg-white text-dark border me-1 mb-1">{{ count }}×: {{ freq }} jogos</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ===== ENTROPY ===== -->
+                {% if stats.entropy is defined %}
+                <div class="card card-custom mb-4">
+                    <div class="card-header card-header-custom">
+                        <i class="fa-solid fa-wave-square text-danger me-2"></i>Entropia de Shannon
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            {% for key, ent in stats.entropy.items() %}
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded-4 border text-center h-100">
+                                    <h6 class="fw-bold mb-2">{{ ent.label }}</h6>
+                                    <div class="fs-2 fw-extrabold" style="color: #7b2cbf;">{{ ent.entropy }}</div>
+                                    <div class="text-muted small">/ {{ ent.max_entropy }} (máx)</div>
+                                    <div class="progress mt-2" style="height: 12px;">
+                                        <div class="progress-bar {% if ent.ratio > 97 %}bg-success{% elif ent.ratio > 90 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ ent.ratio }}%">{{ ent.ratio }}%</div>
+                                    </div>
+                                    <div class="small text-muted mt-2 fst-italic">{{ ent.interpretation }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ===== CORRELATION ===== -->
+                {% if stats.correlation is defined %}
+                <div class="card card-custom mb-4">
+                    <div class="card-header card-header-custom">
+                        <i class="fa-solid fa-circle-nodes text-primary me-2"></i>Correlação entre Dezenas & Pares Frequentes
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3"><i class="fa-solid fa-arrow-trend-up text-success me-1"></i>Top 10 Pares Mais Frequentes</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover">
+                                        <thead><tr><th>Par</th><th>Vezes</th><th>Freq %</th><th>Esperado %</th><th>Desvio</th></tr></thead>
+                                        <tbody>
+                                            {% for p in stats.top_pairs[:10] %}
+                                            <tr>
+                                                <td>
+                                                    <span class="lottery-ball lottery-ball-sm">{{ "%02d"|format(p.pair[0]) }}</span>
+                                                    <span class="lottery-ball lottery-ball-sm">{{ "%02d"|format(p.pair[1]) }}</span>
+                                                </td>
+                                                <td>{{ p.count }}</td>
+                                                <td>{{ p.frequency }}%</td>
+                                                <td>{{ p.expected_pct }}%</td>
+                                                <td class="{% if p.deviation > 0 %}text-success{% else %}text-danger{% endif %} fw-bold">{{ "%+.1f"|format(p.deviation) }}%</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3"><i class="fa-solid fa-layer-group text-warning me-1"></i>Top 10 Trincas Mais Frequentes</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover">
+                                        <thead><tr><th>Trinca</th><th>Vezes</th><th>Freq %</th></tr></thead>
+                                        <tbody>
+                                            {% for t in stats.top_triples[:10] %}
+                                            <tr>
+                                                <td>
+                                                    {% for n in t.triple %}
+                                                    <span class="lottery-ball lottery-ball-sm">{{ "%02d"|format(n) }}</span>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>{{ t.count }}</td>
+                                                <td>{{ t.frequency }}%</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="fw-bold mt-4 mb-3"><i class="fa-solid fa-link-slash text-danger me-1"></i>Top 10 Pares com Correlação Positiva Mais Forte</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for p in stats.correlation.top_positive[:10] %}
+                            <div class="p-2 bg-light rounded-3 border text-center" style="min-width: 100px;">
+                                <span class="lottery-ball lottery-ball-sm">{{ "%02d"|format(p.pair[0]) }}</span>
+                                <span class="lottery-ball lottery-ball-sm">{{ "%02d"|format(p.pair[1]) }}</span>
+                                <div class="small fw-bold text-success mt-1">+{{ "%.4f"|format(p.correlation) }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ===== REGRESSION ===== -->
+                {% if stats.regression is defined %}
+                <div class="card card-custom mb-4">
+                    <div class="card-header card-header-custom">
+                        <i class="fa-solid fa-chart-line text-danger me-2"></i>Regressão à Média — Detecção de Inflação/Deflação
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped align-middle">
+                                <thead class="table-dark">
+                                    <tr><th>Dezena</th><th>Freq. Histórica</th><th>Freq. Recente</th><th>Z-Score</th><th>Status</th><th>Tendência</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for num in range(1, 26) %}
+                                    {% if stats.regression[num] is defined %}
+                                    {% set r = stats.regression[num] %}
+                                    <tr>
+                                        <td><span class="lottery-ball lottery-ball-sm">{{ "%02d"|format(num) }}</span></td>
+                                        <td>{{ r.historical_freq }}%</td>
+                                        <td>{{ r.recent_freq }}%</td>
+                                        <td class="fw-bold {% if r.z_score > 1.96 %}text-danger{% elif r.z_score < -1.96 %}text-info{% endif %}">{{ r.z_score }}</td>
+                                        <td>
+                                            {% if r.status == 'inflated' %}<span class="badge bg-danger">{{ r.status_label }}</span>
+                                            {% elif r.status == 'deflated' %}<span class="badge bg-info">{{ r.status_label }}</span>
+                                            {% elif r.status == 'slightly_hot' %}<span class="badge bg-warning text-dark">{{ r.status_label }}</span>
+                                            {% elif r.status == 'slightly_cold' %}<span class="badge bg-secondary">{{ r.status_label }}</span>
+                                            {% else %}<span class="badge bg-light text-dark border">{{ r.status_label }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="fst-italic text-muted small">{{ r.tendency }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ===== WINDOWED FREQUENCY ===== -->
+                {% if stats.windowed_data is defined %}
+                <div class="card card-custom mb-4">
+                    <div class="card-header card-header-custom">
+                        <i class="fa-solid fa-layer-group text-success me-2"></i>Frequência por Janelas Temporais — Score Ponderado
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped align-middle text-center">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Dezena</th>
+                                        <th>Últ. 10</th>
+                                        <th>Últ. 20</th>
+                                        <th>Últ. 50</th>
+                                        <th>Últ. 100</th>
+                                        <th>Últ. 500</th>
+                                        <th>Total</th>
+                                        <th>Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for num in range(1, 26) %}
+                                    {% set w = stats.windowed_data[num] %}
+                                    <tr>
+                                        <td><span class="lottery-ball lottery-ball-sm">{{ "%02d"|format(num) }}</span></td>
+                                        {% for win in [10, 20, 50, 100, 500] %}
+                                        <td>{{ w.windows[win].frequency if w.windows[win] is defined else '-' }}%</td>
+                                        {% endfor %}
+                                        <td>{{ w.windows['total'].frequency if w.windows['total'] is defined else '-' }}%</td>
+                                        <td class="fw-bold" style="color: #7b2cbf;">{{ "%.3f"|format(w.score) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Summary Statistics Grid -->
+                <h5 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-sliders text-primary me-2"></i>Resumo Numérico do Período</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white rounded-4 border text-center shadow-sm h-100">
+                            <span class="text-muted small d-block mb-1 fw-semibold">Média de Pares</span>
+                            <span class="fs-3 fw-extrabold text-success">{{ "%.2f"|format(stats.avg_even) }}</span>
+                            <span class="text-muted extra-small d-block mt-1">dezenas por jogo</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white rounded-4 border text-center shadow-sm h-100">
+                            <span class="text-muted small d-block mb-1 fw-semibold">Média de Ímpares</span>
+                            <span class="fs-3 fw-extrabold text-danger">{{ "%.2f"|format(stats.avg_odd) }}</span>
+                            <span class="text-muted extra-small d-block mt-1">dezenas por jogo</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white rounded-4 border text-center shadow-sm h-100">
+                            <span class="text-muted small d-block mb-1 fw-semibold">Média de Primos</span>
+                            <span class="fs-3 fw-extrabold" style="color: #7b2cbf;">{{ "%.2f"|format(stats.avg_primes) }}</span>
+                            <span class="text-muted extra-small d-block mt-1">dezenas por jogo</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white rounded-4 border text-center shadow-sm h-100">
+                            <span class="text-muted small d-block mb-1 fw-semibold">Média da Soma Total</span>
+                            <span class="fs-3 fw-extrabold text-primary">{{ "%.1f"|format(stats.avg_sum) }}</span>
+                            <span class="text-muted extra-small d-block mt-1">soma por jogo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hot & Cold Status Grid if Available -->
+                {% if stats.hot_cold %}
+                <div class="card card-custom">
+                    <div class="card-header card-header-custom d-flex align-items-center justify-content-between">
+                        <span><i class="fa-solid fa-temperature-half text-danger me-2"></i> Status de Dezenas Quentes e Frias (Últimos 10 Sorteios)</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-wrap gap-2 justify-content-center">
+                            {% for num in range(1, 26) %}
+                                {% set hc = stats.hot_cold[num] %}
+                                {% set ball_class = "ball-hot" if hc.status == 'quente' else ("ball-cold" if hc.status == 'frio' else "") %}
+                                <div class="text-center p-2 rounded-3 border bg-white" style="width: 70px;">
+                                    <span class="lottery-ball lottery-ball-sm {{ ball_class }}">{{ "%02d"|format(num) }}</span>
+                                    <div class="extra-small fw-bold mt-1">
+                                        {% if hc.status == 'quente' %}
+                                            <span class="text-danger"><i class="fa-solid fa-fire me-1"></i>{{ hc.count }}x</span>
+                                        {% elif hc.status == 'frio' %}
+                                            <span class="text-info"><i class="fa-solid fa-snowflake me-1"></i>{{ hc.count }}x</span>
+                                        {% else %}
+                                            <span class="text-muted">{{ hc.count }}x</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 </div>
-
-<style>
-.number-predictions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.number-badge {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.number-badge small {
-    font-size: 0.7rem;
-    margin-top: 2px;
-}
-</style>
 {% endblock %}

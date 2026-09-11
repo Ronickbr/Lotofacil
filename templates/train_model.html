@@ -1,49 +1,84 @@
 {% extends "base.html" %}
 
-{% block title %}Treinar Modelo{% endblock %}
+{% block title %}Treinamento de IA — Lotofácil Analytics Pro{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Treinar Modelo de Previsão</h4>
-                </div>
-                <div class="card-body">
-                    <p class="alert alert-info">
-                        <i class="fas fa-info-circle"></i>
-                        O treinamento do modelo utilizará todos os dados históricos disponíveis para criar
-                        um modelo de previsão mais preciso.
+<div class="row">
+    <div class="col-lg-10 offset-lg-1">
+        <div class="card card-custom mb-4">
+            <div class="card-header card-header-custom d-flex align-items-center justify-content-between">
+                <span class="fs-5 fw-bold"><i class="fa-solid fa-brain text-warning me-2"></i> Treinamento do Ensemble de Inteligência Artificial</span>
+                <span class="badge text-white px-3 py-1 rounded-pill fw-bold" style="background: linear-gradient(135deg, #fb8500, #ffb703);">Calibrado</span>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <div class="alert bg-light border rounded-4 shadow-sm mb-4">
+                    <h6 class="fw-bold text-dark mb-2"><i class="fa-solid fa-circle-info text-info me-2"></i>Sobre a Arquitetura do Modelo</h6>
+                    <p class="small text-muted mb-0">
+                        O treinamento ajusta um <strong>Ensemble de Classificadores (Random Forest + Logistic Regression)</strong>.
+                        Para evitar data leakage, utilizamos uma estratégia rigorosa de <strong>Walk-Forward Validation</strong>.
+                        O modelo aprende padrões temporais (atraso, frequência, sequência) usando exclusivamente dados disponíveis até o momento de cada sorteio histórico simulado.
                     </p>
-                    
-                    <div id="loading" style="display: none;" class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Carregando...</span>
-                        </div>
-                        <p class="mt-2">Treinando modelo, por favor aguarde...</p>
-                    </div>
-                    
-                    <div id="result" class="mt-3"></div>
-                    
-                    <button id="trainButton" class="btn btn-primary btn-lg btn-block w-100">
-                        <i class="fas fa-brain"></i> Iniciar Treinamento
-                    </button>
                 </div>
+
+                <div id="loading" style="display: none;" class="text-center my-5 py-4">
+                    <div class="spinner-grow text-warning me-2" role="status"></div>
+                    <div class="spinner-grow text-success me-2" role="status"></div>
+                    <div class="spinner-grow text-primary me-2" role="status"></div>
+                    <h5 class="mt-4 fw-bold text-dark">Treinando e Validando Ensemble...</h5>
+                    <p class="text-muted small">Este processo envolve feature engineering vetorial, validação Walk-Forward e simulação de 100.000 cenários de baseline aleatório. Pode levar alguns instantes.</p>
+                </div>
+
+                <div id="result"></div>
+
+                <button id="trainButton" class="btn btn-lg w-100 fw-extrabold py-3 shadow rounded-4 text-white fs-5 mt-2" style="background: linear-gradient(135deg, #ffb703, #fb8500); border: none;">
+                    <i class="fa-solid fa-microchip me-2"></i>Iniciar Treinamento Completo
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .metric-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1rem;
+        border: 1px solid #e9ecef;
+        text-align: center;
+        height: 100%;
+    }
+    .metric-card .value { font-size: 1.8rem; font-weight: 800; }
+    .metric-card .label { font-size: 0.8rem; color: #6c757d; font-weight: 600; text-transform: uppercase; }
+    .dist-bar {
+        height: 24px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+    }
+    .dist-bar .fill {
+        height: 100%;
+        transition: width 0.5s ease;
+    }
+    .dist-bar .text {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.75rem; font-weight: 700; color: #333;
+    }
+</style>
 
 <script>
 document.getElementById('trainButton').addEventListener('click', function(e) {
     e.preventDefault();
     const loading = document.getElementById('loading');
     const result = document.getElementById('result');
-    
+    const btn = document.getElementById('trainButton');
+
     loading.style.display = 'block';
     result.innerHTML = '';
-    
+    btn.disabled = true;
+
     fetch('/train-model', {
         method: 'POST',
         headers: {
@@ -51,15 +86,159 @@ document.getElementById('trainButton').addEventListener('click', function(e) {
             'Content-Type': 'application/json'
         }
     })
-    .then(response => response.text())
+    .then(response => response.json())
     .then(data => {
         loading.style.display = 'none';
-        result.innerHTML = `<div class="alert alert-success">${data}</div>`;
+        btn.disabled = false;
+        
+        if (data.error) {
+            result.innerHTML = `<div class="alert alert-danger rounded-4 shadow-sm my-3"><i class="fa-solid fa-triangle-exclamation me-2"></i>${data.error}</div>`;
+            return;
+        }
+
+        renderReport(data);
     })
     .catch(error => {
         loading.style.display = 'none';
-        result.innerHTML = `<div class="alert alert-danger">Erro: ${error}</div>`;
+        btn.disabled = false;
+        result.innerHTML = `<div class="alert alert-danger rounded-4 shadow-sm my-3"><i class="fa-solid fa-triangle-exclamation me-2"></i>Erro Crítico: ${error}</div>`;
     });
 });
+
+function renderReport(data) {
+    const hist = data.history_entry;
+    const base = data.baseline;
+    const m = hist.metrics;
+
+    const liftColor = hist.lift > 0 ? '#38b000' : '#d90429';
+    const liftSign = hist.lift > 0 ? '+' : '';
+    const liftText = (hist.lift * 100).toFixed(2);
+    
+    const statusColor = hist.status === 'PROMOVIDO' ? 'bg-success' : 'bg-secondary';
+
+    let html = `
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-clipboard-check text-success me-2"></i>Modelo Treinado com Sucesso</h5>
+                <span class="badge ${statusColor} text-white px-3 py-2 rounded-pill fs-6">${hist.status}</span>
+            </div>
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="label mb-1">Versão do Modelo</div>
+                        <div class="fw-bold" style="color: #7b2cbf; font-size: 1.1rem;">${hist.version}</div>
+                        <div class="small text-muted mt-1">Validação: Walk-Forward</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="label mb-1">Tamanho da Amostra</div>
+                        <div class="value text-dark">${hist.train_draws} <span class="fs-6 text-muted fw-normal">treino</span></div>
+                        <div class="small fw-bold text-success mt-1">${hist.test_draws} backtest</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="label mb-1">Lift vs Aleatório</div>
+                        <div class="value" style="color: ${liftColor};">${liftSign}${liftText}%</div>
+                        <div class="small text-muted mt-1">Eficácia acima do acaso</div>
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="fw-bold mb-3"><i class="fa-solid fa-bullseye text-primary me-2"></i>Performance no Top-15 (Backtest)</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="metric-card bg-white border-primary border-2">
+                        <div class="label text-primary">Média de Acertos IA</div>
+                        <div class="value text-primary">${m.mean.toFixed(2)}</div>
+                        <div class="small text-muted">/ 15 dezenas</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card">
+                        <div class="label">Média Aleatória</div>
+                        <div class="value text-secondary">${base.mean.toFixed(2)}</div>
+                        <div class="small text-muted">/ 15 (100k simulações)</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card">
+                        <div class="label">Mediana IA</div>
+                        <div class="value text-dark">${m.median}</div>
+                        <div class="small text-muted">acertos por jogo</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card">
+                        <div class="label">Máximo Atingido</div>
+                        <div class="value text-success">${m.max}</div>
+                        <div class="small text-muted">acertos</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-bar text-info me-2"></i>Distribuição de Acertos (IA)</h6>
+                    <div class="d-flex flex-column gap-2">
+    `;
+
+    const distLevels = [8, 9, 10, 11, 12, 13, 14, 15];
+    distLevels.forEach(k => {
+        const val = m.dist[String(k)] || 0;
+        const color = k >= 11 ? '#38b000' : k >= 10 ? '#ffb703' : '#6c757d';
+        html += `
+            <div class="d-flex align-items-center">
+                <div style="width: 80px;" class="small fw-bold text-end pe-2">${k} acertos</div>
+                <div class="flex-grow-1">
+                    <div class="dist-bar">
+                        <div class="fill" style="width: ${val}%; background: ${color}40;"></div>
+                        <div class="text">${val.toFixed(1)}%</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    html += `
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-3"><i class="fa-solid fa-trophy text-warning me-2"></i>Acumulado de Sucesso</h6>
+                    <ul class="list-group list-group-flush rounded-3 border">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Jogos com <strong>10 ou mais</strong> acertos</span>
+                            <span class="badge bg-secondary rounded-pill fs-6">${m.dist.ge_10.toFixed(1)}%</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
+                            <span>Jogos com <strong class="text-warning">11 ou mais</strong> acertos</span>
+                            <span class="badge bg-warning text-dark rounded-pill fs-6">${m.dist.ge_11.toFixed(1)}%</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Jogos com <strong class="text-success">12 ou mais</strong> acertos</span>
+                            <span class="badge bg-success rounded-pill fs-6">${m.dist.ge_12.toFixed(1)}%</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
+                            <span>Jogos com <strong class="text-primary">13 ou mais</strong> acertos</span>
+                            <span class="badge bg-primary rounded-pill fs-6">${m.dist.ge_13.toFixed(1)}%</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Jogos com <strong class="text-danger">14 ou mais</strong> acertos</span>
+                            <span class="badge bg-danger rounded-pill fs-6">${m.dist.ge_14.toFixed(2)}%</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="alert alert-warning mt-3 small mb-0">
+                        <i class="fa-solid fa-triangle-exclamation me-1"></i> <strong>Aviso:</strong> Sorteios de loteria possuem alta entropia e variância inerente. O modelo identifica as dezenas com maior propensão estatística baseada no histórico, mas isso <strong>não garante</strong> resultados determinísticos em um sorteio futuro.
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('result').innerHTML = html;
+}
 </script>
 {% endblock %}

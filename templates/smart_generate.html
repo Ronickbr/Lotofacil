@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}Fábrica de Jogos - Lotofácil{% endblock %}
+
+{% block extra_head %}
+<style>
+    .factory-container { display: flex; gap: 20px; min-height: 70vh; }
+    .sidebar { width: 250px; flex-shrink: 0; background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); }
+    .main-content { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; }
+    .sidebar-menu { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+    .sidebar-menu li { padding: 12px 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; color: var(--text-muted); font-weight: 500; }
+    .sidebar-menu li:hover { background: rgba(0, 201, 167, 0.1); color: var(--text-color); }
+    .sidebar-menu li.active { background: var(--primary-color); color: #fff; }
+    
+    .panel { display: none; background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); }
+    .panel.active { display: block; animation: fadeIn 0.3s ease; }
+    
+    .generated-games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 20px; }
+    .game-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; }
+    .game-balls { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .ball { width: 28px; height: 28px; border-radius: 50%; background: var(--bg-dark); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold; border: 1px solid var(--border-color); }
+    .game-explanation { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; font-style: italic; }
+    
+    .btn-generate { width: 100%; padding: 15px; font-size: 1.1rem; margin-top: 20px; }
+    .save-actions { position: sticky; bottom: 20px; background: var(--bg-card); padding: 15px; border-radius: 12px; border: 1px solid var(--primary-color); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; margin-top: 20px; }
+    
+    .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); }
+    .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-dark); color: var(--text-color); margin-bottom: 15px; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <h1><i class="fas fa-industry"></i> Fábrica de Jogos</h1>
+    <p>Otimize suas apostas usando algoritmos de IA, estatística e combinatória matemática.</p>
+</div>
+
+<div class="factory-container">
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li class="active" data-target="panel-direto"><i class="fas fa-edit"></i> Jogo Direto / Ampliado</li>
+            <li data-target="panel-estatistico"><i class="fas fa-chart-pie"></i> Estratégias Estatísticas</li>
+            <li data-target="panel-matematico"><i class="fas fa-calculator"></i> Desdobramento / Fechamento</li>
+            <li data-target="panel-ia"><i class="fas fa-robot"></i> Inteligência Artificial (Top 18)</li>
+            <li data-target="panel-montecarlo"><i class="fas fa-dice"></i> Filtros & Monte Carlo</li>
+        </ul>
+        <div style="margin-top: 30px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; text-align: center;">
+            <i class="fas fa-info-circle text-warning mb-2" style="font-size: 1.5rem;"></i>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Lembre-se: Geradores otimizam a cobertura, mas não garantem prêmios absolutos devido à aleatoriedade do sorteio.</p>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <!-- Panel 1: Jogo Direto -->
+        <div class="panel active" id="panel-direto">
+            <h2>Jogo Direto</h2>
+            <p class="text-muted">Informe 15 dezenas separadas por vírgula.</p>
+            <form id="form-direto" class="generation-form">
+                <input type="hidden" name="strategy" value="direto">
+                <input type="hidden" name="num_games" value="1">
+                <div class="form-group">
+                    <label>Suas Dezenas (ex: 1, 2, 3, 5, 8...)</label>
+                    <input type="text" name="numbers" placeholder="01, 02, 03..." required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-generate"><i class="fas fa-cogs"></i> Avaliar e Gerar</button>
+            </form>
+        </div>
+
+        <!-- Panel 2: Estatístico -->
+        <div class="panel" id="panel-estatistico">
+            <h2>Estratégias Estatísticas</h2>
+            <form id="form-estatistico" class="generation-form">
+                <div class="form-group">
+                    <label>Estratégia</label>
+                    <select name="strategy" required>
+                        <option value="frequency">Baseado em Frequência (Quentes, Neutras, Frias)</option>
+                        <option value="delay">Baseado em Atraso (Focar nas mais atrasadas)</option>
+                        <option value="repetition">Baseado em Repetição do Último Concurso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantidade de Jogos (Máx 50)</label>
+                    <input type="number" name="num_games" value="6" min="1" max="50">
+                </div>
+                <button type="submit" class="btn btn-primary btn-generate"><i class="fas fa-cogs"></i> Gerar Jogos</button>
+            </form>
+        </div>
+        
+        <!-- Panel 3: Matemático -->
+        <div class="panel" id="panel-matematico">
+            <h2>Matemática e Cobertura</h2>
+            <form id="form-matematico" class="generation-form">
+                <div class="form-group">
+                    <label>Modo</label>
+                    <select name="strategy" required id="math-mode-select">
+                        <option value="combinatorial_unfold">Desdobramento Completo</option>
+                        <option value="reduced_closure">Fechamento Reduzido (Greedy Set Cover)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Dezenas Base (16 a 20 dezenas)</label>
+                    <input type="text" name="numbers" placeholder="01, 02, 03..." required>
+                </div>
+                
+                <div id="closure-settings" style="display: none;">
+                    <div class="form-group">
+                        <label>Garantia de Acertos (Ex: 14)</label>
+                        <input type="number" name="guarantee" value="14" min="11" max="15">
+                    </div>
+                    <div class="form-group">
+                        <label>Condição (Se acertar X dezenas na base)</label>
+                        <input type="number" name="condition" value="15" min="11" max="15">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Limite de Jogos Gerados (Evita travamentos)</label>
+                    <input type="number" name="num_games" value="100" min="1" max="2000">
+                </div>
+                <button type="submit" class="btn btn-primary btn-generate"><i class="fas fa-cogs"></i> Executar Algoritmo</button>
+            </form>
+        </div>
+
+        <!-- Panel 4: IA -->
+        <div class="panel" id="panel-ia">
+            <h2>Inteligência Artificial & Diversidade</h2>
+            <p class="text-muted">A IA seleciona as 18 dezenas mais promissoras. O sistema extrai combinações diversas usando distância de Hamming.</p>
+            <form id="form-ia" class="generation-form">
+                <input type="hidden" name="strategy" value="ai_based">
+                <div class="form-group">
+                    <label>Quantidade de Jogos (Máx 50)</label>
+                    <input type="number" name="num_games" value="10" min="1" max="50">
+                </div>
+                <button type="submit" class="btn btn-primary btn-generate"><i class="fas fa-cogs"></i> Gerar via IA</button>
+            </form>
+        </div>
+
+        <!-- Panel 5: Monte Carlo -->
+        <div class="panel" id="panel-montecarlo">
+            <h2>Filtros & Simulação Monte Carlo</h2>
+            <p class="text-muted">Simula 100.000 sorteios e escolhe os jogos que sobrevivem aos filtros.</p>
+            <form id="form-montecarlo" class="generation-form">
+                <input type="hidden" name="strategy" value="montecarlo">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Pares Mínimos</label>
+                        <input type="number" name="min_even" value="6">
+                    </div>
+                    <div class="form-group">
+                        <label>Pares Máximos</label>
+                        <input type="number" name="max_even" value="9">
+                    </div>
+                    <div class="form-group">
+                        <label>Máx Consecutivas</label>
+                        <input type="number" name="max_consecutive" value="5">
+                    </div>
+                    <div class="form-group">
+                        <label>Mínimo Repetidas Últ. Conc.</label>
+                        <input type="number" name="min_repeat" value="8">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Quantidade de Jogos</label>
+                    <input type="number" name="num_games" value="6" min="1" max="50">
+                </div>
+                <button type="submit" class="btn btn-primary btn-generate"><i class="fas fa-cogs"></i> Simular e Gerar</button>
+            </form>
+        </div>
+
+        <!-- Resultados -->
+        <div id="results-area" style="display: none;">
+            <hr style="border-color: var(--border-color); margin: 30px 0;">
+            <h3>Resultados da Geração</h3>
+            <p id="results-stats" class="text-muted"></p>
+            
+            <div class="save-actions" id="save-actions">
+                <div>
+                    <strong style="color: var(--primary-color); font-size: 1.2rem;" id="cost-display">Custo: R$ 0,00</strong>
+                    <span class="text-muted" style="margin-left: 10px;">(<span id="games-count">0</span> jogos únicos)</span>
+                </div>
+                <button id="btn-save-games" class="btn btn-success"><i class="fas fa-save"></i> Salvar Estes Jogos no Banco</button>
+            </div>
+            
+            <div class="generated-games-grid" id="games-grid">
+                <!-- Jogos inseridos aqui via JS -->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let currentGeneratedGames = [];
+    let currentStrategy = "";
+    let currentAiRanking = null;
+
+    // Menu logic
+    document.querySelectorAll('.sidebar-menu li').forEach(li => {
+        li.addEventListener('click', () => {
+            document.querySelectorAll('.sidebar-menu li').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(el => el.classList.remove('active'));
+            li.classList.add('active');
+            document.getElementById(li.dataset.target).classList.add('active');
+        });
+    });
+
+    // Math closure logic toggle
+    document.getElementById('math-mode-select').addEventListener('change', function() {
+        if(this.value === 'reduced_closure') {
+            document.getElementById('closure-settings').style.display = 'block';
+        } else {
+            document.getElementById('closure-settings').style.display = 'none';
+        }
+    });
+
+    // Handle Forms
+    document.querySelectorAll('.generation-form').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = form.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+            btn.disabled = true;
+
+            try {
+                const formData = new FormData(form);
+                const response = await fetch('/smart-generate', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResults(data);
+                } else {
+                    alert('Erro: ' + data.error);
+                }
+            } catch (err) {
+                alert('Erro de conexão.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    });
+
+    function displayResults(data) {
+        document.getElementById('results-area').style.display = 'block';
+        currentGeneratedGames = data.games;
+        currentStrategy = data.strategy;
+        currentAiRanking = data.ai_ranking;
+        
+        document.getElementById('games-count').innerText = data.total_generated;
+        document.getElementById('cost-display').innerText = `Custo: R$ ${data.cost.toFixed(2).replace('.', ',')}`;
+        
+        let statsMsg = `Exibindo ${data.games.length} de ${data.total_generated} jogos gerados usando a estratégia <strong>${data.strategy}</strong>.`;
+        if(data.total_generated > data.games.length) {
+            statsMsg += ' (Restringido na interface por segurança, mas todos podem ser salvos).';
+        }
+        document.getElementById('results-stats').innerHTML = statsMsg;
+        
+        const grid = document.getElementById('games-grid');
+        grid.innerHTML = '';
+        
+        data.games.forEach((g, idx) => {
+            let ballsHtml = g.numbers.map(n => `<div class="ball">${n.toString().padStart(2, '0')}</div>`).join('');
+            let card = `
+                <div class="game-card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <strong>Jogo #${idx+1}</strong>
+                        <span style="color: var(--primary-color);">Score: ${g.total_score.toFixed(1)}</span>
+                    </div>
+                    <div class="game-balls">${ballsHtml}</div>
+                    <div class="game-explanation">${g.explanation}</div>
+                </div>
+            `;
+            grid.innerHTML += card;
+        });
+        
+        // Scroll to results
+        document.getElementById('results-area').scrollIntoView({behavior: 'smooth'});
+    }
+
+    document.getElementById('btn-save-games').addEventListener('click', async () => {
+        if(currentGeneratedGames.length === 0) return;
+        
+        const btn = document.getElementById('btn-save-games');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+        btn.disabled = true;
+        
+        try {
+            const response = await fetch('/save-games', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    strategy: currentStrategy,
+                    games: currentGeneratedGames,
+                    ai_ranking: currentAiRanking
+                })
+            });
+            
+            const data = await response.json();
+            if(response.ok) {
+                alert(data.message);
+                window.location.href = '/saved-games';
+            } else {
+                alert('Erro: ' + data.error);
+            }
+        } catch (err) {
+            alert('Erro de conexão ao salvar.');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    });
+</script>
+{% endblock %}

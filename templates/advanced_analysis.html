@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block title %}Análise Avançada — Lotofácil Analytics Pro{% endblock %}
+
+{% block content %}
+<div class="card card-custom mb-4">
+    <div class="card-header card-header-custom d-flex align-items-center justify-content-between">
+        <span class="fs-5 fw-bold"><i class="fa-solid fa-microscope text-primary me-2"></i>Central de Análise Avançada</span>
+        <span class="badge text-white px-3 py-1 rounded-pill fw-bold" style="background: linear-gradient(135deg, #7b2cbf, #5a189a);">17 Análises</span>
+    </div>
+    <div class="card-body p-4">
+        <div class="p-3 rounded-4 bg-light border d-flex align-items-center mb-4">
+            <div class="lottery-ball me-3" style="background: radial-gradient(circle at 30% 30%, #70e000, #38b000); flex-shrink: 0;">
+                <i class="fa-solid fa-atom text-white"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-1">Painel de Análise Multidimensional</h6>
+                <p class="text-muted small mb-0">
+                    Todas as análises são calculadas sobre o histórico completo. Clique em cada aba para carregar os dados em tempo real via API.
+                </p>
+            </div>
+        </div>
+
+        <!-- Analysis Tabs -->
+        <ul class="nav nav-pills nav-fill flex-wrap gap-1 mb-4" id="analysisTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active rounded-pill fw-bold small px-3" id="tab-delays" data-bs-toggle="pill" data-bs-target="#pane-delays" data-api="delays">
+                    <i class="fa-solid fa-hourglass-half me-1"></i>Atraso
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold small px-3" id="tab-spatial" data-bs-toggle="pill" data-bs-target="#pane-spatial" data-api="spatial">
+                    <i class="fa-solid fa-grip me-1"></i>Espacial
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold small px-3" id="tab-consecutive" data-bs-toggle="pill" data-bs-target="#pane-consecutive" data-api="consecutive">
+                    <i class="fa-solid fa-link me-1"></i>Consecutivas
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold small px-3" id="tab-parity" data-bs-toggle="pill" data-bs-target="#pane-parity" data-api="parity">
+                    <i class="fa-solid fa-circle-half-stroke me-1"></i>Par/Ímpar
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold small px-3" id="tab-sum" data-bs-toggle="pill" data-bs-target="#pane-sum" data-api="sum">
+                    <i class="fa-solid fa-calculator me-1"></i>Soma
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold small px-3" id="tab-classes" data-bs-toggle="pill" data-bs-target="#pane-classes" data-api="number_classes">
+                    <i class="fa-solid fa-superscript me-1"></i>Classes
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold small px-3" id="tab-entropy" data-bs-toggle="pill" data-bs-target="#pane-entropy" data-api="entropy">
+                    <i class="fa-solid fa-wave-square me-1"></i>Entropia
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold small px-3" id="tab-correlation" data-bs-toggle="pill" data-bs-target="#pane-correlation" data-api="correlation">
+                    <i class="fa-solid fa-circle-nodes me-1"></i>Correlação
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold small px-3" id="tab-regression" data-bs-toggle="pill" data-bs-target="#pane-regression" data-api="regression">
+                    <i class="fa-solid fa-chart-line me-1"></i>Regressão
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold small px-3" id="tab-hyper" data-bs-toggle="pill" data-bs-target="#pane-hyper" data-api="hypergeometric">
+                    <i class="fa-solid fa-percent me-1"></i>Hipergeométrica
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="analysisTabContent">
+            {% for pane_id in ['delays', 'spatial', 'consecutive', 'parity', 'sum', 'classes', 'entropy', 'correlation', 'regression', 'hyper'] %}
+            <div class="tab-pane fade {% if pane_id == 'delays' %}show active{% endif %}" id="pane-{{ pane_id }}" role="tabpanel">
+                <div class="text-center py-5" id="loader-{{ pane_id }}">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="text-muted mt-2">Carregando análise...</p>
+                </div>
+                <div id="content-{{ pane_id }}"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-pills .nav-link {
+        color: #495057;
+        background: #f1f3f5;
+        transition: all 0.2s ease;
+    }
+    .nav-pills .nav-link:hover {
+        background: #e9ecef;
+        transform: translateY(-1px);
+    }
+    .nav-pills .nav-link.active {
+        background: linear-gradient(135deg, #7b2cbf, #5a189a);
+        color: white;
+    }
+    .analysis-metric {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1rem;
+        border: 1px solid #e9ecef;
+        text-align: center;
+    }
+    .analysis-metric .value { font-size: 1.8rem; font-weight: 800; color: #7b2cbf; }
+    .analysis-metric .label { font-size: 0.8rem; color: #6c757d; }
+</style>
+
+<script>
+const loaded = {};
+
+function loadAnalysis(apiType, paneId) {
+    if (loaded[paneId]) return;
+    loaded[paneId] = true;
+
+    fetch(`/api/analysis/${apiType}`)
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById(`loader-${paneId}`).style.display = 'none';
+            const content = document.getElementById(`content-${paneId}`);
+            content.innerHTML = renderAnalysis(apiType, data);
+        })
+        .catch(err => {
+            document.getElementById(`loader-${paneId}`).style.display = 'none';
+            document.getElementById(`content-${paneId}`).innerHTML =
+                `<div class="alert alert-danger rounded-3"><i class="fa-solid fa-triangle-exclamation me-2"></i>${err}</div>`;
+        });
+}
+
+function renderAnalysis(type, data) {
+    if (data.error) return `<div class="alert alert-danger">${data.error}</div>`;
+
+    switch(type) {
+        case 'delays': return renderDelays(data);
+        case 'spatial': return renderSpatial(data);
+        case 'consecutive': return renderConsecutive(data);
+        case 'parity': return renderParity(data);
+        case 'sum': return renderSum(data);
+        case 'number_classes': return renderClasses(data);
+        case 'entropy': return renderEntropy(data);
+        case 'correlation': return renderCorrelation(data);
+        case 'regression': return renderRegression(data);
+        case 'hypergeometric': return renderHypergeometric(data);
+        default: return `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+    }
+}
+
+function renderDelays(data) {
+    let rows = '';
+    for (let n = 1; n <= 25; n++) {
+        const d = data[n];
+        if (!d) continue;
+        const statusClass = d.current > d.mean + 2*d.std ? 'bg-danger' : d.current > d.mean + d.std ? 'bg-warning text-dark' : d.current < d.mean - d.std ? 'bg-success' : 'bg-secondary';
+        const statusText = d.current > d.mean + 2*d.std ? 'Muito Atrasado' : d.current > d.mean + d.std ? 'Atrasado' : d.current < d.mean - d.std ? 'Recente' : 'Normal';
+        rows += `<tr>
+            <td><span class="lottery-ball lottery-ball-sm">${String(n).padStart(2,'0')}</span></td>
+            <td class="fw-bold">${d.current}</td><td>${d.mean}</td><td>${d.max}</td><td>${d.std}</td>
+            <td><div class="progress" style="height:18px;min-width:80px"><div class="progress-bar ${d.percentile > 80 ? 'bg-danger' : d.percentile > 60 ? 'bg-warning' : 'bg-success'}" style="width:${d.percentile}%">${d.percentile}%</div></div></td>
+            <td><span class="badge ${statusClass}">${statusText}</span></td></tr>`;
+    }
+    return `<div class="table-responsive"><table class="table table-hover table-striped align-middle"><thead class="table-dark"><tr><th>Dezena</th><th>Atual</th><th>Médio</th><th>Máx</th><th>Desvio</th><th>Percentil</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderSpatial(data) {
+    let heatmap = '<table class="table table-bordered text-center mx-auto" style="max-width:450px">';
+    for (const row of data.heatmap) {
+        heatmap += '<tr>';
+        for (const cell of row) {
+            const alpha = Math.min(cell.pct / 80, 1);
+            heatmap += `<td style="background:rgba(123,44,191,${alpha});color:${alpha > 0.5 ? 'white' : '#333'};width:90px;height:70px;font-weight:700"><div class="fs-5">${String(cell.number).padStart(2,'0')}</div><div class="small">${cell.pct}%</div></td>`;
+        }
+        heatmap += '</tr>';
+    }
+    heatmap += '</table>';
+
+    let bc = data.border_center;
+    return `<h6 class="fw-bold mb-3">Heatmap de Frequência no Volante</h6><div class="d-flex justify-content-center mb-4">${heatmap}</div>
+    <div class="row g-3">
+        <div class="col-md-6"><div class="analysis-metric"><div class="label">Borda (média)</div><div class="value">${bc.border_avg}</div></div></div>
+        <div class="col-md-6"><div class="analysis-metric"><div class="label">Centro (média)</div><div class="value">${bc.center_avg}</div></div></div>
+    </div>`;
+}
+
+function renderConsecutive(data) {
+    return `<div class="row g-3">
+        <div class="col-md-3"><div class="analysis-metric"><div class="label">Maior Seq. Média</div><div class="value">${data.max_sequence.avg}</div></div></div>
+        <div class="col-md-3"><div class="analysis-metric"><div class="label">Maior Seq. Máxima</div><div class="value">${data.max_sequence.max}</div></div></div>
+        <div class="col-md-3"><div class="analysis-metric"><div class="label">Blocos Médios</div><div class="value">${data.blocks.avg}</div></div></div>
+        <div class="col-md-3"><div class="analysis-metric"><div class="label">Pares Consec.</div><div class="value">${data.consecutive_pairs.avg}</div></div></div>
+    </div>
+    <div class="mt-4"><h6 class="fw-bold">Distribuição do Tamanho da Maior Sequência</h6>
+    <div class="d-flex flex-wrap gap-2 mt-2">${Object.entries(data.max_sequence.distribution).map(([k,v]) => `<div class="analysis-metric" style="min-width:80px"><div class="label">${k} nºs</div><div class="value fs-5">${v}</div></div>`).join('')}</div></div>`;
+}
+
+function renderParity(data) {
+    let rows = '';
+    for (const [key, d] of Object.entries(data.distribution)) {
+        if (d.observed > 0 || d.theoretical_pct > 0.1) {
+            const diff = (d.observed_pct - d.theoretical_pct).toFixed(1);
+            rows += `<tr><td class="fw-bold">${d.even}P / ${d.odd}I</td><td>${d.observed}</td><td>${d.observed_pct}%</td><td>${d.theoretical_pct}%</td><td class="${diff > 2 ? 'text-success' : diff < -2 ? 'text-danger' : ''}">${diff > 0 ? '+' : ''}${diff}%</td></tr>`;
+        }
+    }
+    return `<div class="table-responsive"><table class="table table-hover table-striped"><thead class="table-dark"><tr><th>Config</th><th>Observado</th><th>Obs %</th><th>Teórico %</th><th>Desvio</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderSum(data) {
+    return `<div class="row g-3 mb-4">
+        <div class="col-md-2"><div class="analysis-metric"><div class="label">Média</div><div class="value">${data.mean}</div></div></div>
+        <div class="col-md-2"><div class="analysis-metric"><div class="label">Mediana</div><div class="value">${data.median}</div></div></div>
+        <div class="col-md-2"><div class="analysis-metric"><div class="label">Desvio</div><div class="value">${data.std}</div></div></div>
+        <div class="col-md-2"><div class="analysis-metric"><div class="label">Mínimo</div><div class="value">${data.min}</div></div></div>
+        <div class="col-md-2"><div class="analysis-metric"><div class="label">Máximo</div><div class="value">${data.max}</div></div></div>
+        <div class="col-md-2"><div class="analysis-metric"><div class="label">P50</div><div class="value">${data.percentiles['50']}</div></div></div>
+    </div>
+    <h6 class="fw-bold">Histograma de Somas</h6>
+    <div class="d-flex flex-wrap gap-1 mt-2">${data.histogram.map(h => `<div class="analysis-metric" style="min-width:70px"><div class="label">${h.range}</div><div class="value fs-6">${h.count}</div></div>`).join('')}</div>`;
+}
+
+function renderClasses(data) {
+    let html = '<div class="row g-3">';
+    for (const [key, cls] of Object.entries(data)) {
+        const balls = cls.pool_numbers.map(n => `<span class="lottery-ball lottery-ball-sm">${String(n).padStart(2,'0')}</span>`).join(' ');
+        const dist = Object.entries(cls.distribution).map(([k,v]) => `<span class="badge bg-white text-dark border me-1 mb-1">${k}×: ${v}</span>`).join('');
+        html += `<div class="col-md-4"><div class="p-3 bg-light rounded-4 border h-100">
+            <h6 class="fw-bold mb-2">${cls.label}</h6>
+            <div class="d-flex flex-wrap gap-1 mb-2">${balls}</div>
+            <div class="small text-muted">Pool: ${cls.pool_size} | Média: <strong>${cls.avg}</strong> ± ${cls.std}</div>
+            <div class="mt-2">${dist}</div>
+        </div></div>`;
+    }
+    return html + '</div>';
+}
+
+function renderEntropy(data) {
+    let html = '<div class="row g-3">';
+    for (const [key, ent] of Object.entries(data)) {
+        const barColor = ent.ratio > 97 ? 'bg-success' : ent.ratio > 90 ? 'bg-warning' : 'bg-danger';
+        html += `<div class="col-md-4"><div class="p-3 bg-light rounded-4 border text-center h-100">
+            <h6 class="fw-bold">${ent.label}</h6>
+            <div class="fs-2 fw-extrabold" style="color:#7b2cbf">${ent.entropy}</div>
+            <div class="text-muted small">/ ${ent.max_entropy} (máx)</div>
+            <div class="progress mt-2" style="height:12px"><div class="progress-bar ${barColor}" style="width:${ent.ratio}%">${ent.ratio}%</div></div>
+            <div class="small text-muted mt-2 fst-italic">${ent.interpretation}</div>
+        </div></div>`;
+    }
+    return html + '</div>';
+}
+
+function renderCorrelation(data) {
+    let pairs = '';
+    for (const p of (data.top_pairs || []).slice(0, 10)) {
+        pairs += `<tr><td><span class="lottery-ball lottery-ball-sm">${String(p.pair[0]).padStart(2,'0')}</span> <span class="lottery-ball lottery-ball-sm">${String(p.pair[1]).padStart(2,'0')}</span></td><td>${p.count}</td><td>${p.frequency}%</td><td>${p.expected_pct}%</td><td class="${p.deviation > 0 ? 'text-success' : 'text-danger'} fw-bold">${p.deviation > 0 ? '+' : ''}${p.deviation}%</td></tr>`;
+    }
+    let triples = '';
+    for (const t of (data.top_triples || []).slice(0, 10)) {
+        const balls = t.triple.map(n => `<span class="lottery-ball lottery-ball-sm">${String(n).padStart(2,'0')}</span>`).join(' ');
+        triples += `<tr><td>${balls}</td><td>${t.count}</td><td>${t.frequency}%</td></tr>`;
+    }
+    return `<div class="row g-3"><div class="col-md-6"><h6 class="fw-bold mb-3"><i class="fa-solid fa-arrow-trend-up text-success me-1"></i>Top 10 Pares</h6>
+    <div class="table-responsive"><table class="table table-sm table-hover"><thead><tr><th>Par</th><th>Vezes</th><th>Freq</th><th>Esperado</th><th>Desvio</th></tr></thead><tbody>${pairs}</tbody></table></div></div>
+    <div class="col-md-6"><h6 class="fw-bold mb-3"><i class="fa-solid fa-layer-group text-warning me-1"></i>Top 10 Trincas</h6>
+    <div class="table-responsive"><table class="table table-sm table-hover"><thead><tr><th>Trinca</th><th>Vezes</th><th>Freq</th></tr></thead><tbody>${triples}</tbody></table></div></div></div>`;
+}
+
+function renderRegression(data) {
+    let rows = '';
+    const entries = Object.entries(data).sort((a, b) => Math.abs(b[1].z_score) - Math.abs(a[1].z_score));
+    for (const [num, r] of entries) {
+        const statusClass = r.status === 'inflated' ? 'bg-danger' : r.status === 'deflated' ? 'bg-info' : r.status === 'slightly_hot' ? 'bg-warning text-dark' : r.status === 'slightly_cold' ? 'bg-secondary' : 'bg-light text-dark border';
+        rows += `<tr><td><span class="lottery-ball lottery-ball-sm">${String(num).padStart(2,'0')}</span></td><td>${r.historical_freq}%</td><td>${r.recent_freq}%</td><td class="fw-bold ${r.z_score > 1.96 ? 'text-danger' : r.z_score < -1.96 ? 'text-info' : ''}">${r.z_score}</td><td><span class="badge ${statusClass}">${r.status_label}</span></td><td class="fst-italic text-muted small">${r.tendency}</td></tr>`;
+    }
+    return `<div class="table-responsive"><table class="table table-hover table-striped"><thead class="table-dark"><tr><th>Dezena</th><th>Histórica</th><th>Recente</th><th>Z-Score</th><th>Status</th><th>Tendência</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderHypergeometric(data) {
+    let headers = '<th>Grupo \\ Acertos</th>';
+    const hitValues = [11, 12, 13, 14, 15];
+    for (const h of hitValues) headers += `<th>${h}</th>`;
+
+    let rows = '';
+    for (const [group, hits] of Object.entries(data)) {
+        rows += `<tr><td class="fw-bold">${group} dezenas</td>`;
+        for (const h of hitValues) {
+            const val = hits[String(h)];
+            if (val) {
+                rows += `<td>${val.percentage}%</td>`;
+            } else {
+                rows += '<td class="text-muted">—</td>';
+            }
+        }
+        rows += '</tr>';
+    }
+
+    return `<div class="p-3 bg-light rounded-4 border mb-3">
+        <p class="small text-muted mb-0"><strong>Tabela Hipergeométrica:</strong> Probabilidade de acertar exatamente K números dado um grupo de N dezenas escolhidas. Lotofácil sorteia 15 de 25.</p>
+    </div>
+    <div class="table-responsive"><table class="table table-hover table-striped"><thead class="table-dark"><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+// Auto-load first tab
+document.addEventListener('DOMContentLoaded', () => {
+    loadAnalysis('delays', 'delays');
+});
+
+// Load on tab click
+document.querySelectorAll('[data-bs-toggle="pill"]').forEach(btn => {
+    btn.addEventListener('shown.bs.tab', () => {
+        const apiType = btn.dataset.api;
+        const paneId = btn.dataset.bsTarget.replace('#pane-', '');
+        loadAnalysis(apiType, paneId);
+    });
+});
+</script>
+{% endblock %}
