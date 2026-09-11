@@ -1,9 +1,10 @@
-"""Smoke and regression tests for Flask routes and database helpers."""
+"""Smoke and regression tests for Flask routes, database helpers and ML resilience."""
 
 import unittest
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import app as app_module
+from analysis.ml import predict_next_numbers, predict_next_numbers_detailed
 
 
 class RouteSmokeTests(unittest.TestCase):
@@ -39,6 +40,34 @@ class RouteSmokeTests(unittest.TestCase):
 
     def test_delay_generator_is_imported(self):
         self.assertTrue(callable(app_module.generate_delay_based))
+
+
+class MLResilienceTests(unittest.TestCase):
+    def setUp(self):
+        self.results = []
+        for offset in range(60):
+            balls = [((n + offset) % 25) + 1 for n in range(15)]
+            self.results.append(tuple(sorted(balls)) + (f"2026-01-{(offset % 28) + 1:02d}",))
+
+    def test_prediction_falls_back_when_model_inference_fails(self):
+        broken_model = MagicMock()
+        broken_model.predict_proba.side_effect = ValueError("incompatible feature count")
+
+        numbers = predict_next_numbers(broken_model, self.results, top_k=10)
+
+        self.assertEqual(len(numbers), 10)
+        self.assertEqual(len(set(numbers)), 10)
+        self.assertTrue(all(1 <= n <= 25 for n in numbers))
+
+    def test_detailed_prediction_falls_back_when_model_inference_fails(self):
+        broken_model = MagicMock()
+        broken_model.predict_proba.side_effect = RuntimeError("broken pickle")
+
+        data = predict_next_numbers_detailed(broken_model, self.results)
+
+        self.assertEqual(len(data["ranking"]), 25)
+        self.assertEqual(len(data["top18"]), 18)
+        self.assertEqual(len(set(data["top18"])), 18)
 
 
 class DatabaseHelperRegressionTests(unittest.TestCase):
