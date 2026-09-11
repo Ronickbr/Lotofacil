@@ -43,6 +43,7 @@ from analysis import (
     get_game_hash,
     explain_game,
     generate_frequency_based,
+    generate_delay_based,
     generate_repetition_based,
 )
 from analysis.mlops import check_and_evaluate_generations, continuous_training_pipeline
@@ -130,7 +131,6 @@ def calculate_statistics(results, prediction_type):
     elif prediction_type == 'delay':
         stats['method_name'] = 'Análise de Atraso Completa'
         full_delays = calculate_full_delays(results)
-        # Sort by current delay descending (most overdue)
         sorted_delays = sorted(full_delays.items(), key=lambda x: x[1]['current'], reverse=True)
         stats['frequent_numbers'] = [
             {
@@ -160,7 +160,6 @@ def calculate_statistics(results, prediction_type):
         stats['method_name'] = 'Distribuição Par/Ímpar'
         parity = calculate_parity_distribution(results)
         stats['parity_distribution'] = parity
-        # Top numbers are most frequent overall
         num_freq = basic_stats['number_frequencies']
         sorted_freq = sorted(num_freq.items(), key=lambda x: x[1]['count'], reverse=True)
         stats['frequent_numbers'] = [
@@ -242,7 +241,6 @@ def calculate_statistics(results, prediction_type):
         stats['method_name'] = 'Regressão à Média'
         regression = detect_mean_regression(results)
         stats['regression'] = regression
-        # Sort by absolute z-score
         sorted_reg = sorted(regression.items(), key=lambda x: abs(x[1]['z_score']), reverse=True)
         stats['frequent_numbers'] = [
             {
@@ -282,8 +280,6 @@ def inject_now():
     return {'now': datetime.now()}
 
 
-
-
 def _fetch_all_results():
     """Helper to fetch all results ordered by concurso ASC."""
     cur = mysql.connection.cursor()
@@ -298,6 +294,35 @@ def _fetch_all_results():
     return results
 
 
+def _get_next_contest_number():
+    """Return the next contest number based on the greatest contest stored in results."""
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT MAX(concurso) FROM results")
+        row = cur.fetchone()
+        last_contest = int(row[0]) if row and row[0] is not None else 0
+        return last_contest + 1
+    finally:
+        cur.close()
+
+
+def _fetch_latest_result():
+    """Return the latest draw as 15 balls plus draw date, or None when the DB is empty."""
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute(
+            """SELECT bola1, bola2, bola3, bola4, bola5, bola6, bola7, bola8,
+                      bola9, bola10, bola11, bola12, bola13, bola14, bola15,
+                      data_sorteio
+               FROM results
+               ORDER BY concurso DESC
+               LIMIT 1"""
+        )
+        return cur.fetchone()
+    finally:
+        cur.close()
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -305,6 +330,7 @@ def index():
 
 @app.route('/add-concurso', methods=['POST'])
 def add_concurso():
+    cur = None
     try:
         cur = mysql.connection.cursor()
 
@@ -337,13 +363,15 @@ def add_concurso():
         mysql.connection.rollback()
         flash(f'Erro ao adicionar concurso: {str(e)}', 'danger')
     finally:
-        cur.close()
+        if cur is not None:
+            cur.close()
 
     return redirect(url_for('upload'))
 
 
 @app.route('/delete-concurso/<int:concurso>', methods=['DELETE'])
 def delete_concurso(concurso):
+    cur = None
     try:
         cur = mysql.connection.cursor()
         cur.execute("DELETE FROM results WHERE concurso = %s", (concurso,))
@@ -353,7 +381,8 @@ def delete_concurso(concurso):
         mysql.connection.rollback()
         return jsonify({'success': False, 'error': str(e)})
     finally:
-        cur.close()
+        if cur is not None:
+            cur.close()
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -539,8 +568,7 @@ def predict():
         response = "<div class='mb-4 p-3 rounded-4 bg-light border'>"
         response += (
             "<h5 class='fw-bold mb-3 text-dark d-flex align-items-center'><i"
-            " class='fa-solid fa-star text-warning me-2"
-            " fs-4'></i>Dezenas Mais Prováveis (Top 10):</h5>"
+            " class='fa-solid fa-star text-warning me-2 fs-4'></i>Dezenas Mais Prováveis (Top 10):</h5>"
         )
         response += "<div class='d-flex flex-wrap gap-2'>"
         for num in valid_numbers:
@@ -551,8 +579,7 @@ def predict():
 
         response += (
             "<h5 class='fw-bold mb-3 text-dark d-flex align-items-center'><i"
-            " class='fa-solid fa-ticket text-danger me-2"
-            " fs-4'></i>Bilhetes Sugeridos para Aposta (6 Jogos):</h5>"
+            " class='fa-solid fa-ticket text-danger me-2 fs-4'></i>Bilhetes Sugeridos para Aposta (6 Jogos):</h5>"
         )
         response += "<div class='row g-3'>"
         for i, game in enumerate(games, 1):
@@ -574,7 +601,7 @@ def predict():
             response += f"""
                     </div>
                     <div class='mt-2 pt-2 border-top text-end'>
-                        <button class='btn btn-sm rounded-pill px-3 fw-bold' style='color: #7b2cbf; border: 1px solid #7b2cbf;' onclick='navigator.clipboard.writeText("{game_str}"); this.innerHTML="<i class=\\"fa-solid fa-check me-1\\"></i>Copiado!"; setTimeout(() => this.innerHTML="<i class=\\"fa-regular fa-copy me-1\\"></i>Copiar Jogo", 2000);'>
+                        <button class='btn btn-sm rounded-pill px-3 fw-bold' style='color: #7b2cbf; border: 1px solid #7b2cbf;' onclick='navigator.clipboard.writeText("{game_str}"); this.innerHTML="<i class=\"fa-solid fa-check me-1\"></i>Copiado!"; setTimeout(() => this.innerHTML="<i class=\"fa-regular fa-copy me-1\"></i>Copiar Jogo", 2000);'>
                             <i class='fa-regular fa-copy me-1'></i>Copiar Jogo
                         </button>
                     </div>
@@ -647,13 +674,11 @@ def historical_stats():
 
 @app.route('/advanced-analysis')
 def advanced_analysis():
-    """Page with tabbed interface for all analysis types."""
     return render_template('advanced_analysis.html')
 
 
 @app.route('/api/analysis/<analysis_type>')
 def api_analysis(analysis_type):
-    """JSON API for individual analysis types, consumed via AJAX."""
     try:
         results = _fetch_all_results()
         if not results:
@@ -685,7 +710,6 @@ def api_analysis(analysis_type):
             data = calculate_windowed_frequency(results)
         elif analysis_type == 'hypergeometric':
             data = calculate_hypergeometric_table()
-            # Convert int keys to string for JSON
             data = {str(k): {str(kk): vv for kk, vv in v.items()} for k, v in data.items()}
         elif analysis_type == 'hot_cold':
             data = calculate_hot_cold(results)
@@ -700,7 +724,6 @@ def api_analysis(analysis_type):
 
 @app.route('/smart-generate', methods=['GET', 'POST'])
 def smart_generate():
-    """Advanced game factory hub handling diverse strategies and combinatorial logic."""
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         try:
             results = _fetch_all_results()
@@ -709,8 +732,7 @@ def smart_generate():
 
             strategy = request.form.get('strategy', 'montecarlo')
             num_games = int(request.form.get('num_games', 6))
-            
-            # Allow larger limits for combinatorial unfoldings but cap output for UI safety
+
             if strategy not in ['combinatorial_unfold', 'reduced_closure']:
                 num_games = max(1, min(num_games, 50))
             else:
@@ -724,33 +746,33 @@ def smart_generate():
                 if len(parsed) != 15 or len(set(parsed)) != 15 or any(n < 1 or n > 25 for n in parsed):
                     return jsonify({'error': 'Forneça exatamente 15 dezenas únicas entre 1 e 25.'}), 400
                 games = [sorted(parsed)]
-                
+
             elif strategy == 'combinatorial_unfold':
                 nums = request.form.get('numbers', '')
                 parsed = sorted([int(n.strip()) for n in nums.split(',') if n.strip().isdigit()])
                 if len(parsed) < 16 or len(parsed) > 20 or len(set(parsed)) != len(parsed):
                     return jsonify({'error': 'Forneça entre 16 e 20 dezenas únicas para desdobramento.'}), 400
                 games = generate_combinations(parsed, k=15, max_games=num_games)
-                
+
             elif strategy == 'reduced_closure':
                 nums = request.form.get('numbers', '')
                 parsed = sorted([int(n.strip()) for n in nums.split(',') if n.strip().isdigit()])
                 guarantee = int(request.form.get('guarantee', 14))
                 condition = int(request.form.get('condition', 15))
-                if len(parsed) < 16 or len(parsed) > 20:
-                    return jsonify({'error': 'Forneça entre 16 e 20 dezenas.'}), 400
+                if len(parsed) < 16 or len(parsed) > 20 or len(set(parsed)) != len(parsed):
+                    return jsonify({'error': 'Forneça entre 16 e 20 dezenas únicas.'}), 400
                 games = generate_reduced_closure(parsed, guarantee=guarantee, match_condition=condition, max_games=num_games)
-                
+
             elif strategy == 'frequency':
                 games = generate_frequency_based(results, num_games=num_games)
-                
+
             elif strategy == 'delay':
                 mode = request.form.get('delay_mode', 'most_delayed')
                 games = generate_delay_based(results, num_games=num_games, mode=mode)
-                
+
             elif strategy == 'repetition':
                 games = generate_repetition_based(results, num_games=num_games)
-                
+
             elif strategy == 'ai_based':
                 try:
                     model = load_lotofacil_model('lotofacil_model.pkl')
@@ -760,10 +782,8 @@ def smart_generate():
                 detailed = predict_next_numbers_detailed(model, results)
                 top_nums = detailed['top18']
                 ai_ranking = detailed['ranking']
-                # Generate mixed from AI top 18
                 candidates = [sorted(random.sample(top_nums, 15)) for _ in range(500)]
-                diverse = hamming_distance_optimize(candidates, num_games=num_games)
-                games = diverse
+                games = hamming_distance_optimize(candidates, num_games=num_games)
 
             elif strategy == 'montecarlo':
                 filters = {
@@ -791,20 +811,16 @@ def smart_generate():
             else:
                 return jsonify({'error': f'Estratégia desconhecida: {strategy}'}), 400
 
-            # Score and enrich all games
             response_games = []
-            
-            # Precompute history object once for fast scoring!
             from analysis.scoring import GameScorer
             scorer = GameScorer(results)
-            
+
             for game_data in games:
                 nums = game_data['numbers'] if isinstance(game_data, dict) else game_data
-                
                 score_detail = scorer.score_game(nums)
                 game_hash = get_game_hash(nums)
                 explanation = explain_game(nums, results)
-                
+
                 response_games.append({
                     'hash': game_hash,
                     'numbers': nums,
@@ -816,8 +832,7 @@ def smart_generate():
                     'odds': score_detail['odds'],
                     'primes': score_detail['primes'],
                 })
-                
-            # Limit returned games to 100 to prevent browser crash, but notify if more exist
+
             total_generated = len(response_games)
             returned_games = response_games[:100]
 
@@ -841,53 +856,43 @@ def smart_generate():
 def save_games():
     if not _db_initialized:
         return jsonify({'error': 'Banco de dados não inicializado.'}), 500
-        
+
     try:
         data = request.get_json()
         if not data or 'games' not in data:
             return jsonify({'error': 'Dados inválidos.'}), 400
-            
+
         strategy = data.get('strategy', 'Unknown')
         games = data['games']
         ai_ranking = data.get('ai_ranking')
-        
-        # Determine target_contest
-        results = _fetch_all_results()
-        target_contest = (int(results[0][0]) + 1) if results else 1
-        
+
+        target_contest = _get_next_contest_number()
+
         import uuid
         generation_id = f"GEN-{target_contest}-{uuid.uuid4().hex[:6].upper()}"
-        
+
         cur = mysql.connection.cursor()
         saved_count = 0
-        
-        # 1. Insert Generation
-        try:
-            cur.execute("""
-            INSERT INTO generations 
+
+        cur.execute("""
+            INSERT INTO generations
             (id, target_contest, created_at, model_version, strategy, num_games, status)
             VALUES (%s, %s, NOW(), %s, %s, %s, 'AGUARDANDO_RESULTADO')
-            """, (generation_id, target_contest, 'current', strategy, len(games)))
-        except Exception as e:
-            print(f"Error saving generation: {e}")
-            
-        # 2. Insert AI Predictions if available
+        """, (generation_id, target_contest, 'current', strategy, len(games)))
+
         if ai_ranking and isinstance(ai_ranking, list):
             for i, r in enumerate(ai_ranking):
-                try:
-                    cur.execute("""
-                    INSERT INTO prediction_history 
+                cur.execute("""
+                    INSERT INTO prediction_history
                     (generation_id, target_contest, number, predicted_probability, ranking_position, model_version, created_at)
                     VALUES (%s, %s, %s, %s, %s, %s, NOW())
-                    """, (generation_id, target_contest, r['dezena'], r['score'], i+1, 'current'))
-                except Exception as e:
-                    pass
-        
-        # 3. Insert Games
+                """, (generation_id, target_contest, r['dezena'], r['score'], i + 1, 'current'))
+
         for g in games:
             hash_val = g.get('hash')
-            if not hash_val: continue
-            
+            if not hash_val:
+                continue
+
             balls_str = ",".join(map(str, g['numbers']))
             score = g.get('total_score', 0)
             import json
@@ -898,28 +903,26 @@ def save_games():
                 'primes': g.get('primes', 0),
                 'game_sum': g.get('game_sum', 0)
             })
-            
-            try:
-                cur.execute("""
-                INSERT IGNORE INTO saved_games 
+
+            cur.execute("""
+                INSERT IGNORE INTO saved_games
                 (created_at, strategy, balls, score, details, hash, generation_id, target_contest)
                 VALUES (NOW(), %s, %s, %s, %s, %s, %s, %s)
-                """, (strategy, balls_str, score, details_json, hash_val, generation_id, target_contest))
-                if cur.rowcount > 0:
-                    saved_count += 1
-            except Exception as inner_e:
-                print(f"Skipped saving game: {inner_e}")
-                
+            """, (strategy, balls_str, score, details_json, hash_val, generation_id, target_contest))
+            if cur.rowcount > 0:
+                saved_count += 1
+
         mysql.connection.commit()
         cur.close()
-        
+
         return jsonify({
             'message': f'{saved_count} novos jogos salvos com sucesso (ignoradas duplicatas).',
             'generation_id': generation_id,
             'target_contest': target_contest
         })
-        
+
     except Exception as e:
+        mysql.connection.rollback()
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
@@ -930,15 +933,15 @@ def saved_games():
     if not _db_initialized:
         flash('Banco de dados não pronto.', 'error')
         return redirect(url_for('index'))
-        
+
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("SELECT * FROM saved_games ORDER BY created_at DESC LIMIT 500")
     saved = cur.fetchall()
     cur.close()
-    
-    results = _fetch_all_results()
-    last_draw = set(results[0][:-1]) if results else set()
-    
+
+    latest_result = _fetch_latest_result()
+    last_draw = set(latest_result[:15]) if latest_result else set()
+
     import json
     for game in saved:
         balls = [int(n) for n in game['balls'].split(',')]
@@ -947,13 +950,10 @@ def saved_games():
             game['details_obj'] = json.loads(game['details'])
         else:
             game['details_obj'] = {}
-            
-        if last_draw:
-            game['hits_last_draw'] = len(set(balls) & last_draw)
-        else:
-            game['hits_last_draw'] = 0
-            
-    return render_template('saved_games.html', saved_games=saved, last_draw=list(last_draw))
+
+        game['hits_last_draw'] = len(set(balls) & last_draw) if last_draw else 0
+
+    return render_template('saved_games.html', saved_games=saved, last_draw=sorted(last_draw))
 
 
 @app.route('/export-excel', methods=['GET'])
@@ -969,23 +969,8 @@ def export_excel():
     cur.close()
 
     columns = [
-        'Concurso',
-        'Data',
-        'Bola1',
-        'Bola2',
-        'Bola3',
-        'Bola4',
-        'Bola5',
-        'Bola6',
-        'Bola7',
-        'Bola8',
-        'Bola9',
-        'Bola10',
-        'Bola11',
-        'Bola12',
-        'Bola13',
-        'Bola14',
-        'Bola15',
+        'Concurso', 'Data', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6',
+        'Bola7', 'Bola8', 'Bola9', 'Bola10', 'Bola11', 'Bola12', 'Bola13', 'Bola14', 'Bola15'
     ]
     data = []
     for row in results:
@@ -998,25 +983,10 @@ def export_excel():
             date_str = date_val.strftime('%d/%m/%Y')
 
         bolas = list(row[2:17])
-
         data.append({
             'Concurso': row[0],
             'Data': date_str,
-            'Bola1': bolas[0] if len(bolas) > 0 else None,
-            'Bola2': bolas[1] if len(bolas) > 1 else None,
-            'Bola3': bolas[2] if len(bolas) > 2 else None,
-            'Bola4': bolas[3] if len(bolas) > 3 else None,
-            'Bola5': bolas[4] if len(bolas) > 4 else None,
-            'Bola6': bolas[5] if len(bolas) > 5 else None,
-            'Bola7': bolas[6] if len(bolas) > 6 else None,
-            'Bola8': bolas[7] if len(bolas) > 7 else None,
-            'Bola9': bolas[8] if len(bolas) > 8 else None,
-            'Bola10': bolas[9] if len(bolas) > 9 else None,
-            'Bola11': bolas[10] if len(bolas) > 10 else None,
-            'Bola12': bolas[11] if len(bolas) > 11 else None,
-            'Bola13': bolas[12] if len(bolas) > 12 else None,
-            'Bola14': bolas[13] if len(bolas) > 13 else None,
-            'Bola15': bolas[14] if len(bolas) > 14 else None,
+            **{f'Bola{i + 1}': bolas[i] if i < len(bolas) else None for i in range(15)}
         })
 
     df = pd.DataFrame(data, columns=columns)
@@ -1040,24 +1010,22 @@ def mlops():
     if not _db_initialized:
         flash('Banco de dados não inicializado.', 'error')
         return redirect(url_for('index'))
-        
+
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    
-    # 1. Get Model Performance history
+
     cur.execute("SELECT * FROM model_performance ORDER BY evaluated_contest DESC LIMIT 20")
     model_perf = cur.fetchall()
-    
-    # 2. Get Generations
+
     cur.execute("SELECT * FROM generations ORDER BY created_at DESC LIMIT 50")
     generations = cur.fetchall()
-    
+
     import json
     for g in generations:
         if g['eval_metrics']:
             g['metrics_obj'] = json.loads(g['eval_metrics'])
         else:
             g['metrics_obj'] = {}
-            
+
     cur.close()
     return render_template('continuous_learning.html', model_perf=model_perf, generations=generations)
 
