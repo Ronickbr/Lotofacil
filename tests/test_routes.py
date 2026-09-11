@@ -1,7 +1,7 @@
 """Smoke and regression tests for Flask routes and database helpers."""
 
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import app as app_module
 
@@ -9,7 +9,12 @@ import app as app_module
 class RouteSmokeTests(unittest.TestCase):
     def setUp(self):
         app_module.app.config.update(TESTING=True, SECRET_KEY="test-secret")
+        self.previous_db_state = app_module._db_initialized
+        app_module._db_initialized = True
         self.client = app_module.app.test_client()
+
+    def tearDown(self):
+        app_module._db_initialized = self.previous_db_state
 
     def test_public_get_pages_render(self):
         routes = [
@@ -43,7 +48,12 @@ class DatabaseHelperRegressionTests(unittest.TestCase):
         connection = MagicMock()
         connection.cursor.return_value = cursor
 
-        with patch.object(app_module.mysql, "connection", connection):
+        with patch.object(
+            type(app_module.mysql),
+            "connection",
+            new_callable=PropertyMock,
+            return_value=connection,
+        ):
             result = app_module._get_next_contest_number()
 
         self.assertEqual(result, 3488)
@@ -56,7 +66,12 @@ class DatabaseHelperRegressionTests(unittest.TestCase):
         connection = MagicMock()
         connection.cursor.return_value = cursor
 
-        with patch.object(app_module.mysql, "connection", connection):
+        with patch.object(
+            type(app_module.mysql),
+            "connection",
+            new_callable=PropertyMock,
+            return_value=connection,
+        ):
             result = app_module._get_next_contest_number()
 
         self.assertEqual(result, 1)
@@ -68,7 +83,12 @@ class DatabaseHelperRegressionTests(unittest.TestCase):
         connection = MagicMock()
         connection.cursor.return_value = cursor
 
-        with patch.object(app_module.mysql, "connection", connection):
+        with patch.object(
+            type(app_module.mysql),
+            "connection",
+            new_callable=PropertyMock,
+            return_value=connection,
+        ):
             result = app_module._fetch_latest_result()
 
         self.assertEqual(result, latest)
@@ -94,7 +114,12 @@ class DatabaseHelperRegressionTests(unittest.TestCase):
         latest = tuple(range(1, 16)) + ("2026-09-10",)
 
         with patch.object(app_module, "_db_initialized", True), \
-             patch.object(app_module.mysql, "connection", connection), \
+             patch.object(
+                 type(app_module.mysql),
+                 "connection",
+                 new_callable=PropertyMock,
+                 return_value=connection,
+             ), \
              patch.object(app_module, "_fetch_latest_result", return_value=latest), \
              patch.object(app_module, "render_template", return_value="ok") as render:
             response = client.get("/saved-games")
