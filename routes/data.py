@@ -176,21 +176,52 @@ def upload():
 
         return redirect(url_for('data.upload'))
 
+    page = max(request.args.get('page', 1, type=int) or 1, 1)
+    per_page = 50
+    offset = (page - 1) * per_page
+
     try:
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("SELECT * FROM results ORDER BY concurso DESC")
+        cur.execute('SELECT COUNT(*) AS total FROM results')
+        count_row = cur.fetchone()
+        total_results = int(count_row['total'] if isinstance(count_row, dict) else count_row[0])
+        total_pages = max(1, (total_results + per_page - 1) // per_page)
+        if page > total_pages:
+            page = total_pages
+            offset = (page - 1) * per_page
+
+        cur.execute(
+            'SELECT * FROM results ORDER BY concurso DESC LIMIT %s OFFSET %s',
+            (per_page, offset),
+        )
         concursos = cur.fetchall()
 
         for concurso in concursos:
             if isinstance(concurso['data_sorteio'], str):
-                concurso['data_sorteio'] = datetime.strptime(
-                    concurso['data_sorteio'], '%Y-%m-%d'
-                )
+                try:
+                    concurso['data_sorteio'] = datetime.strptime(
+                        concurso['data_sorteio'], '%Y-%m-%d'
+                    )
+                except ValueError:
+                    concurso['data_sorteio'] = None
 
-        return render_template('upload.html', concursos=concursos)
+        return render_template(
+            'upload.html',
+            concursos=concursos,
+            page=page,
+            total_pages=total_pages,
+            total_results=total_results,
+        )
     except Exception as e:
+        current_app.logger.exception('Failed to load contest management page')
         flash(f'Erro ao carregar concursos: {str(e)}', 'danger')
-        return render_template('upload.html', concursos=[])
+        return render_template(
+            'upload.html',
+            concursos=[],
+            page=1,
+            total_pages=1,
+            total_results=0,
+        )
     finally:
         if cur is not None:
             cur.close()
