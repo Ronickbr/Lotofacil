@@ -9,7 +9,7 @@
         <span class="badge bg-purple text-white px-3 py-1 rounded-pill fw-bold" style="background: #7b2cbf;">Filtro Avançado</span>
     </div>
     <div class="card-body p-4 p-md-5">
-        <form method="GET" action="{{ url_for('historical_stats') }}" class="row g-3">
+        <form method="GET" action="{{ url_for('analysis.historical_stats') }}" class="row g-3">
             <div class="col-md-5">
                 <label for="period" class="form-label fw-bold text-dark">Período de Análise</label>
                 <select name="period" id="period" class="form-select form-select-lg rounded-3" required>

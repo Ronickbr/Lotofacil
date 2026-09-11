@@ -144,7 +144,7 @@
         <h2 class="fw-bold mb-1" style="color:#10002b"><i class="fa-solid fa-industry text-primary me-2"></i>Fábrica de Jogos</h2>
         <p class="text-muted mb-0">Gere apostas otimizadas utilizando estatísticas, matemática e inteligência artificial.</p>
     </div>
-    <a href="{{ url_for('saved_games') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+    <a href="{{ url_for('data.saved_games') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
         <i class="fa-solid fa-floppy-disk me-2"></i>Ver jogos salvos
     </a>
 </div>
@@ -496,7 +496,7 @@ document.querySelectorAll('.generation-form').forEach(form => form.addEventListe
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Processando...';
     
     try {
-        const response = await fetch('{{ url_for("smart_generate") }}', {
+        const response = await fetch('{{ url_for('ml.smart_generate') }}', {
             method: 'POST',
             body: new FormData(form),
             headers: {'X-Requested-With': 'XMLHttpRequest'}
@@ -558,7 +558,7 @@ document.getElementById('btn-save-games').addEventListener('click', async () => 
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Salvando no Banco...';
     
     try {
-        const response = await fetch('{{ url_for("save_games") }}', {
+        const response = await fetch('{{ url_for('data.save_games') }}', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -570,7 +570,7 @@ document.getElementById('btn-save-games').addEventListener('click', async () => 
         const data = await response.json();
         if(!response.ok) throw new Error(data.error || 'Falha ao salvar jogos.');
         
-        window.location.href = '{{ url_for("saved_games") }}';
+        window.location.href = '{{ url_for('data.saved_games') }}';
     } catch(err) {
         showFeedback(err.message || String(err), 'danger');
     } finally {

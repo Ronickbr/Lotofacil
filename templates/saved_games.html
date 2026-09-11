@@ -168,7 +168,7 @@
                 <h2 class="fw-bold mb-2">Meus Jogos Salvos</h2>
                 <p class="mb-0" style="color:rgba(255,255,255,.8)">Acompanhe os jogos gerados, pontuações de IA e o desempenho contra o último resultado oficial.</p>
             </div>
-            <a href="{{ url_for('smart_generate') }}" class="btn btn-warning rounded-pill fw-bold px-4 py-2 shadow-sm">
+            <a href="{{ url_for('ml.smart_generate') }}" class="btn btn-warning rounded-pill fw-bold px-4 py-2 shadow-sm">
                 <i class="fa-solid fa-plus me-2"></i>Gerar novos jogos
             </a>
         </div>
@@ -226,7 +226,7 @@
     <div class="empty-icon"><i class="fa-solid fa-ticket"></i></div>
     <h4 class="fw-bold" style="color:#240046">Nenhum jogo salvo ainda</h4>
     <p class="text-muted mb-4 fs-5">Crie jogos utilizando a nossa Fábrica de Jogos e salve as combinações que deseja acompanhar.</p>
-    <a href="{{ url_for('smart_generate') }}" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+    <a href="{{ url_for('ml.smart_generate') }}" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
         <i class="fa-solid fa-industry me-2"></i>Abrir Fábrica de Jogos
     </a>
 </div>

@@ -245,5 +245,41 @@
             "test_samples": 200
         },
         "status": "REJEITADO (Desempenho inferior ao atual)"
+    },
+    {
+        "date": "2026-09-11 20:56:34",
+        "version": "LF-ENSEMBLE-v1.1789160194",
+        "model_type": "Calibrated VotingClassifier (RF+LR)",
+        "train_draws": 3569,
+        "test_draws": 200,
+        "mean_hits": 9.015,
+        "baseline_hits": 9.00286,
+        "lift": 0.001348460378146554,
+        "metrics": {
+            "mean": 9.015,
+            "median": 9.0,
+            "std": 1.2266927080569119,
+            "min": 5,
+            "max": 12,
+            "dist": {
+                "8": 21.0,
+                "9": 32.5,
+                "10": 27.500000000000004,
+                "11": 6.5,
+                "12": 2.0,
+                "13": 0.0,
+                "14": 0.0,
+                "15": 0.0,
+                "ge_10": 36.0,
+                "ge_11": 8.5,
+                "ge_12": 2.0,
+                "ge_13": 0.0,
+                "ge_14": 0.0
+            },
+            "lift": 0.001348460378146554,
+            "train_samples": 3569,
+            "test_samples": 200
+        },
+        "status": "REJEITADO (Desempenho inferior ao atual)"
     }
 ]

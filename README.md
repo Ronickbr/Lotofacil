@@ -23,8 +23,9 @@ Este sistema foi desenvolvido para oferecer ferramentas completas de análise es
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Backend:** Python, Flask
+- **Backend:** Python, Flask (Arquitetura Modular em Blueprints)
 - **Machine Learning & Dados:** Scikit-Learn, Pandas, NumPy
+- **Documentação de API:** Flasgger (Swagger UI)
 - **Banco de Dados:** MySQL
 - **Infraestrutura:** Docker, Docker Compose
 - **Frontend:** HTML5, CSS3, JavaScript (Templates Bootstrap)
@@ -43,16 +44,22 @@ Este sistema foi desenvolvido para oferecer ferramentas completas de análise es
    cd lotofacil-analise
    ```
 
-2. **Inicie os containers com Docker:**
+3. **Configuração de Variáveis de Ambiente:**
+   Copie o arquivo de exemplo e crie o seu `.env`:
    ```bash
-   docker-compose up --build
+   cp .env.example .env
+   ```
+   *As credenciais padrão do banco já estão configuradas para rodar localmente.*
+
+4. **Inicie os containers com Docker:**
+   ```bash
+   docker-compose up --build -d
    ```
 
-3. **Acesse a aplicação:**
+5. **Acesse a aplicação:**
    - **App Principal:** [http://localhost:5000](http://localhost:5000)
+   - **Documentação da API (Swagger):** [http://localhost:5000/apidocs/](http://localhost:5000/apidocs/)
    - **Banco de Dados (phpMyAdmin):** [http://localhost:8081](http://localhost:8081)
-     - *Usuário:* `root`
-     - *Senha:* `secret`
 
 ## 🧠 Como Funciona o Modelo Preditivo
 
@@ -63,10 +70,9 @@ Antes de realizar previsões na tela de IA, é necessário treinar o modelo atra
 
 ## 🔒 Segurança
 
-**Aviso Importante para Produção:** As configurações atuais do banco de dados (usuário `root`, senha `secret`) são estritamente para ambiente de desenvolvimento local e testes. Para implantação em produção, certifique-se de:
-- Alterar as credenciais no arquivo `docker-compose.yml`.
-- Ocultar a interface do phpMyAdmin ou desabilitar o container.
-- Utilizar variáveis de ambiente (`.env`) para gerenciar dados sensíveis.
+**Aviso Importante para Produção:** As senhas e dados sensíveis não são mais armazenadas no repositório. O banco de dados agora utiliza o arquivo `.env` para carregar as credenciais:
+- Sempre adicione seu arquivo `.env` ao `.gitignore`.
+- Ocultar a interface do phpMyAdmin ou desabilitar o container para implantação em produção.
 
 ## 🤝 Contribuindo
 

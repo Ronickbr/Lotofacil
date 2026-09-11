@@ -163,7 +163,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('main.index') }}">
                 <div class="lottery-ball lottery-ball-sm" style="background: radial-gradient(circle at 30% 30%, #ffb703, #fb8500);">
                     <i class="fa-solid fa-clover text-white fs-6"></i>
                 </div>
@@ -175,53 +175,53 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto gap-1">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">
+                        <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">
                             <i class="fa-solid fa-house me-1"></i> Início
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
+                        <a class="nav-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}" href="{{ url_for('main.dashboard') }}">
                             <i class="fa-solid fa-chart-pie me-1"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'historical_stats' %}active{% endif %}" href="{{ url_for('historical_stats') }}">
+                        <a class="nav-link {% if request.endpoint == 'analysis.historical_stats' %}active{% endif %}" href="{{ url_for('analysis.historical_stats') }}">
                             <i class="fa-solid fa-clock-rotate-left me-1"></i> Histórico
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'advanced_analysis' %}active{% endif %}" href="{{ url_for('advanced_analysis') }}">
+                        <a class="nav-link {% if request.endpoint == 'analysis.advanced_analysis' %}active{% endif %}" href="{{ url_for('analysis.advanced_analysis') }}">
                             <i class="fa-solid fa-microscope me-1"></i> Análise Avançada
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'smart_generate' %}active{% endif %}" href="{{ url_for('smart_generate') }}">
+                        <a class="nav-link {% if request.endpoint == 'ml.smart_generate' %}active{% endif %}" href="{{ url_for('ml.smart_generate') }}">
                             <i class="fa-solid fa-industry me-1"></i> Fábrica de Jogos
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'saved_games' %}active{% endif %}" href="{{ url_for('saved_games') }}">
+                        <a class="nav-link {% if request.endpoint == 'data.saved_games' %}active{% endif %}" href="{{ url_for('data.saved_games') }}">
                             <i class="fa-solid fa-save me-1"></i> Meus Jogos
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'mlops' %}active{% endif %}" href="{{ url_for('mlops') }}">
+                        <a class="nav-link {% if request.endpoint == 'ml.mlops' %}active{% endif %}" href="{{ url_for('ml.mlops') }}">
                             <i class="fa-solid fa-network-wired me-1"></i> MLOps
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'predict' %}active{% endif %}" href="{{ url_for('predict') }}">
+                        <a class="nav-link {% if request.endpoint == 'ml.predict' %}active{% endif %}" href="{{ url_for('ml.predict') }}">
                             <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Previsão
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'train_model' %}active{% endif %}" href="{{ url_for('train_model') }}">
+                        <a class="nav-link {% if request.endpoint == 'ml.train_model' %}active{% endif %}" href="{{ url_for('ml.train_model') }}">
                             <i class="fa-solid fa-brain me-1"></i> IA / Modelo
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'upload' %}active{% endif %}" href="{{ url_for('upload') }}">
+                        <a class="nav-link {% if request.endpoint == 'data.upload' %}active{% endif %}" href="{{ url_for('data.upload') }}">
                             <i class="fa-solid fa-database me-1"></i> Gestão de Concursos
                         </a>
                     </li>

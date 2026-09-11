@@ -12,10 +12,10 @@
             Plataforma de análise numérica estatística, inferência Bayesiana e modelos de aprendizado de máquina para otimização de jogos da Lotofácil.
         </p>
         <div class="d-flex flex-wrap gap-2">
-            <a href="{{ url_for('predict') }}" class="btn btn-warning btn-lg fw-semibold shadow-sm">
+            <a href="{{ url_for('ml.predict') }}" class="btn btn-warning btn-lg fw-semibold shadow-sm">
                 <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Gerar Previsão
             </a>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-lg fw-semibold">
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-light btn-lg fw-semibold">
                 <i class="fa-solid fa-chart-line me-2"></i>Ver Dashboard
             </a>
         </div>
@@ -45,7 +45,7 @@
                 <p class="card-text text-muted flex-grow-1">
                     Estatísticas gerais dos concursos cadastrados, ranking de frequência de dezenas e distribuição par/ímpar.
                 </p>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary w-100 fw-semibold mt-3">
+                <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-primary w-100 fw-semibold mt-3">
                     Acessar Dashboard <i class="fa-solid fa-arrow-right ms-1"></i>
                 </a>
             </div>
@@ -62,7 +62,7 @@
                 <p class="card-text text-muted flex-grow-1">
                     Análise Bayesiana, modelo probabilístico, contagem de repetições em sorteios consecutivos e scores combinados.
                 </p>
-                <a href="{{ url_for('historical_stats') }}" class="btn btn-outline-purple w-100 fw-semibold mt-3" style="color: #7b2cbf; border-color: #7b2cbf;">
+                <a href="{{ url_for('analysis.historical_stats') }}" class="btn btn-outline-purple w-100 fw-semibold mt-3" style="color: #7b2cbf; border-color: #7b2cbf;">
                     Análise Histórica <i class="fa-solid fa-arrow-right ms-1"></i>
                 </a>
             </div>
@@ -79,7 +79,7 @@
                 <p class="card-text text-muted flex-grow-1">
                     Gere previsões e 6 sugestões de apostas balanceadas com base na inteligência do modelo preditivo.
                 </p>
-                <a href="{{ url_for('predict') }}" class="btn btn-outline-success w-100 fw-semibold mt-3">
+                <a href="{{ url_for('ml.predict') }}" class="btn btn-outline-success w-100 fw-semibold mt-3">
                     Gerar Apostas <i class="fa-solid fa-arrow-right ms-1"></i>
                 </a>
             </div>
@@ -96,7 +96,7 @@
                 <p class="card-text text-muted flex-grow-1">
                     Treine o modelo RandomForestClassifier com o histórico atualizado de concursos e avalie a acurácia.
                 </p>
-                <a href="{{ url_for('train_model') }}" class="btn btn-outline-warning text-dark w-100 fw-semibold mt-3">
+                <a href="{{ url_for('ml.train_model') }}" class="btn btn-outline-warning text-dark w-100 fw-semibold mt-3">
                     Treinar Modelo <i class="fa-solid fa-arrow-right ms-1"></i>
                 </a>
             </div>
@@ -113,7 +113,7 @@
                 <p class="card-text text-muted flex-grow-1">
                     Importe arquivos Excel (.xlsx) com o histórico de sorteios, adicione novos concursos ou exporte dados.
                 </p>
-                <a href="{{ url_for('upload') }}" class="btn btn-outline-danger w-100 fw-semibold mt-3">
+                <a href="{{ url_for('data.upload') }}" class="btn btn-outline-danger w-100 fw-semibold mt-3">
                     Gerenciar Dados <i class="fa-solid fa-arrow-right ms-1"></i>
                 </a>
             </div>

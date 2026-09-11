@@ -60,7 +60,7 @@ btn.addEventListener('click', async (e) => {
     btn.disabled = true;
 
     try {
-        const response = await fetch('{{ url_for("train_model") }}', {
+        const response = await fetch('{{ url_for('ml.train_model') }}', {
             method: 'POST',
             headers: {'X-Requested-With': 'XMLHttpRequest'}
         });

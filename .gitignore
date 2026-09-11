@@ -3,3 +3,10 @@ __pycache__/
 *.pyo
 *.pkl
 .pytest_cache/
+
+.env
+
+analises.txt
+prompt_aprendizado_continuo_lotofacil.md
+prompt_sistema_jogo_lotofacil.md
+prompt_treinamento_lotofacil.md
