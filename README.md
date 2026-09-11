@@ -19,6 +19,7 @@ Este sistema foi desenvolvido para oferecer ferramentas completas de análise es
 - **📈 Análise Histórica:** Consulte períodos específicos (semana, mês, ano) com diferentes métodos preditivos (frequência, bayesiano, padrões sequenciais e método combinado).
 - **🤖 Machine Learning:** Previsão de próximos sorteios utilizando modelo RandomForest treinado com dados históricos em pares sequenciais.
 - **💾 Gerenciamento de Dados:** Upload de novos resultados manuais ou importação em lote para manter a base de dados atualizada.
+- **🔄 Sincronização CAIXA:** Consulta incremental gratuita do Portal Loterias CAIXA ao abrir a Gestão de Concursos, sem duplicar ou sobrescrever resultados existentes.
 - **🎯 Geração de Jogos:** Sugestão inteligente de jogos (cartelas) com base nas probabilidades calculadas e no modelo de IA.
 
 ## 🛠️ Tecnologias Utilizadas

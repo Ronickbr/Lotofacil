@@ -1,15 +1,43 @@
 from io import BytesIO
 from flask import send_file
 from services.stats_service import _fetch_latest_result, _get_next_contest_number
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash, jsonify
 import pandas as pd
 from datetime import datetime
 from extensions import mysql
 import MySQLdb
 from analysis.mlops import check_and_evaluate_generations
 from analysis.combinatorics import get_game_hash
+from services.caixa_service import CaixaAPIError, sync_missing_contests
 
 data_bp = Blueprint('data', __name__)
+
+
+@data_bp.route('/sync-caixa', methods=['POST'])
+def sync_caixa():
+    """Import new official Lotofácil contests without changing existing rows."""
+    try:
+        result = sync_missing_contests(
+            mysql,
+            max_batch=current_app.config['CAIXA_SYNC_MAX_BATCH'],
+            timeout=current_app.config['CAIXA_SYNC_TIMEOUT'],
+        )
+        if result['imported']:
+            check_and_evaluate_generations(mysql)
+            message = f"{result['imported']} concurso(s) oficial(is) importado(s) da CAIXA."
+        else:
+            message = 'O banco já está atualizado com o último concurso da CAIXA.'
+        if result['remaining']:
+            message += f" Ainda restam {result['remaining']} concurso(s); sincronize novamente para continuar."
+        return jsonify({'success': True, 'message': message, **result})
+    except CaixaAPIError as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 502
+    except Exception:
+        current_app.logger.exception('CAIXA synchronization failed')
+        return jsonify({
+            'success': False,
+            'error': 'Não foi possível salvar os concursos recebidos da CAIXA.',
+        }), 500
 
 @data_bp.route('/add-concurso', methods=['POST'])
 def add_concurso():

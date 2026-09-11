@@ -17,6 +17,28 @@
         {% endif %}
     {% endwith %}
 
+    <div class="col-12">
+        <div class="card card-custom border-0 shadow-sm overflow-hidden">
+            <div class="card-body p-4 d-flex flex-wrap align-items-center justify-content-between gap-3" style="background:linear-gradient(135deg,#240046,#5a189a);color:#fff">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="lottery-ball" style="background:radial-gradient(circle at 30% 30%,#ffb703,#fb8500);flex-shrink:0">
+                        <i class="fa-solid fa-rotate"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">Sincronização automática com a CAIXA</h5>
+                        <p class="mb-0 small" style="color:rgba(255,255,255,.8)">Ao abrir esta página, o sistema consulta o último resultado oficial e importa somente os concursos ausentes.</p>
+                    </div>
+                </div>
+                <button id="syncCaixaButton" type="button" class="btn btn-warning rounded-pill fw-bold px-4 py-2 shadow-sm">
+                    <i class="fa-solid fa-cloud-arrow-down me-2"></i>Sincronizar agora
+                </button>
+            </div>
+            <div id="syncCaixaStatus" class="card-footer bg-white border-0 px-4 py-3 small text-muted" aria-live="polite">
+                <i class="fa-solid fa-circle-info me-1"></i>Fonte: Portal Loterias CAIXA. Nenhum concurso existente será sobrescrito.
+            </div>
+        </div>
+    </div>
+
     <div class="col-lg-6">
         <div class="card card-custom h-100">
             <div class="card-header card-header-custom d-flex align-items-center">
@@ -162,6 +184,48 @@ function deleteConcurso(concurso) {
         .catch(error => alert('Erro ao excluir concurso: ' + error));
     }
 }
+
+(function configureCaixaSync() {
+    const button = document.getElementById('syncCaixaButton');
+    const status = document.getElementById('syncCaixaStatus');
+    const storageKey = 'lotofacilLastCaixaSync';
+    const intervalMs = 30 * 60 * 1000;
+
+    if (!button || !status) return;
+
+    async function synchronize(manual = false) {
+        const original = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Consultando CAIXA...';
+        status.className = 'card-footer bg-white border-0 px-4 py-3 small text-muted';
+        status.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i>Verificando novos concursos oficiais...';
+
+        try {
+            const response = await fetch('{{ url_for('data.sync_caixa') }}', {
+                method: 'POST',
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.error || `HTTP ${response.status}`);
+
+            localStorage.setItem(storageKey, String(Date.now()));
+            status.className = 'card-footer bg-success bg-opacity-10 border-0 px-4 py-3 small text-success fw-semibold';
+            status.innerHTML = `<i class="fa-solid fa-circle-check me-1"></i>${data.message}`;
+            if (data.imported > 0) setTimeout(() => location.reload(), 1200);
+        } catch (error) {
+            status.className = 'card-footer bg-danger bg-opacity-10 border-0 px-4 py-3 small text-danger fw-semibold';
+            status.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i>${error.message || 'Falha na sincronização.'}`;
+            if (!manual) console.warn('Sincronização automática indisponível:', error);
+        } finally {
+            button.disabled = false;
+            button.innerHTML = original;
+        }
+    }
+
+    button.addEventListener('click', () => synchronize(true));
+    const lastSync = Number(localStorage.getItem(storageKey) || 0);
+    if (Date.now() - lastSync >= intervalMs) synchronize(false);
+})();
 
 (function configureExcelUpload() {
     const form = document.getElementById('excelUploadForm');
