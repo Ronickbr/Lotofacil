@@ -1,6 +1,7 @@
 """Regression tests for Blueprints, route contracts and ML resilience."""
 
 import unittest
+from datetime import date
 from unittest.mock import MagicMock, PropertyMock, patch
 
 from app import create_app
@@ -39,6 +40,27 @@ class RouteSmokeTests(AppTestCase):
             response = self.client.get('/api/analysis/not-a-real-analysis')
         self.assertEqual(response.status_code, 400)
         self.assertIn('Tipo de análise desconhecido', response.get_json()['error'])
+
+    def test_upload_page_uses_database_pagination(self):
+        cursor = MagicMock()
+        cursor.fetchone.return_value = {'total': 3779}
+        cursor.fetchall.return_value = [{
+            'concurso': 3779,
+            'data_sorteio': date(2026, 9, 3),
+            **{f'bola{number}': number for number in range(1, 16)},
+        }]
+        mysql_mock = MagicMock()
+        mysql_mock.connection.cursor.return_value = cursor
+
+        with patch('routes.data.mysql', mysql_mock):
+            response = self.client.get('/upload?page=2')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Página 2 de 76', response.get_data(as_text=True))
+        paginated_query = cursor.execute.call_args_list[1]
+        self.assertIn('LIMIT %s OFFSET %s', paginated_query.args[0])
+        self.assertEqual(paginated_query.args[1], (50, 50))
+        cursor.close.assert_called_once()
 
 
 class SmartGenerateContractTests(AppTestCase):
