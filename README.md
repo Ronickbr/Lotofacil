@@ -24,6 +24,7 @@ Este sistema foi desenvolvido para oferecer ferramentas completas de análise es
 - **📊 Dashboard Interativo:** Estatísticas gerais de frequência de números, distribuição par/ímpar e análise por posição nas cartelas.
 - **📈 Análise Histórica:** Consultas por período (semana, mês, ano) com métodos de cálculo bayesiano, frequência e padrões sequenciais.
 - **🤖 Machine Learning:** Previsão de próximos sorteios utilizando modelo *RandomForest* treinado com pares sequenciais e distância de Hamming para diversidade de bilhetes.
+- **🧭 Assistente JEV:** Interpreta o objetivo escrito pelo usuário e sugere uma estratégia existente. A confiança do JEV mede a classificação do pedido, não a chance de ganhar.
 - **🔄 Sincronização CAIXA (`/sync-caixa`):** Atualização automática incremental a partir do serviço da CAIXA Econômica Federal.
 
 ---
@@ -49,8 +50,8 @@ Este sistema foi desenvolvido para oferecer ferramentas completas de análise es
 
 1. **Clone o repositório:**
    ```bash
-   git clone https://github.com/seu-usuario/lotofacil.git
-   cd lotofacil
+   git clone https://github.com/Ronickbr/Lotofacil.git
+   cd Lotofacil
    ```
 
 2. **Configuração de Variáveis de Ambiente:**
@@ -75,6 +76,14 @@ Este sistema foi desenvolvido para oferecer ferramentas completas de análise es
 ## 🔒 Segurança
 
 As credenciais do banco de dados e chave secreta do Flask utilizam o arquivo `.env` (ignorado pelo Git). Nunca envie o `.env` para o repositório público.
+
+## JEV e avaliação do modelo
+
+Para habilitar a sugestão de estratégia na Fábrica de Jogos, configure `TYPESAFE_API_KEY` no `.env` e reinicie a aplicação. A aplicação envia apenas o texto digitado pelo usuário para `POST https://api.typesafe.ai/v1/systemone`, com uma pergunta `choice` sobre as estratégias disponíveis. Sem chave ou em caso de indisponibilidade, o usuário continua a escolher a estratégia manualmente. Uma resposta com confiança menor que 0,6 exige escolha manual.
+
+O JEV é usado para interpretar a intenção do usuário. Ele não prevê resultados de sorteios. O modelo local usa concursos anteriores para classificar dezenas, com treinamento, calibração e teste separados por concurso e em ordem cronológica. O teste é um bloco final reservado; não equivale a validação contínua de apostas futuras. As métricas incluem Brier score, acertos médios do cartão de 15 dezenas e referência aleatória exata: **9 acertos médios** e **Brier 0,24** para probabilidade uniforme de 0,6 por dezena. Um resultado superior nesse bloco isolado não prova vantagem futura. O novo treinamento substitui o modelo antigo, porque históricos de avaliação com janelas diferentes não permitem uma comparação direta para promoção.
+
+Execute os testes sem acesso ao banco com `python -m unittest tests.test_analysis tests.test_jev_and_validation -v`. A suíte completa requer as dependências do `requirements.txt` e os serviços configurados para os testes de rotas. O painel de IA precisa de pelo menos 200 concursos válidos em ordem crescente de `concurso`.
 
 ---
 

@@ -7,6 +7,7 @@ import os
 import json
 import random
 import tempfile
+from math import comb
 import joblib
 import pandas as pd
 import numpy as np
@@ -15,6 +16,8 @@ from datetime import datetime
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.calibration import CalibratedClassifierCV
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 from .stats import extract_balls
 from .ml_features import build_feature_dataset, extract_latest_features
@@ -23,34 +26,33 @@ from .ml_features import build_feature_dataset, extract_latest_features
 HISTORY_FILE = 'training_history.json'
 
 
+def _calibrate_prefit(estimator, X_calibration, y_calibration):
+    """Calibrate on later contests only (supports sklearn 1.3 and 1.6+)."""
+    try:
+        from sklearn.frozen import FrozenEstimator
+    except ImportError:
+        classifier = CalibratedClassifierCV(estimator, method='sigmoid', cv='prefit')
+    else:
+        classifier = CalibratedClassifierCV(FrozenEstimator(estimator), method='sigmoid')
+    return classifier.fit(X_calibration, y_calibration)
+
+
 def _simulate_random_baseline(num_simulations=50000):
-    """Simula uma seleção aleatória de 15 dezenas contra um sorteio de 15 dezenas."""
-    hits = np.random.hypergeometric(
-        ngood=15,
-        nbad=10,
-        nsample=15,
-        size=num_simulations,
-    )
+    """Distribuição hipergeométrica exata, sem ruído de Monte Carlo."""
+    probabilities = {k: comb(15, k) * comb(10, 15 - k) / comb(25, 15)
+                     for k in range(5, 16)}
+    mean = sum(k * p for k, p in probabilities.items())
+    variance = sum((k - mean) ** 2 * p for k, p in probabilities.items())
     return {
-        'mean': float(np.mean(hits)),
-        'median': float(np.median(hits)),
-        'std': float(np.std(hits)),
-        'min': int(np.min(hits)),
-        'max': int(np.max(hits)),
+        'mean': mean,
+        'median': 9.0,
+        'std': variance ** 0.5,
+        'min': 5,
+        'max': 15,
         'dist': {
-            '8': float(np.mean(hits == 8) * 100),
-            '9': float(np.mean(hits == 9) * 100),
-            '10': float(np.mean(hits == 10) * 100),
-            '11': float(np.mean(hits == 11) * 100),
-            '12': float(np.mean(hits == 12) * 100),
-            '13': float(np.mean(hits == 13) * 100),
-            '14': float(np.mean(hits == 14) * 100),
-            '15': float(np.mean(hits == 15) * 100),
-            'ge_10': float(np.mean(hits >= 10) * 100),
-            'ge_11': float(np.mean(hits >= 11) * 100),
-            'ge_12': float(np.mean(hits >= 12) * 100),
-            'ge_13': float(np.mean(hits >= 13) * 100),
-            'ge_14': float(np.mean(hits >= 14) * 100),
+            **{str(k): probabilities[k] * 100 for k in range(8, 16)},
+            **{f'ge_{k}': sum(p for hits, p in probabilities.items() if hits >= k) * 100
+               for k in range(10, 15)},
         },
     }
 
@@ -131,20 +133,24 @@ def train_lotofacil_model(results, model_path='lotofacil_model.pkl'):
         random_state=42,
         n_jobs=1,
     )
-    lr = LogisticRegression(
-        max_iter=700,
-        C=0.1,
-        class_weight='balanced',
-        random_state=42,
+    lr = make_pipeline(
+        StandardScaler(),
+        LogisticRegression(max_iter=700, C=0.1, random_state=42),
     )
     ensemble = VotingClassifier(
         estimators=[('rf', rf), ('lr', lr)],
         voting='soft',
         n_jobs=1,
     )
-    calibrated_model = CalibratedClassifierCV(ensemble, method='sigmoid', cv=3)
-
-    calibrated_model.fit(X_train, y_train)
+    # Split by entire contests: calibrating on shuffled rows leaks other numbers
+    # from the same contest into the classifier's training set.
+    calibration_size = max(20, len(train_draw_ids) // 5)
+    fit_ids = train_draw_ids[:-calibration_size]
+    calibration_ids = train_draw_ids[-calibration_size:]
+    fit_mask = full_df['draw_id'].isin(fit_ids)
+    calibration_mask = full_df['draw_id'].isin(calibration_ids)
+    ensemble.fit(X[fit_mask], y[fit_mask])
+    calibrated_model = _calibrate_prefit(ensemble, X[calibration_mask], y[calibration_mask])
 
     preds_prob = calibrated_model.predict_proba(X_test)[:, 1]
     test_eval_df = pd.DataFrame({
@@ -167,6 +173,7 @@ def train_lotofacil_model(results, model_path='lotofacil_model.pkl'):
     baseline = _simulate_random_baseline()
     mean_hits = float(np.mean(hits_arr))
     lift = float((mean_hits - baseline['mean']) / baseline['mean'])
+    brier = float(np.mean((preds_prob - np.asarray(y_test)) ** 2))
 
     model_metrics = {
         'mean': mean_hits,
@@ -190,12 +197,20 @@ def train_lotofacil_model(results, model_path='lotofacil_model.pkl'):
             'ge_14': float(np.mean(hits_arr >= 14) * 100),
         },
         'lift': lift,
+        'brier_score': brier,
+        'baseline_brier_score': 0.24,
+        'calibration_draws': int(len(calibration_ids)),
         'train_samples': int(len(train_draw_ids)),
         'test_samples': int(len(test_draw_ids)),
     }
 
-    # Treino final usando todos os dados.
-    calibrated_model.fit(X, y)
+    # Treino final: a cauda continua reservada para calibrar, sem misturar concursos.
+    final_calibration_size = max(20, len(draw_ids) // 5)
+    final_fit_mask = full_df['draw_id'].isin(draw_ids[:-final_calibration_size])
+    final_cal_mask = full_df['draw_id'].isin(draw_ids[-final_calibration_size:])
+    final_ensemble = VotingClassifier(estimators=[('rf', rf), ('lr', lr)], voting='soft', n_jobs=1)
+    final_ensemble.fit(X[final_fit_mask], y[final_fit_mask])
+    final_model = _calibrate_prefit(final_ensemble, X[final_cal_mask], y[final_cal_mask])
 
     version = f"LF-ENSEMBLE-v1.{int(datetime.now().timestamp())}"
     history_entry = {
@@ -211,15 +226,9 @@ def train_lotofacil_model(results, model_path='lotofacil_model.pkl'):
     }
 
     history = _load_training_history()
-    past_scores = [h.get('mean_hits') for h in history if isinstance(h, dict) and isinstance(h.get('mean_hits'), (int, float))]
-    best_past = max(past_scores) if past_scores else None
-    is_better = best_past is None or mean_hits >= best_past
-
-    if is_better or not os.path.exists(model_path):
-        _save_model_atomic(calibrated_model, model_path)
-        history_entry['status'] = 'PROMOVIDO'
-    else:
-        history_entry['status'] = 'REJEITADO (Desempenho inferior ao atual)'
+    # Backtests antigos usaram outras janelas; não são comparáveis para promoção.
+    _save_model_atomic(final_model, model_path)
+    history_entry['status'] = 'ATUALIZADO (sem evidência de vantagem futura)'
 
     history.append(history_entry)
     with open(HISTORY_FILE, 'w', encoding='utf-8') as f:

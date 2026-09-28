@@ -25,6 +25,21 @@ from analysis.scoring import GameScorer
 ml_bp = Blueprint('ml', __name__)
 
 
+@ml_bp.route('/api/jev/strategy', methods=['POST'])
+def jev_strategy():
+    """Interpreta uma preferência textual sem transformar confiança em chance de prêmio."""
+    from services.jev_service import JevError, choose_strategy
+
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(choose_strategy(data.get('text')))
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+    except JevError as exc:
+        current_app.logger.warning('JEV strategy unavailable: %s', exc)
+        return jsonify({'error': str(exc)}), 503
+
+
 def _integer_field(name, default, minimum, maximum):
     """Read and validate a bounded integer form field."""
     raw_value = request.form.get(name, default)

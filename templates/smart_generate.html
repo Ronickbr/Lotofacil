@@ -234,7 +234,7 @@
                 <h1 class="d-flex align-items-center gap-3">
                     <i class="fa-solid fa-industry text-warning"></i> Fábrica de Jogos
                 </h1>
-                <p class="mb-0">Crie cartões competitivos utilizando inteligência probabilística, análise combinatorial e redes neurais avançadas.</p>
+                <p class="mb-0">Monte cartões com filtros, análise histórica e comparação transparente com o acaso. Nenhuma estratégia garante acertos.</p>
             </div>
             <a href="{{ url_for('data.saved_games') }}" class="btn btn-warning btn-lg rounded-pill fw-bold px-4 py-3 shadow-sm d-inline-flex align-items-center gap-2 text-dark">
                 <i class="fa-solid fa-box-archive"></i> Ver Meus Jogos
@@ -281,6 +281,13 @@
     <!-- Main Content Panels -->
     <section>
         <div id="factory-feedback" class="alert rounded-4 shadow-sm" style="display:none;"></div>
+
+        <div class="factory-menu-card mb-4">
+            <label for="jev-request" class="form-label fw-bold">Descreva seu objetivo para o JEV</label>
+            <textarea id="jev-request" class="form-control mb-2" maxlength="500" rows="2" placeholder="Ex.: quero gerar cartões com filtros de pares e sequências"></textarea>
+            <button id="jev-suggest" type="button" class="btn btn-outline-primary">Sugerir estratégia</button>
+            <p id="jev-result" class="small text-muted mt-2 mb-0" role="status">O JEV escolhe o método para o seu pedido; ele não prevê o próximo sorteio.</p>
+        </div>
 
         <!-- Panel: Jogo Direto -->
         <div class="factory-panel active" id="panel-direto">
@@ -432,7 +439,7 @@
                 </span>
                 <div>
                     <h3 class="fw-bold mb-1 text-dark fs-4">Inteligência Artificial & Machine Learning</h3>
-                    <p class="text-muted mb-0 font-medium">Predição probabilística via Random Forest com otimização genética de cartões</p>
+                    <p class="text-muted mb-0 font-medium">Modelo estatístico local e diversidade entre cartões, avaliados contra uma referência aleatória</p>
                 </div>
             </div>
             <div class="card-body p-4 p-md-5">
@@ -441,7 +448,7 @@
                     
                     <div class="d-flex gap-4 mb-4 bg-light p-4 rounded-4 border align-items-center">
                         <i class="fa-solid fa-microchip text-danger fs-1"></i>
-                        <p class="text-dark fw-medium mb-0 fs-6">O modelo seleciona dinamicamente as 18 dezenas com maior propensão estatística para o próximo sorteio e otimiza a dispersão de Hamming entre as apostas para garantir máxima cobertura.</p>
+                        <p class="text-dark fw-medium mb-0 fs-6">O modelo classifica 18 dezenas com base no histórico e distribui as apostas por distância de Hamming. A classificação não garante vantagem sobre o acaso.</p>
                     </div>
                     
                     <div class="form-card-section mb-4">
@@ -624,6 +631,40 @@ document.querySelectorAll('.factory-menu .nav-link').forEach(btn => btn.addEvent
     hideFeedback();
 }));
 
+document.getElementById('jev-suggest').addEventListener('click', async () => {
+    const button = document.getElementById('jev-suggest');
+    const status = document.getElementById('jev-result');
+    button.disabled = true;
+    status.textContent = 'Consultando JEV...';
+    try {
+        const response = await fetch('{{ url_for('ml.jev_strategy') }}', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({text: document.getElementById('jev-request').value})
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'JEV indisponível.');
+        const panels = {direto: 'panel-direto', frequency: 'panel-estatistico',
+            delay: 'panel-estatistico', repetition: 'panel-estatistico',
+            montecarlo: 'panel-montecarlo', ai_based: 'panel-ia'};
+        const panel = panels[data.strategy];
+        if (!panel) throw new Error('Estratégia desconhecida.');
+        const description = `Sugestão: ${data.strategy} (confiança ${Math.round(data.confidence * 100)}%). ${data.note}`;
+        if (data.requires_confirmation) {
+            status.textContent = `${description} Confiança baixa: selecione manualmente a estratégia.`;
+            return;
+        }
+        document.querySelector(`.factory-menu [data-target="${panel}"]`).click();
+        if (panel === 'panel-estatistico') {
+            document.querySelector('#panel-estatistico select[name="strategy"]').value = data.strategy;
+        }
+        status.textContent = description;
+    } catch (error) {
+        status.textContent = error.message;
+    } finally {
+        button.disabled = false;
+    }
+});
+
 document.getElementById('math-mode-select').addEventListener('change', function() {
     document.getElementById('closure-settings').style.display = this.value === 'reduced_closure' ? 'block' : 'none';
 });
@@ -674,7 +715,7 @@ function displayResults(data) {
     
     document.getElementById('games-count').textContent = data.total_generated || currentGeneratedGames.length;
     document.getElementById('cost-display').textContent = `Custo: R$ ${Number(data.cost || 0).toFixed(2).replace('.', ',')}`;
-    document.getElementById('results-stats').textContent = `Exibindo ${currentGeneratedGames.length} jogo(s) perfeitamente otimizado(s).`;
+    document.getElementById('results-stats').textContent = `Exibindo ${currentGeneratedGames.length} jogo(s) gerado(s). Resultados futuros são incertos.`;
     
     const grid = document.getElementById('games-grid');
     grid.innerHTML = '';
