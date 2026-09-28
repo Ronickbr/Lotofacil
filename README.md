@@ -83,6 +83,8 @@ Para habilitar a sugestão de estratégia na Fábrica de Jogos, configure `TYPES
 
 O JEV é usado para interpretar a intenção do usuário. Ele não prevê resultados de sorteios. O modelo local usa concursos anteriores para classificar dezenas, com treinamento, calibração e teste separados por concurso e em ordem cronológica. O teste é um bloco final reservado; não equivale a validação contínua de apostas futuras. As métricas incluem Brier score, acertos médios do cartão de 15 dezenas e referência aleatória exata: **9 acertos médios** e **Brier 0,24** para probabilidade uniforme de 0,6 por dezena. Um resultado superior nesse bloco isolado não prova vantagem futura. O novo treinamento substitui o modelo antigo, porque históricos de avaliação com janelas diferentes não permitem uma comparação direta para promoção.
 
+A **meta de produto é 11 acertos médios por cartão de 15 dezenas**, reportada com sua distância do resultado medido no bloco de teste. Abaixo dela, o modelo recebe status experimental; mesmo se for alcançada em um bloco histórico, isso não garante desempenho futuro. Aumentar o número de dezenas no mesmo volante muda o custo da aposta e não demonstra melhora do modelo.
+
 Execute os testes sem acesso ao banco com `python -m unittest tests.test_analysis tests.test_jev_and_validation -v`. A suíte completa requer as dependências do `requirements.txt` e os serviços configurados para os testes de rotas. O painel de IA precisa de pelo menos 200 concursos válidos em ordem crescente de `concurso`.
 
 ---

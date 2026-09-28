@@ -91,7 +91,7 @@ function renderReport(data) {
     const dist = m.dist || {};
     const lift = Number(hist.lift || 0);
     const liftColor = lift >= 0 ? '#38b000' : '#d90429';
-    const statusColor = hist.status === 'PROMOVIDO' ? 'bg-success' : 'bg-secondary';
+    const statusColor = m.target_met_in_holdout ? 'bg-success' : 'bg-warning text-dark';
 
     let html = `
     <div class="mb-4">
@@ -107,9 +107,10 @@ function renderReport(data) {
         <div class="row g-3 mb-4">
             <div class="col-md-3"><div class="metric-card"><div class="label">Média IA</div><div class="value text-primary">${Number(m.mean || 0).toFixed(2)}</div></div></div>
             <div class="col-md-3"><div class="metric-card"><div class="label">Média aleatória</div><div class="value text-secondary">${Number(base.mean || 0).toFixed(2)}</div></div></div>
-            <div class="col-md-3"><div class="metric-card"><div class="label">Mediana</div><div class="value text-dark">${Number(m.median || 0).toFixed(1)}</div></div></div>
-            <div class="col-md-3"><div class="metric-card"><div class="label">Máximo</div><div class="value text-success">${m.max ?? 0}</div></div></div>
+            <div class="col-md-3"><div class="metric-card"><div class="label">Meta média</div><div class="value text-dark">${Number(m.target_mean_hits || 11).toFixed(2)}</div></div></div>
+            <div class="col-md-3"><div class="metric-card"><div class="label">Faltam para a meta</div><div class="value ${m.target_met_in_holdout ? 'text-success' : 'text-warning'}">${Math.max(0, Number(m.target_gap || 0)).toFixed(2)}</div></div></div>
         </div>
+        <p class="small text-muted">Meta calculada por cartão simples de 15 dezenas no bloco de teste. Média histórica não é previsão de acertos no próximo concurso.</p>
         <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-column text-info me-2"></i>Distribuição de acertos</h6>
         <div class="d-flex flex-column gap-2">`;
 

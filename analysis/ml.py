@@ -24,6 +24,7 @@ from .ml_features import build_feature_dataset, extract_latest_features
 
 
 HISTORY_FILE = 'training_history.json'
+TARGET_MEAN_HITS = 11.0  # Meta do produto para cartões simples de 15 dezenas.
 
 
 def _calibrate_prefit(estimator, X_calibration, y_calibration):
@@ -177,6 +178,9 @@ def train_lotofacil_model(results, model_path='lotofacil_model.pkl'):
 
     model_metrics = {
         'mean': mean_hits,
+        'target_mean_hits': TARGET_MEAN_HITS,
+        'target_gap': float(TARGET_MEAN_HITS - mean_hits),
+        'target_met_in_holdout': bool(mean_hits >= TARGET_MEAN_HITS),
         'median': float(np.median(hits_arr)),
         'std': float(np.std(hits_arr)),
         'min': int(np.min(hits_arr)),
@@ -228,7 +232,11 @@ def train_lotofacil_model(results, model_path='lotofacil_model.pkl'):
     history = _load_training_history()
     # Backtests antigos usaram outras janelas; não são comparáveis para promoção.
     _save_model_atomic(final_model, model_path)
-    history_entry['status'] = 'ATUALIZADO (sem evidência de vantagem futura)'
+    history_entry['status'] = (
+        'META 11 NO TESTE (não garante resultado futuro)'
+        if model_metrics['target_met_in_holdout'] else
+        'EXPERIMENTAL (meta de 11 não atingida)'
+    )
 
     history.append(history_entry)
     with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
